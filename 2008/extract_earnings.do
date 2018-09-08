@@ -20,4 +20,9 @@ forvalues w=2/15{
 append using "$tempdir/sipp08tpearn`w'"
 }
 
+destring ssuid, replace
+destring epppnum, replace
+destring shhadid, replace
+destring swave, replace
+
 save "$SIPP2008/IncomeAndEarnings/sipp08tpearn_all", $replace
