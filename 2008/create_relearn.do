@@ -69,6 +69,12 @@ replace onlyadult=1 if nHHadults==1
 gen solomom=0
 replace solomom=1 if onlyadult==1 & momtoany==1
 
+gen bw50=1 if pHHearn > .5 & !missing(pHHearn)
+replace bw50=0 if pHHearn <=.5 & !missing(pHHearn)
+
+gen bw60=1 if pHHearn > .6 & !missing(pHHearn)
+replace bw60=0 if pHHearn <=.6 & !missing(pHHearn)
+
 keep if adj_age > 18 & adj_age < 70
 keep if my_sex==2
 
