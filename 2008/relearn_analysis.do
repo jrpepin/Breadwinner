@@ -20,6 +20,12 @@ keep if momtoany==1
 
 table adj_age, c(mean pHHearn)
 
+// Count number of mothers
+preserve
+collapse adj_age,by(ssuid)
+count if adj_age <=65
+restore
+
 
 preserve
 
