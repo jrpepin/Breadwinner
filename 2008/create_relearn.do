@@ -73,6 +73,7 @@ replace nHHkids=1 if missing(nHHkids) & adj_age < 18
 replace nmomto=0 if missing(nmomto)
 replace nmomtominor=0 if missing(nmomtominor)
 replace nbiomomto=0 if missing(nbiomomto)
+replace spartner=0 if missing(spartner)
 
 drop _merge
 
