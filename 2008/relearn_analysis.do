@@ -7,13 +7,44 @@ log using "$logdir/relearn_analysis.log", $replace
 
 use "$tempdir/relearn.dta", clear
 
-tab adj_age momtoany
+tab momtoanyminor spartner, nofreq row col
+
+sum tpearn thearn pHHearn, detail
+
+sum tpearn thearn pHHearn if momtoanyminor==1, detail
+
+sort spartner
+
+by spartner: sum tpearn thearn pHHearn if momtoanyminor==1, detail
+
+tab spartner bw50 if momtoanyminor==1, nofreq row
+tab spartner bw60 if momtoanyminor==1, nofreq row
+
+tab adj_age momtoanyminor
+
+tab adj_age momtoanyminor if spartner==1
+
+keep if momtoanyminor==1
+
+tab adj_age bw50, nofreq row
+
+tab adj_age bw60, nofreq row
+
+tab adj_age bw50 if spartner==1, nofreq row
+
+tab adj_age bw60 if spartner==1, nofreq row
+
+tab adj_age bw50 if spartner==0, nofreq row
+
+tab adj_age bw60 if spartner==0, nofreq row
+
+/*
+
+sum adj_age
 
 tab adj_age spartner if momtoany==1
 
-sort momtoany onlyadult
 
-by momtoany onlyadult: sum pHHearn
 
 table adj_age, c(mean pHHearn)
 
