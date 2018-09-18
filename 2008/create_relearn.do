@@ -47,7 +47,7 @@ tab spartner, m
 * add in self as a household member.
 replace HHsize=HHsize+1
 
-replace nHHkids=nHHkids+1 if adj_age < 18
+
 
 keep SSUID EPPPNUM SWAVE nmomto nmomtominor nbiomomto HHsize nHHkids spartner
 
@@ -62,6 +62,9 @@ keep if !missing(ERRP)
 rename SSUID ssuid
 rename EPPPNUM epppnum
 rename SWAVE swave
+
+* adding self to count of household kids if self is < 18
+replace nHHkids=nHHkids+1 if adj_age < 18
 
 * fixing records living alone
 replace HHsize=1 if missing(HHsize)
