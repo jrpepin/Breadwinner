@@ -8,9 +8,9 @@ use "$tempdir/relearn.dta", clear
 
 local i_variables " ssuid epppnum "
 local j_variables " swave "
-local other_variables "nmomto nbiomomto HHsize nHHkids spartner adj_age EBORNUS EMS EORIGIN ERRP thearn thothinc tpearn pHHearn momtoany momtoanyminor nHHadults bw50 bw60 WPFINWGT"
+local other_variables "nmomto nbiomomto HHsize nHHkids spartner adj_age EBORNUS EMS EORIGIN ERRP thearn tfearn thothinc tpearn pHHearn momtoany momtoanyminor nHHadults bw50 bw60 fbw50 fbw60 WPFINWGT"
 
-keep `j_variables' `i_variables' `other_variables' my_race my_race2 my_sex
+keep `j_variables' `i_variables' `other_variables' my_racealt my_sex
 
 reshape wide `other_variables', i(`i_variables') j(`j_variables')
 
@@ -130,7 +130,7 @@ egen bw60profile = concat (yearbw601 yearbw602 yearbw603 yearbw604 yearbw605)
  tab bw50profile
  tab bw60profile
  
- keep ssuid epppnum year_pearn* year_hearn* yearbw50* yearbw60* inyear* nmpyear* nmhyear* yearage* ybecome_bw50* nobsmom* yearspartner* my_race my_race2 my_sex *profile weight*
+ keep ssuid epppnum year_pearn* year_hearn* yearbw50* yearbw60* inyear* nmpyear* nmhyear* yearage* ybecome_bw50* nobsmom* yearspartner* my_racealt my_sex *profile weight*
  
  reshape long year_pearn year_hearn yearbw50 yearbw60 inyear nmpyear nmhyear yearage ybecome_bw50 nobsmom nobsmomminor yearspartner weight, i(`i_variables') j(year)
   

@@ -12,20 +12,20 @@
 * run do_childrens_household_core to create.
 * The file has one observation per person in ego's (EPPPNUM's) household. 
 * It does not include a record for self and thus does not include people living alone.
-use "$tempdir/HHcomp.dta", clear
+use "$SIPP08keep/HHcomp_asis.dta", clear
 
 * Create a dummy indicator for whether ego is a mother to anyone in the household
 * by collapsing all records for same person (ssuid epppnum swave)
 
 * 2, 5, and 8 are bio, step, and adoptive mom respectively
 * 22 and 23 are parent codes
-gen nmomto=1 if inlist(unified_rel,2,5,8)
-replace nmomto=1 if my_sex==2 & inlist(unified_rel,22,23)
+gen nmomto=1 if inlist(relationship,2,5,8)
+replace nmomto=1 if my_sex==2 & inlist(relationship,22,23)
 
-gen nmomtominor=1 if inlist(unified_rel,2,5,8) & to_age < 18
-replace nmomtominor=1 if my_sex==2 & inlist(unified_rel,22,23) & to_age < 18
+gen nmomtominor=1 if inlist(relationship,2,5,8) & to_age < 18
+replace nmomtominor=1 if my_sex==2 & inlist(relationship,22,23) & to_age < 18
 
-gen nbiomomto=1 if unified_rel==2
+gen nbiomomto=1 if relationship==2
 
 * Create indicators for other aspects of household composition
 gen nHHkids=1 if adj_age < 18
@@ -33,7 +33,7 @@ gen nHHkids=1 if adj_age < 18
 gen HHsize=1
 
 * spouse or partner
-gen spartner=1 if inlist(unified_rel,12,18)
+gen spartner=1 if inlist(relationship,12,18)
 
 * collapse across all people in ego's (EPPPNUM's) household to create a person-level file
 * with information on that person's household composition in the wave.
@@ -85,8 +85,12 @@ merge 1:1 ssuid epppnum swave using "$SIPP2008/IncomeAndEarnings/sipp08tpearn_al
 tab nmomto
 
 gen pHHearn=tpearn/thearn if !missing(tpearn) & !missing(thearn) & tpearn > 0 & thearn > 0
-replace tpearn=0 if !missing(tpearn) & !missing(thearn) & tpearn < 0 & thearn > 0
+replace pHHearn=0 if !missing(tpearn) & !missing(thearn) & tpearn < 0 & thearn > 0 // 
 replace pHHearn=. if tpearn > thearn
+
+gen pFearn=tpearn/tfearn
+replace pFearn=0 if !missing(tpearn) & !missing(tfearn) & tpearn < 0 & tfearn > 0 // 
+replace pFearn=. if tpearn > tfearn
 
 gen momtoany=0 if nmomto==0
 replace momtoany=1 if nmomto > 0 & !missing(nmomto)
@@ -103,6 +107,12 @@ replace bw50=0 if pHHearn <=.5 & !missing(pHHearn)
 
 gen bw60=1 if pHHearn > .6 & !missing(pHHearn)
 replace bw60=0 if pHHearn <=.6 & !missing(pHHearn)
+
+gen fbw50=1 if pFearn > .5 & !missing(pFearn)
+replace fbw50=0 if pFearn <=.5 & !missing(pFearn)
+
+gen fbw60=1 if pFearn > .6 & !missing(pFearn)
+replace fbw60=0 if pFearn <=.6 & !missing(pFearn)
 
 keep if adj_age >= 18 & adj_age < 70
 keep if my_sex==2

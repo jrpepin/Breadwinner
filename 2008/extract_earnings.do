@@ -9,7 +9,7 @@ use "$SIPP2008/FullFile/sippl08puw`w'"
 
 keep if srefmon==4
 
-keep ssuid shhadid epppnum swave tpearn thearn thothinc
+keep ssuid shhadid epppnum swave tpearn thearn tfearn thothinc tftotinc
 save "$tempdir/sipp08tpearn`w'", replace
 }
 
