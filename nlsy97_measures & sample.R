@@ -176,24 +176,32 @@ remove(marstat)
 
 ### Personal Income of R by year
 
-# YINC-1400 - R RECEIVE INCOME FROM JOB IN PAST YEAR?
-# YINC-1700 - TOTAL INCOME FROM WAGES AND SALARY IN PAST YEAR
+# YINC-1400 - R RECEIVE INCOME FROM JOB IN PAST YEAR? (incd)
+# YINC-1500 - INCOME IN WAGES, SALARY, TIPS FROM REGULAR OR ODD JOBS (incd2)
+# YINC-1700 - TOTAL INCOME FROM WAGES AND SALARY IN PAST YEAR (wages)
+# YINC-1800 - ESTIMATED INCOME FROM WAGES AND SALARY IN PAST YEAR
+# YINC-2000 - ANY INCOME FROM OWN BUSINESS OR FARM IN PAST YEAR
+# YINC-2100 - TOTAL INCOME FROM BUSINESS OR FARM IN PAST YEAR
+# YINC-2200 - ESTIMATED INCOME FROM BUSINESS OR FARM IN PAST YEAR
+
 mominc <- new_data %>%
-  select(PUBID_1997, starts_with("YINC-1700"), starts_with("YINC-1400"), starts_with("YINC-1500")) %>%
+  select(PUBID_1997, starts_with("YINC-1700"), starts_with("YINC-1400"), starts_with("YINC-1500"), starts_with("YINC-1800")) %>%
   gather(var, val, -PUBID_1997) %>%
   separate(var, c("type", "year"), "_")
 
 mominc <- mominc %>%
-  mutate(rinc  = case_when(type == "YINC-1700" ~ val),
-         incd  = case_when(type == "YINC-1400" ~ val),
-         incd2 = case_when(type == "YINC-1500" ~ val)) %>%
+  mutate(wages     = case_when(type == "YINC-1700" ~ val),
+         incd      = case_when(type == "YINC-1400" ~ val),
+         incd2     = case_when(type == "YINC-1500" ~ val),
+         wages_est = case_when(type == "YINC-1800" ~ val)) %>%
   group_by(PUBID_1997, year) %>% 
-  summarise(rinc = first(rinc), incd = nth(incd, 2), incd2 = last(incd2))
+  summarise(wages = first(wages), incd = nth(incd, 2), incd2 = last(incd2), wages_est = last(wages_est))
 
 # Give people an income if they reported it, and 0 if they reported they had no income. Other is missing
+#This code chunk has extra codes in it unless the missing codes were added. Doesn't mess up results to just leave it.
 mominc <- mominc %>%
   group_by(PUBID_1997, year) %>%
-  mutate(rinc = case_when( incd   == "1"    ~ rinc,
+  mutate(wages = case_when(incd   == "1"    ~ wages,
                            incd   == "0"    ~ 0L,
                            incd   == "-5"   ~ -5L,
                            incd   == "-4"   ~ -4L,
@@ -203,6 +211,21 @@ mominc <- mominc %>%
                            incd2  == "0"    ~ 0L,
                            TRUE             ~ NA_integer_
                       ))
+
+# Let's give people the estimated income if they reported it. Use the mean of the range selected, as done for the Gross Income variables.
+# https://www.nlsinfo.org/content/cohorts/nlsy97/other-documentation/codebook-supplement/appendix-5-income-and-assets-variab-3
+mominc <- mominc %>%
+  group_by(PUBID_1997, year) %>%
+  mutate(wages = case_when(!is.na(wages)    ~ wages,
+                           wages_est == "1" ~ 2500L,
+                           wages_est == "2" ~ 7500L,
+                           wages_est == "3" ~ 17500L,
+                           wages_est == "4" ~ 37500L,
+                           wages_est == "5" ~ 75000L,
+                           wages_est == "6" ~ 175000L,
+                           wages_est == "7" ~ 250001L,
+                           TRUE             ~ NA_integer_))
+
 # Order the dataset to match new_data and then add birth_year variable
 mominc <- arrange(mominc, year, PUBID_1997)
 mominc$birth_year   <- new_data$birth_year
@@ -231,26 +254,26 @@ mominc$birth_minus4 <- mominc$birth_year - 4
 ## Careful - t0 is birth year plus 1 for income because respondents report income from the previous year
 mominc <- mominc %>%
   group_by(PUBID_1997) %>% 
-  mutate(inc_t0  = case_when(birth_year1   == year ~ rinc),
-         inc_t1  = case_when(birth_year2   == year ~ rinc),
-         inc_t2  = case_when(birth_year3   == year ~ rinc),
-         inc_t3  = case_when(birth_year4   == year ~ rinc),
-         inc_t4  = case_when(birth_year5   == year ~ rinc),
-         inc_t5  = case_when(birth_year6   == year ~ rinc),
-         inc_t6  = case_when(birth_year7   == year ~ rinc),
-         inc_t7  = case_when(birth_year8   == year ~ rinc),
-         inc_t8  = case_when(birth_year9   == year ~ rinc),
-         inc_t9  = case_when(birth_year10  == year ~ rinc),
-         inc_t10 = case_when(birth_year11  == year ~ rinc))
+  mutate(inc_t0  = case_when(birth_year1   == year ~ wages),
+         inc_t1  = case_when(birth_year2   == year ~ wages),
+         inc_t2  = case_when(birth_year3   == year ~ wages),
+         inc_t3  = case_when(birth_year4   == year ~ wages),
+         inc_t4  = case_when(birth_year5   == year ~ wages),
+         inc_t5  = case_when(birth_year6   == year ~ wages),
+         inc_t6  = case_when(birth_year7   == year ~ wages),
+         inc_t7  = case_when(birth_year8   == year ~ wages),
+         inc_t8  = case_when(birth_year9   == year ~ wages),
+         inc_t9  = case_when(birth_year10  == year ~ wages),
+         inc_t10 = case_when(birth_year11  == year ~ wages))
 
 # give people the income they reported for each of the income minus 1 variables
 mominc <- mominc %>%
   group_by(PUBID_1997) %>% 
-  mutate(inc_m1 = case_when(birth_year   == year ~ rinc),
-         inc_m2 = case_when(birth_minus1 == year ~ rinc),
-         inc_m3 = case_when(birth_minus2 == year ~ rinc),
-         inc_m4 = case_when(birth_minus3 == year ~ rinc),
-         inc_m5 = case_when(birth_minus4 == year ~ rinc))
+  mutate(inc_m1 = case_when(birth_year   == year ~ wages),
+         inc_m2 = case_when(birth_minus1 == year ~ wages),
+         inc_m3 = case_when(birth_minus2 == year ~ wages),
+         inc_m4 = case_when(birth_minus3 == year ~ wages),
+         inc_m5 = case_when(birth_minus4 == year ~ wages))
 
 # aggregate the data so there is 1 row per person
 mominc <- mominc %>%
