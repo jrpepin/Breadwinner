@@ -34,4 +34,4 @@ knitr::opts_knit$set(root.dir = 'C:/Users/Joanna/Dropbox/Repositories/NLSY97_Bre
 At the bottom of the script, remove three '#' signs to create a data file called "categories" with value labels and to rename variables using Qnames instead of Reference Numbers. Then, run the entire script.
 
 # Measures and Sample
-Open then "nlsy97_measures & sample" R script to begin managing the data.
+Open the "nlsy97_measures & sample" R script to begin managing the data.
