@@ -1,0 +1,37 @@
+---
+title: "NLSY97 Breadwinning"
+subtitle: "An Analysis of Mothers' Share of the Total Household Earnings"
+author: "Joanna R. Pepin"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+
+# Getting the data
+This analysis uses National Longitudinal Survey of Youth 1997 (NLSY97) data downloaded from
+[NLS Investigator](https://www.nlsinfo.org/investigator/pages/login.jsp).
+
+## Data Download
+To get the variables used in this analysis, after logging into the NLS Investigator and choosing the NLSY97 sample, you'll need to upload the [tagset](https://www.nlsinfo.org/content/access-data-investigator/investigator-user-guide/choose-tagsets-tab). The tagset for this project is located in the NLSY97_tagset sub-folder of the repository.  
+
+To download the data, click on "Advanced Download" and click "R® Source code (includes the datafile of selected variables)." Give your download a filename and click download.
+
+## Data  Import
+This R code was executed in the open source edition of [RStudio](https://www.rstudio.com/products/RStudio/).  
+
+After extracting the downloaded files, open the R file.
+
+### Set the working directory file path
+You will need to change your file path to the local folder where you saved the data extract.  
+Notice the "/" lean to the right and not the left "\" if you are using a Windows computer.
+``` {r eval = FALSE}
+setwd("C:/Users/Joanna/Dropbox/NLSY97")
+```
+
+``` {r setup, echo = FALSE}
+knitr::opts_knit$set(root.dir = 'C:/Users/Joanna/Dropbox/Repositories/NLSY97_Breadwinning/NLSY97_tagset')
+```
+  
+At the bottom of the script, remove three '#' signs to create a data file called "categories" with value labels and to rename variables using Qnames instead of Reference Numbers. Then, run the entire script.
+
+# Measures and Sample
+Open then "nlsy97_measures & sample" R script to begin managing the data.

@@ -1,4 +1,5 @@
-setwd("C:/Users/Joanna/Dropbox/Repositories/NLSY_Breadwinning")
+# Change the working directory to the repository
+setwd("C:/Users/Joanna/Dropbox/Repositories/NLSY97_Breadwinning")
 
 # Use this script after the Investigator R script
 # mark out the "Handle missing values" code in the Investigator script to analyze type of missing data
@@ -8,7 +9,6 @@ library(lubridate)
 
 
 ## Fix caseID in categories dataset
-
 categories$PUBID_1997 <- new_data$PUBID_1997
 
 # Map special values to NA in every NUMERIC column: Refusal(-1), Don't Know(-2), Invalid Skip (-3),VALID SKIP(-4), NON-INTERVIEW(-5)

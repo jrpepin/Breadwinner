@@ -1,6 +1,6 @@
 
 # Set working directory
-# setwd()
+setwd("C:/Users/Joanna/Dropbox/Repositories/NLSY97_Breadwinning/NLSY97_tagset")
 
 
 new_data <- read.table('NLSY97_tagset.dat', sep=' ')
@@ -5015,11 +5015,11 @@ qnames = function(data) {
 #********************************************************************************************************
 
 # Remove the '#' before the following line to create a data file called "categories" with value labels. 
-#categories <- vallabels(new_data)
+categories <- vallabels(new_data)
 
 # Remove the '#' before the following lines to rename variables using Qnames instead of Reference Numbers
-#new_data <- qnames(new_data)
-#categories <- qnames(categories)
+new_data <- qnames(new_data)
+categories <- qnames(categories)
 
 # Produce summaries for the raw (uncategorized) data file
 summary(new_data)
