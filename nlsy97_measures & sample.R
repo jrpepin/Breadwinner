@@ -602,7 +602,7 @@ nlsy97$everbw[is.na(nlsy97$everbw)] <- 0
 table(nlsy97$everbw)
 
 # Descriptives
-table(nlsy97$birth_year, nlsy97$mar_t0)
+table(nlsy97$birth_year, nlsy97$mar_t0, exclude = NULL)
 table(nlsy97$birth_year, nlsy97$age_birth)
 
 table(nlsy97$birth_year, nlsy97$bw_t0)
@@ -676,8 +676,14 @@ nlsy97 %>%
   ggplot(aes(birth_year, age_birth, color = mar_t0)) +
   geom_point(position = "jitter") +
   theme_minimal() +
-  scale_y_continuous(name = "Age at First Birth", breaks = c(18, 20, 22, 24, 26, 28)) +
-  labs(color = "Marital Status at 1st Birth")
+  theme(legend.position = c(0.85, 0.2),
+        plot.margin=unit(c(1,1,1.5,1.5),"cm")) +
+  scale_y_continuous(name = "Age at 1st birth", breaks = c(18, 20, 22, 24, 26, 28)) +
+  scale_x_continuous(name = "Year of 1st birth", breaks = c(1996, 2000, 2004, 2008, 2012)) +
+  labs(title = "Mothers' marital status at the time of 1st birth", 
+       subtitle = "Mothers aged 18 - 27 at 1st birth",
+       color = "Marital status",
+       caption = "Source: National Longitudinal Survey of Youth | 1997 \n Analysis by: Joanna R. Pepin")
 
 #Age_birth by inc_t1 & marst
 nlsy97 %>%
