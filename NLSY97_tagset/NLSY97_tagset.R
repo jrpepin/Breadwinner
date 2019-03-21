@@ -260,11 +260,11 @@ names(new_data) <- c('R0000100',
 
 # Handle missing values
 
-  new_data[new_data == -1] = NA  # Refused 
-  new_data[new_data == -2] = NA  # Dont know 
-  new_data[new_data == -3] = NA  # Invalid missing 
-  new_data[new_data == -4] = NA  # Valid missing 
-  new_data[new_data == -5] = NA  # Non-interview 
+#   new_data[new_data == -1] = NA  # Refused 
+#   new_data[new_data == -2] = NA  # Dont know 
+#   new_data[new_data == -3] = NA  # Invalid missing 
+#   new_data[new_data == -4] = NA  # Valid missing 
+#   new_data[new_data == -5] = NA  # Non-interview 
 
 
 # If there are values not categorized they will be represented as NA

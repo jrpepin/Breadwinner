@@ -179,11 +179,12 @@ remove(marstat)
 # YINC-1400 - R RECEIVE INCOME FROM JOB IN PAST YEAR? (incd)
 # YINC-1500 - INCOME IN WAGES, SALARY, TIPS FROM REGULAR OR ODD JOBS (incd2)
 # YINC-1700 - TOTAL INCOME FROM WAGES AND SALARY IN PAST YEAR (wages)
-# YINC-1800 - ESTIMATED INCOME FROM WAGES AND SALARY IN PAST YEAR
-# YINC-2000 - ANY INCOME FROM OWN BUSINESS OR FARM IN PAST YEAR
-# YINC-2100 - TOTAL INCOME FROM BUSINESS OR FARM IN PAST YEAR
-# YINC-2200 - ESTIMATED INCOME FROM BUSINESS OR FARM IN PAST YEAR
+# YINC-1800 - ESTIMATED INCOME FROM WAGES AND SALARY IN PAST YEAR (wages_est)
+# YINC-2000 - ANY INCOME FROM OWN BUSINESS OR FARM IN PAST YEAR (bizincd)
+# YINC-2100 - TOTAL INCOME FROM BUSINESS OR FARM IN PAST YEAR (bizinc)
+# YINC-2200 - ESTIMATED INCOME FROM BUSINESS OR FARM IN PAST YEAR (bizinc_est)
 
+# Mom's personal income
 mominc <- new_data %>%
   select(PUBID_1997, starts_with("YINC-1700"), starts_with("YINC-1400"), starts_with("YINC-1500"), starts_with("YINC-1800")) %>%
   gather(var, val, -PUBID_1997) %>%
@@ -197,8 +198,8 @@ mominc <- mominc %>%
   group_by(PUBID_1997, year) %>% 
   summarise(wages = first(wages), incd = nth(incd, 2), incd2 = last(incd2), wages_est = last(wages_est))
 
-# Give people an income if they reported it, and 0 if they reported they had no income. Other is missing
-#This code chunk has extra codes in it unless the missing codes were added. Doesn't mess up results to just leave it.
+##  Give people an income if they reported it, and 0 if they reported they had no income. Other is missing
+### This code chunk has extra codes in it unless the missing codes were added. Doesn't mess up results to just leave it.
 mominc <- mominc %>%
   group_by(PUBID_1997, year) %>%
   mutate(wages = case_when(incd   == "1"    ~ wages,
@@ -212,23 +213,65 @@ mominc <- mominc %>%
                            TRUE             ~ NA_integer_
                       ))
 
-# Let's give people the estimated income if they reported it. Use the mean of the range selected, as done for the Gross Income variables.
-# https://www.nlsinfo.org/content/cohorts/nlsy97/other-documentation/codebook-supplement/appendix-5-income-and-assets-variab-3
+## Let's give people the estimated income if they reported it. Use the mean of the range selected, as done for the Gross Income variables.
+### https://www.nlsinfo.org/content/cohorts/nlsy97/other-documentation/codebook-supplement/appendix-5-income-and-assets-variab-3
 mominc <- mominc %>%
   group_by(PUBID_1997, year) %>%
-  mutate(wages = case_when(!is.na(wages)    ~ wages,
-                           wages_est == "1" ~ 2500L,
-                           wages_est == "2" ~ 7500L,
-                           wages_est == "3" ~ 17500L,
-                           wages_est == "4" ~ 37500L,
-                           wages_est == "5" ~ 75000L,
-                           wages_est == "6" ~ 175000L,
-                           wages_est == "7" ~ 250001L,
-                           TRUE             ~ NA_integer_))
+  mutate(wages = case_when(!is.na(wages) & (wages< -5L | wages >=0L)  ~ wages,
+                           wages_est == 1L ~ 2500L,
+                           wages_est == 2L ~ 7500L,
+                           wages_est == 3L ~ 17500L,
+                           wages_est == 4L ~ 37500L,
+                           wages_est == 5L ~ 75000L,
+                           wages_est == 6L ~ 175000L,
+                           wages_est == 7L ~ 250001L,
+                           (wages >= -5L & wages <= -1) & wages_est<= -1L ~ wages,
+                           TRUE            ~ NA_integer_))
 
-# Order the dataset to match new_data and then add birth_year variable
+### Order the dataset to match new_data and then add birth_year variable
 mominc <- arrange(mominc, year, PUBID_1997)
 mominc$birth_year   <- new_data$birth_year
+
+# Mom's business earnings
+mombiz <- new_data %>%
+  select(PUBID_1997, starts_with("YINC-2000"), starts_with("YINC-2100"), starts_with("YINC-2200")) %>%
+  gather(var, val, -PUBID_1997) %>%
+  separate(var, c("type", "year"), "_")
+
+mombiz <- mombiz %>%
+  mutate(bizinc     = case_when(type == "YINC-2100" ~ val),
+         bizinc_est = case_when(type == "YINC-2200" ~ val),
+         bizincd    = case_when(type == "YINC-2000" ~ val)) %>%
+  group_by(PUBID_1997, year) %>%
+  summarise(bizincd = first(bizincd), bizinc = nth(bizinc, 2), bizinc_est = last(bizinc_est))
+
+mombiz <- mombiz %>%
+  group_by(PUBID_1997, year) %>%
+  mutate(bizinc = case_when(bizincd    == "1"  ~ bizinc,
+                            bizincd    == "0"  ~ 0L,
+                            bizinc_est == "-1" ~ -2L,
+                            bizinc_est == "2"  ~ 2500L,
+                            bizinc_est == "3"  ~ 7500L,
+                            bizinc_est == "4"  ~ 17500L,
+                            bizinc_est == "5"  ~ 37500L,
+                            bizinc_est == "6"  ~ 75000L,
+                            bizinc_est == "7"  ~ 175000L,
+                            bizinc_est == "8"  ~ 250001L,
+                            (bizinc >= -5L & bizinc <= -1) & bizinc_est<= -1L ~ bizinc,
+                            TRUE               ~ NA_integer_))
+
+# Create mom's total income variable
+## Add mombiz to mominc
+mombiz <- arrange(mombiz, year, PUBID_1997)
+mominc$bizinc   <- mombiz$bizinc
+
+## Combine income variables
+mominc <- mominc %>%
+  group_by(PUBID_1997, year) %>%  
+  mutate(momtot = case_when(wages >-1     & (bizinc<=-6 | bizinc >=0)  ~ wages + bizinc,
+                            !is.na(wages) & (bizinc>=-5 | bizinc <=-1) ~ wages,
+                            wages < 0     &  bizinc>=0                 ~ bizinc,
+                            TRUE                                       ~ NA_integer_))
 
 # Create the birth year plus 1 variables
 mominc$birth_year1   <- mominc$birth_year + 1
@@ -243,7 +286,6 @@ mominc$birth_year9   <- mominc$birth_year + 9
 mominc$birth_year10  <- mominc$birth_year + 10
 mominc$birth_year11  <- mominc$birth_year + 11
 
-
 mominc$birth_minus1 <- mominc$birth_year - 1
 mominc$birth_minus2 <- mominc$birth_year - 2
 mominc$birth_minus3 <- mominc$birth_year - 3
@@ -254,26 +296,26 @@ mominc$birth_minus4 <- mominc$birth_year - 4
 ## Careful - t0 is birth year plus 1 for income because respondents report income from the previous year
 mominc <- mominc %>%
   group_by(PUBID_1997) %>% 
-  mutate(inc_t0  = case_when(birth_year1   == year ~ wages),
-         inc_t1  = case_when(birth_year2   == year ~ wages),
-         inc_t2  = case_when(birth_year3   == year ~ wages),
-         inc_t3  = case_when(birth_year4   == year ~ wages),
-         inc_t4  = case_when(birth_year5   == year ~ wages),
-         inc_t5  = case_when(birth_year6   == year ~ wages),
-         inc_t6  = case_when(birth_year7   == year ~ wages),
-         inc_t7  = case_when(birth_year8   == year ~ wages),
-         inc_t8  = case_when(birth_year9   == year ~ wages),
-         inc_t9  = case_when(birth_year10  == year ~ wages),
-         inc_t10 = case_when(birth_year11  == year ~ wages))
+  mutate(inc_t0  = case_when(birth_year1   == year ~ momtot),
+         inc_t1  = case_when(birth_year2   == year ~ momtot),
+         inc_t2  = case_when(birth_year3   == year ~ momtot),
+         inc_t3  = case_when(birth_year4   == year ~ momtot),
+         inc_t4  = case_when(birth_year5   == year ~ momtot),
+         inc_t5  = case_when(birth_year6   == year ~ momtot),
+         inc_t6  = case_when(birth_year7   == year ~ momtot),
+         inc_t7  = case_when(birth_year8   == year ~ momtot),
+         inc_t8  = case_when(birth_year9   == year ~ momtot),
+         inc_t9  = case_when(birth_year10  == year ~ momtot),
+         inc_t10 = case_when(birth_year11  == year ~ momtot))
 
 # give people the income they reported for each of the income minus 1 variables
 mominc <- mominc %>%
   group_by(PUBID_1997) %>% 
-  mutate(inc_m1 = case_when(birth_year   == year ~ wages),
-         inc_m2 = case_when(birth_minus1 == year ~ wages),
-         inc_m3 = case_when(birth_minus2 == year ~ wages),
-         inc_m4 = case_when(birth_minus3 == year ~ wages),
-         inc_m5 = case_when(birth_minus4 == year ~ wages))
+  mutate(inc_m1 = case_when(birth_year   == year ~ momtot),
+         inc_m2 = case_when(birth_minus1 == year ~ momtot),
+         inc_m3 = case_when(birth_minus2 == year ~ momtot),
+         inc_m4 = case_when(birth_minus3 == year ~ momtot),
+         inc_m5 = case_when(birth_minus4 == year ~ momtot))
 
 # aggregate the data so there is 1 row per person
 mominc <- mominc %>%
@@ -304,6 +346,7 @@ mominc$inc_m5[is.nan(mominc$inc_m5)] <- NA
 ### Add new variables to original dataset
 new_data   <- left_join(new_data,   mominc, by = "PUBID_1997")
 remove(mominc)
+remove(mombiz)
 
 ### R's Total Household Income by year
 # https://www.nlsinfo.org/content/cohorts/nlsy97/topical-guide/income/income
@@ -398,7 +441,7 @@ which( colnames(nlsy97)=="dob" )
 which( colnames(nlsy97)=="hhinc_m5" )
 
 nlsy97 <- nlsy97 %>%
-  select(1, 185:226)
+  select(1, 253:294) # This needs to be updated each time new variables are added/created.
 
 # sample <- nlsy97 %>%
   # select(PUBID_1997, birth_year, age_birth, mar_t1:bw_m4)
@@ -452,48 +495,48 @@ nlsy97 %>%
 nlsy97 <- nlsy97 %>%
   mutate(
     bw_t0 = case_when(
-      (nlsy97$inc_t0/nlsy97$hhinc_t0) > .5 ~ "Breadwinner",
-      (nlsy97$inc_t0/nlsy97$hhinc_t0) < .5 ~ "Not a breadwinner",
+      (nlsy97$inc_t0/nlsy97$hhinc_t0) > .6 ~ "Breadwinner",
+      (nlsy97$inc_t0/nlsy97$hhinc_t0) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
     bw_t1 = case_when(
-      (nlsy97$inc_t1/nlsy97$hhinc_t1) > .5 ~ "Breadwinner",
-      (nlsy97$inc_t1/nlsy97$hhinc_t1) < .5 ~ "Not a breadwinner",
+      (nlsy97$inc_t1/nlsy97$hhinc_t1) > .6 ~ "Breadwinner",
+      (nlsy97$inc_t1/nlsy97$hhinc_t1) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
     bw_t2 = case_when(
-      (nlsy97$inc_t2/nlsy97$hhinc_t2) > .5 ~ "Breadwinner",
-      (nlsy97$inc_t2/nlsy97$hhinc_t2) < .5 ~ "Not a breadwinner",
+      (nlsy97$inc_t2/nlsy97$hhinc_t2) > .6 ~ "Breadwinner",
+      (nlsy97$inc_t2/nlsy97$hhinc_t2) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
     bw_t3 = case_when(
-      (nlsy97$inc_t3/nlsy97$hhinc_t3) > .5 ~ "Breadwinner",
-      (nlsy97$inc_t3/nlsy97$hhinc_t3) < .5 ~ "Not a breadwinner",
+      (nlsy97$inc_t3/nlsy97$hhinc_t3) > .6 ~ "Breadwinner",
+      (nlsy97$inc_t3/nlsy97$hhinc_t3) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
     bw_t4 = case_when(
-      (nlsy97$inc_t4/nlsy97$hhinc_t4) > .5 ~ "Breadwinner",
-      (nlsy97$inc_t4/nlsy97$hhinc_t4) < .5 ~ "Not a breadwinner",
+      (nlsy97$inc_t4/nlsy97$hhinc_t4) > .6 ~ "Breadwinner",
+      (nlsy97$inc_t4/nlsy97$hhinc_t4) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
     bw_t5 = case_when(
-      (nlsy97$inc_t5/nlsy97$hhinc_t5) > .5 ~ "Breadwinner",
-      (nlsy97$inc_t5/nlsy97$hhinc_t5) < .5 ~ "Not a breadwinner",
+      (nlsy97$inc_t5/nlsy97$hhinc_t5) > .6 ~ "Breadwinner",
+      (nlsy97$inc_t5/nlsy97$hhinc_t5) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
     bw_t6 = case_when(
-      (nlsy97$inc_t6/nlsy97$hhinc_t6) > .5 ~ "Breadwinner",
-      (nlsy97$inc_t6/nlsy97$hhinc_t6) < .5 ~ "Not a breadwinner",
+      (nlsy97$inc_t6/nlsy97$hhinc_t6) > .6 ~ "Breadwinner",
+      (nlsy97$inc_t6/nlsy97$hhinc_t6) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
     bw_t7 = case_when(
-      (nlsy97$inc_t7/nlsy97$hhinc_t7) > .5 ~ "Breadwinner",
-      (nlsy97$inc_t7/nlsy97$hhinc_t7) < .5 ~ "Not a breadwinner",
+      (nlsy97$inc_t7/nlsy97$hhinc_t7) > .6 ~ "Breadwinner",
+      (nlsy97$inc_t7/nlsy97$hhinc_t7) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
     bw_t8 = case_when(
-      (nlsy97$inc_t8/nlsy97$hhinc_t8) > .5 ~ "Breadwinner",
-      (nlsy97$inc_t8/nlsy97$hhinc_t8) < .5 ~ "Not a breadwinner",
+      (nlsy97$inc_t8/nlsy97$hhinc_t8) > .6 ~ "Breadwinner",
+      (nlsy97$inc_t8/nlsy97$hhinc_t8) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
     bw_t9 = case_when(
-      (nlsy97$inc_t9/nlsy97$hhinc_t9) > .5 ~ "Breadwinner",
-      (nlsy97$inc_t9/nlsy97$hhinc_t9) < .5 ~ "Not a breadwinner",
+      (nlsy97$inc_t9/nlsy97$hhinc_t9) > .6 ~ "Breadwinner",
+      (nlsy97$inc_t9/nlsy97$hhinc_t9) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
     bw_t10 = case_when(
-      (nlsy97$inc_t10/nlsy97$hhinc_t10) > .5 ~ "Breadwinner",
-      (nlsy97$inc_t10/nlsy97$hhinc_t10) < .5 ~ "Not a breadwinner",
+      (nlsy97$inc_t10/nlsy97$hhinc_t10) > .6 ~ "Breadwinner",
+      (nlsy97$inc_t10/nlsy97$hhinc_t10) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_)
   )
 nlsy97$bw_t0 <- factor(nlsy97$bw_t0, levels = c("Breadwinner", "Not a breadwinner"))
@@ -512,24 +555,24 @@ nlsy97$bw_t10 <- factor(nlsy97$bw_t10, levels = c("Breadwinner", "Not a breadwin
 nlsy97 <- nlsy97 %>%
   mutate(
     bw_m1 = case_when(
-      (nlsy97$inc_m1/nlsy97$hhinc_m1) > .5 ~ "Breadwinner",
-      (nlsy97$inc_m1/nlsy97$hhinc_m1) < .5 ~ "Not a breadwinner",
+      (nlsy97$inc_m1/nlsy97$hhinc_m1) > .6 ~ "Breadwinner",
+      (nlsy97$inc_m1/nlsy97$hhinc_m1) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
     bw_m2 = case_when(
-      (nlsy97$inc_m2/nlsy97$hhinc_m2) > .5 ~ "Breadwinner",
-      (nlsy97$inc_m2/nlsy97$hhinc_m2) < .5 ~ "Not a breadwinner",
+      (nlsy97$inc_m2/nlsy97$hhinc_m2) > .6 ~ "Breadwinner",
+      (nlsy97$inc_m2/nlsy97$hhinc_m2) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
     bw_m3 = case_when(
-      (nlsy97$inc_m3/nlsy97$hhinc_m3) > .5 ~ "Breadwinner",
-      (nlsy97$inc_m3/nlsy97$hhinc_m3) < .5 ~ "Not a breadwinner",
+      (nlsy97$inc_m3/nlsy97$hhinc_m3) > .6 ~ "Breadwinner",
+      (nlsy97$inc_m3/nlsy97$hhinc_m3) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
     bw_m4 = case_when(
-      (nlsy97$inc_m4/nlsy97$hhinc_m4) > .5 ~ "Breadwinner",
-      (nlsy97$inc_m4/nlsy97$hhinc_m4) < .5 ~ "Not a breadwinner",
+      (nlsy97$inc_m4/nlsy97$hhinc_m4) > .6 ~ "Breadwinner",
+      (nlsy97$inc_m4/nlsy97$hhinc_m4) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
     bw_m5 = case_when(
-      (nlsy97$hhinc_m5/nlsy97$inc_m5) > .5 ~ "Breadwinner",
-      (nlsy97$hhinc_m5/nlsy97$inc_m5) < .5 ~ "Not a breadwinner",
+      (nlsy97$hhinc_m5/nlsy97$inc_m5) > .6 ~ "Breadwinner",
+      (nlsy97$hhinc_m5/nlsy97$inc_m5) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
   )
 
@@ -542,7 +585,7 @@ nlsy97$bw_m5 <- factor(nlsy97$bw_m5, levels = c("Breadwinner", "Not a breadwinne
 ## Ever breadwinning
 nlsy97 <- nlsy97 %>%
   mutate(everbw = case_when(
-    bw_t0  == "Breadwinner" |
+      bw_t0  == "Breadwinner" |
       bw_t1  == "Breadwinner" |  
       bw_t2  == "Breadwinner" |
       bw_t3  == "Breadwinner" |

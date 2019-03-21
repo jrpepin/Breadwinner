@@ -30,6 +30,7 @@ setwd("C:/Users/Joanna/Dropbox/NLSY97")
 ``` {r setup, echo = FALSE}
 knitr::opts_knit$set(root.dir = 'C:/Users/Joanna/Dropbox/Repositories/NLSY97_Breadwinning/NLSY97_tagset')
 ```
+Search for the missing codes and remove the '#' so we can see why values are missing.
   
 At the bottom of the script, remove three '#' signs to create a data file called "categories" with value labels and to rename variables using Qnames instead of Reference Numbers. Then, run the entire script.
 
