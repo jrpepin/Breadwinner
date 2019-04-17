@@ -5,7 +5,7 @@
 *********************************************************************
 
 forvalues w=1/15{
-use "$SIPP2008/FullFile/sippl08puw`w'"
+use "$SIPP2008/sippl08puw`w'"
 
 keep if srefmon==4
 

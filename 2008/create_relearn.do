@@ -12,7 +12,7 @@
 * run do_childrens_household_core to create.
 * The file has one observation per person in ego's (EPPPNUM's) household. 
 * It does not include a record for self and thus does not include people living alone.
-use "$SIPP08keep/HHcomp_asis.dta", clear
+use "$childhh/HHComp_asis.dta", clear
 
 * Create a dummy indicator for whether ego is a mother to anyone in the household
 * by collapsing all records for same person (ssuid epppnum swave)
@@ -53,7 +53,7 @@ keep SSUID EPPPNUM SWAVE nmomto nmomtominor nbiomomto HHsize nHHkids spartner
 * Section: merging to children's households long demographic file, 
 * a person-level data file, to get basic demographic information about ego.
 *******************************************************************************
-merge 1:1 SSUID EPPPNUM SWAVE using "$tempdir/demo_long_interviews.dta"
+merge 1:1 SSUID EPPPNUM SWAVE using "$childhh/demo_long_interviews.dta"
 
 keep if !missing(ERRP)
 
@@ -78,7 +78,7 @@ drop _merge
 sort ssuid epppnum swave
 
 * merging in a person-level data file with personal earnings and household earnings.
-merge 1:1 ssuid epppnum swave using "$SIPP2008keep/sipp08tpearn_all"
+merge 1:1 ssuid epppnum swave using "$SIPP08keep/sipp08tpearn_all"
 
 tab nmomto
 
