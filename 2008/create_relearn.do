@@ -47,8 +47,6 @@ tab spartner, m
 * add in self as a household member.
 replace HHsize=HHsize+1
 
-
-
 keep SSUID EPPPNUM SWAVE nmomto nmomtominor nbiomomto HHsize nHHkids spartner
 
 *******************************************************************************
@@ -80,7 +78,7 @@ drop _merge
 sort ssuid epppnum swave
 
 * merging in a person-level data file with personal earnings and household earnings.
-merge 1:1 ssuid epppnum swave using "$SIPP2008/IncomeAndEarnings/sipp08tpearn_all"
+merge 1:1 ssuid epppnum swave using "$SIPP2008keep/sipp08tpearn_all"
 
 tab nmomto
 

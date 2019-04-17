@@ -9,7 +9,7 @@ use "$SIPP2008/FullFile/sippl08puw`w'"
 
 keep if srefmon==4
 
-keep ssuid shhadid epppnum swave tpearn thearn tfearn thothinc tftotinc
+keep ssuid shhadid epppnum swave tpearn thearn tfearn thothinc tftotinc tbm* tpm* tmlmsum tprftb* eslryb1 eslryb2 eoincb1 eoincb2 tpprpinc tptrninc tpothinc
 save "$tempdir/sipp08tpearn`w'", replace
 }
 
@@ -23,4 +23,4 @@ append using "$tempdir/sipp08tpearn`w'"
 destring epppnum, replace
 
 
-save "$SIPP2008/IncomeAndEarnings/sipp08tpearn_all", $replace
+save "$SIPP08keep/sipp08tpearn_all", $replace
