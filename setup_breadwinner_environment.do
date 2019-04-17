@@ -14,7 +14,7 @@ if ("`c(os)'" == "Windows") {
     macro drop _temp_drive _temp_dir`
 }
 else {
-    if ("`c(os)'" == "MacOSX") {
+    if ("`c(os)'" == "MacOSX") | ("`c(os)'" == "Unix") {
         global homedir : env HOME
     }
     else {
@@ -61,6 +61,6 @@ if ("$boxdir" == "") {
 * If a file is in the shared directory, there should be code that takes us from
 * an original data file to the shared data file. The name of the file with 
 * that code should be the same name as the shared data file.
-global SIPP2008 "$boxdir/SIPP/data/SIPP2008"
-global SIPP2014 "$boxdir/SIPP/data/SIPP2014"
+
+
 
