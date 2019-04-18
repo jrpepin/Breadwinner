@@ -2,23 +2,46 @@ use "$SIPP08keep/sipp08tpearn_all", clear
 
 * doing my best to reconstruct tpearn
 * starting by summing up reported earnings
-gen altearn=tpmsum1 if !missing(tpmsum1)             // income from job 1
-replace altearn=altearn+tpmsum2 if !missing(tpmsum2) // income from job 2
-replace altearn=altearn+tbmsum1 if !missing(tbmsum1) // income from business 1
-replace altearn=altearn+tbmsum2 if !missing(tbmsum2) // income from business 2
-replace altearn=altearn+tmlmsum
+gen altpearn=tpmsum1 if !missing(tpmsum1)             // income from job 1
+replace altpearn=altpearn+tpmsum2 if !missing(tpmsum2) // income from job 2
+replace altpearn=altpearn+tbmsum1 if !missing(tbmsum1) // income from business 1
+replace altpearn=altpearn+tbmsum2 if !missing(tbmsum2) // income from business 2
+replace altpearn=altpearn+tmlmsum
+
+local allocate "abmsum1 abmsum2 apmsum1 apmsum2 amlmsum"
+
+gen anyallocate=0
+foreach var in `allocate'{
+	replace anyallocate=1 if `var' !=0
+}
 
 * accounting for business losses
 gen profit=tprftb1 if !missing(tprftb1)
 replace profit=profit+tprftb2 if !missing(tprftb1)
 
-gen samearn=1 if altearn==tpearn & !missing(altearn) & !missing(tpearn)
-replace samearn=0 if altearn != tpearn & !missing(altearn) & !missing(tpearn)
+* create measures of household and family income
+* Note that aggregating tpearn instead of altpearn replicates
+* thearn and tfearn. 
+egen althearn=total(altpearn), by(ssuid shhadid swave)
+egen altfearn=total(altpearn), by(ssuid shhadid rfid swave)
 
 gen negearn=1 if tpearn < 0
 
-tab samearn negearn, m
+gen samepearn=1 if altpearn==tpearn 
+gen samefearn=1 if altfearn==tfearn 
+gen samehearn=1 if althearn==thearn
 
-gen diffearn=altearn-tpearn
+local same "samepearn samefearn samehearn"
 
-sum diffearn, detail
+foreach var in `same'{
+	tab `var', m
+}
+
+gen diffpearn=altpearn-tpearn
+gen diffhearn=althearn-thearn
+gen difffearn=altfearn-tfearn
+
+sum diffpearn diffhearn difffearn, detail
+
+save "$tempdir/altearn.dta", $replace
+

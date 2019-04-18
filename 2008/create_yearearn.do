@@ -6,14 +6,19 @@
 
 use "$tempdir/relearn.dta", clear
 
+* first set altpearn to missing if it is based on allocated data
+replace altpearn=. if anyallocate==1
+
 local i_variables " ssuid epppnum "
 local j_variables " swave "
-local other_variables "nmomto nbiomomto HHsize nHHkids spartner adj_age EBORNUS EMS EORIGIN ERRP thearn tfearn thothinc tpearn pHHearn momtoany momtoanyminor nHHadults bw50 bw60 fbw50 fbw60 WPFINWGT"
+local other_variables "nmomto nbiomomto HHsize nHHkids spartner adj_age EBORNUS EMS EORIGIN ERRP thearn tfearn thothinc tpearn momtoany momtoanyminor nHHadults WPFINWGT altpearn altfearn althearn anyallocate"
 
 keep `j_variables' `i_variables' `other_variables' my_racealt my_sex
 
 reshape wide `other_variables', i(`i_variables') j(`j_variables')
 
+/*
+* we aren't using this
 * create inter-wave transition variables
 forvalues w=1/14 {
 local x=`w'+1
@@ -29,7 +34,7 @@ replace become_bw60`w'=0 if !missing(bw60`w') & !missing(bw60`x') & (bw60`w'==1 
 gen leave_bw60`w'=1 if bw60`w'==1 & bw60`x'==0
 replace leave_bw60`w'=0 if !missing(bw60`w') & !missing(bw60`x') & (bw60`w'==0 | bw60`x'==1)
 }
-
+*/
 
 * create indicators for in each wave (w)
 
@@ -38,11 +43,11 @@ gen in`w'=0
 gen nmpearn`w'=0
 gen nmhearn`w'=0
 replace in`w'=1 if !missing(ERRP`w')
-replace nmpearn`w'=1 if !missing(tpearn`w')
-replace nmhearn`w'=1 if !missing(thearn`w')
+replace nmpearn`w'=1 if !missing(altpearn`w')
+replace nmhearn`w'=1 if !missing(althearn`w')
 }
 
-* create indicates of number of observations in each year, where a year is a collection 
+* create indicators of number of observations in each year, where a year is a collection 
 * of three consecutive waves. (Does not correspond to calendar year)
 
 forvalues y=1/5 {
@@ -63,7 +68,7 @@ forvalues y=1/5 {
   tab nobsmomminor`y'
   }
 
- local y=0 
+local y=0 
 foreach w of numlist 1 4 7 8 13 {
    local y=`y'+1
    display `w'
@@ -82,8 +87,8 @@ forvalues y=1/5 {
   gen nmyear_hearn`y'=0
   forvalues o=1/3 {
     local w=(`y'-1)*3 + `o'
-    replace nmyear_pearn`y'=nmyear_pearn`y'+tpearn`w' if !missing(tpearn`w')
-	replace nmyear_hearn`y'=nmyear_hearn`y'+thearn`w' if !missing(thearn`w')
+    replace nmyear_pearn`y'=nmyear_pearn`y'+altpearn`w' if !missing(altpearn`w')
+	replace nmyear_hearn`y'=nmyear_hearn`y'+althearn`w' if !missing(althearn`w')
   }
 }
  * annualize (both to match variable name and to adjust for missing observations)
@@ -119,6 +124,10 @@ forvalues y=1/5 {
    gen ybecome_bw50`y'=0 if !missing(yearbw50`y')
    replace ybecome_bw50`y'=1 if ybecome_bw50`y'==0 & yearbw50`y'==0 & yearbw50`z'==1
    replace ybecome_bw50`y'=2 if ybecome_bw50`y'==0 & yearbw50`y'==1
+   
+   gen ybecome_bw60`y'=0 if !missing(yearbw60`y')
+   replace ybecome_bw60`y'=1 if ybecome_bw60`y'==0 & yearbw60`y'==0 & yearbw60`z'==1
+   replace ybecome_bw60`y'=2 if ybecome_bw60`y'==0 & yearbw60`y'==1
  }
 
 egen momprofile = concat (nobsmom1 nobsmom2 nobsmom3 nobsmom4 nobsmom5)
@@ -130,10 +139,14 @@ egen bw60profile = concat (yearbw601 yearbw602 yearbw603 yearbw604 yearbw605)
  tab bw50profile
  tab bw60profile
  
- keep ssuid epppnum year_pearn* year_hearn* yearbw50* yearbw60* inyear* nmpyear* nmhyear* yearage* ybecome_bw50* nobsmom* yearspartner* my_racealt my_sex *profile weight*
+ keep ssuid epppnum year_pearn* year_hearn* yearbw50* yearbw60* inyear* nmpyear* nmhyear* yearage* ybecome_bw50* ybecome_bw60* nobsmom* yearspartner* my_racealt my_sex *profile weight*
  
- reshape long year_pearn year_hearn yearbw50 yearbw60 inyear nmpyear nmhyear yearage ybecome_bw50 nobsmom nobsmomminor yearspartner weight, i(`i_variables') j(year)
-  
+ reshape long year_pearn year_hearn yearbw50 yearbw60 inyear nmpyear nmhyear yearage ybecome_bw50 ybecome_bw60 nobsmom nobsmomminor yearspartner weight, i(`i_variables') j(year)
+
+label define trans 0 "Not breadwinner" 1 "Became breadwinner" 2 "Already breadwinner"
+
+label values ybecome_bw50 ybecome_bw60 trans
+
 save "$tempdir/relearn_year.dta", replace
 
 

@@ -9,7 +9,9 @@ use "$SIPP2008/sippl08puw`w'"
 
 keep if srefmon==4
 
-keep ssuid shhadid epppnum swave tpearn thearn tfearn thothinc tftotinc tbm* tpm* tmlmsum tprftb* eslryb1 eslryb2 eoincb1 eoincb2 tpprpinc tptrninc tpothinc
+keep ssuid shhadid rfid epppnum swave tpearn thearn tfearn thothinc tftotinc tbm* ///
+abmsum* tpm* apmsum* tmlmsum amlmsum tprftb* aprftb* eslryb1 eslryb2 aslryb* ///
+eoincb1 eoincb2 aoincb* tpprpinc tptrninc tpothinc efnp t15amt
 save "$tempdir/sipp08tpearn`w'", replace
 }
 

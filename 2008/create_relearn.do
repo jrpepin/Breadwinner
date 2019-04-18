@@ -78,17 +78,7 @@ drop _merge
 sort ssuid epppnum swave
 
 * merging in a person-level data file with personal earnings and household earnings.
-merge 1:1 ssuid epppnum swave using "$SIPP08keep/sipp08tpearn_all"
-
-tab nmomto
-
-gen pHHearn=tpearn/thearn if !missing(tpearn) & !missing(thearn) & tpearn > 0 & thearn > 0
-replace pHHearn=0 if !missing(tpearn) & !missing(thearn) & tpearn < 0 & thearn > 0 // 
-replace pHHearn=. if tpearn > thearn
-
-gen pFearn=tpearn/tfearn
-replace pFearn=0 if !missing(tpearn) & !missing(tfearn) & tpearn < 0 & tfearn > 0 // 
-replace pFearn=. if tpearn > tfearn
+merge 1:1 ssuid epppnum swave using "$tempdir/altearn.dta"
 
 gen momtoany=0 if nmomto==0
 replace momtoany=1 if nmomto > 0 & !missing(nmomto)
@@ -99,18 +89,6 @@ replace momtoanyminor=1 if nmomtominor > 0 & !missing(nmomtominor)
 gen nHHadults=HHsize-nHHkids
 
 sum nHHadults
-
-gen bw50=1 if pHHearn > .5 & !missing(pHHearn)
-replace bw50=0 if pHHearn <=.5 & !missing(pHHearn)
-
-gen bw60=1 if pHHearn > .6 & !missing(pHHearn)
-replace bw60=0 if pHHearn <=.6 & !missing(pHHearn)
-
-gen fbw50=1 if pFearn > .5 & !missing(pFearn)
-replace fbw50=0 if pFearn <=.5 & !missing(pFearn)
-
-gen fbw60=1 if pFearn > .6 & !missing(pFearn)
-replace fbw60=0 if pFearn <=.6 & !missing(pFearn)
 
 keep if adj_age >= 18 & adj_age < 70
 keep if my_sex==2
