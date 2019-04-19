@@ -15,6 +15,10 @@ foreach var in `allocate'{
 	replace anyallocate=1 if `var' !=0
 }
 
+* set ualtpearn to missing if it is based on allocated data
+gen ualtpearn=altpearn
+replace ualtpearn=. if anyallocate==1
+
 * accounting for business losses
 gen profit=tprftb1 if !missing(tprftb1)
 replace profit=profit+tprftb2 if !missing(tprftb1)
@@ -24,6 +28,9 @@ replace profit=profit+tprftb2 if !missing(tprftb1)
 * thearn and tfearn. 
 egen althearn=total(altpearn), by(ssuid shhadid swave)
 egen altfearn=total(altpearn), by(ssuid shhadid rfid swave)
+
+egen ualthearn=total(ualtpearn), by(ssuid shhadid swave)
+egen ualtfearn=total(ualtpearn), by(ssuid shhadid rfid swave)
 
 gen negearn=1 if tpearn < 0
 

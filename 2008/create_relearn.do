@@ -18,7 +18,7 @@ use "$childhh/HHComp_asis.dta", clear
 * by collapsing all records for same person (ssuid epppnum swave)
 
 * 2, 5, and 8 are bio, step, and adoptive mom respectively
-* 22 and 23 are parent codes
+* 22 and 23 are parent codes, without info on specific type of relationship (or gender)
 gen nmomto=1 if inlist(relationship,2,5,8)
 replace nmomto=1 if my_sex==2 & inlist(relationship,22,23)
 
@@ -32,22 +32,28 @@ gen nHHkids=1 if adj_age < 18
 
 gen HHsize=1
 
+* age of youngest son or daughter in the household
+gen agechild=to_age if inlist(relationship,2,3,8,22,23)
+
 * spouse or partner
 gen spartner=1 if inlist(relationship,12,18)
 
 * collapse across all people in ego's (EPPPNUM's) household to create a person-level file
 * with information on that person's household composition in the wave.
-collapse (count) nmomto nmomtominor nbiomomto HHsize nHHkids spartner, by(SSUID EPPPNUM SWAVE)
+collapse (count) nmomto nmomtominor nbiomomto HHsize nHHkids spartner (max) agechild, by(SSUID EPPPNUM SWAVE)
+
+rename agechild ageoldest
+tab spartner, m
+tab ageoldest
+
 
 * some have more than one person in the household coded as spouse or partner. 
 recode spartner (0=0)(1/20=1)
 
-tab spartner, m
-
 * add in self as a household member.
 replace HHsize=HHsize+1
 
-keep SSUID EPPPNUM SWAVE nmomto nmomtominor nbiomomto HHsize nHHkids spartner
+keep SSUID EPPPNUM SWAVE nmomto nmomtominor nbiomomto HHsize nHHkids spartner ageoldest
 
 *******************************************************************************
 * Section: merging to children's households long demographic file, 

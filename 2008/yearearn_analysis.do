@@ -10,9 +10,9 @@ gen year_pHHearn=year_pearn/year_hearn if !missing(year_pearn) & !missing(year_h
 replace year_pearn=0 if !missing(year_pearn) & !missing(year_hearn) & year_pearn < 0 & year_hearn > 0
 replace year_pHHearn=. if year_pearn > year_hearn
 
-tab yearspartner
-
-sum year_pearn year_hearn year_pHHearn [aweight=weight], detail
+gen year_upHHearn=year_upearn/year_uhearn if !missing(year_upearn) & !missing(year_uhearn) & year_upearn > 0 & year_uhearn > 0
+replace year_upearn=0 if !missing(year_upearn) & !missing(year_uhearn) & year_upearn < 0 & year_uhearn > 0
+replace year_upHHearn=. if year_upearn > year_uhearn
 
 sort yearspartner
 
@@ -28,9 +28,14 @@ tab yearage yearbw60 if yearspartner==1 [aweight=weight], nofreq row
 
 tab yearage yearbw60 if yearspartner==0 [aweight=weight], nofreq row
 
-/*
 tab yearage ybecome_bw50, nofreq row
 
 sort yearspartner
 
 by yearspartner: tab yearage ybecome_bw50, nofreq row
+
+tab ageoldest yearbw50 [aweight=weight] if ageoldest <=10, nofreq row 
+tab ageoldest yearbw60 [aweight=weight] if ageoldest <=10, nofreq row
+
+tab ageoldest uyearbw50 [aweight=weight] if ageoldest <=10, nofreq row 
+tab ageoldest uyearbw60 [aweight=weight] if ageoldest <=10, nofreq row

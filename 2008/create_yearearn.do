@@ -6,12 +6,9 @@
 
 use "$tempdir/relearn.dta", clear
 
-* first set altpearn to missing if it is based on allocated data
-replace altpearn=. if anyallocate==1
-
 local i_variables " ssuid epppnum "
 local j_variables " swave "
-local other_variables "nmomto nbiomomto HHsize nHHkids spartner adj_age EBORNUS EMS EORIGIN ERRP thearn tfearn thothinc tpearn momtoany momtoanyminor nHHadults WPFINWGT altpearn altfearn althearn anyallocate"
+local other_variables "nmomto nbiomomto HHsize nHHkids spartner adj_age EBORNUS EMS EORIGIN ERRP thearn tfearn thothinc tpearn momtoany momtoanyminor nHHadults WPFINWGT altpearn altfearn althearn ualtpearn ualtfearn ualthearn anyallocate ageoldest"
 
 keep `j_variables' `i_variables' `other_variables' my_racealt my_sex
 
@@ -42,9 +39,13 @@ forvalues w=1/15 {
 gen in`w'=0
 gen nmpearn`w'=0
 gen nmhearn`w'=0
+gen nmupearn`w'=0
+gen nmuhearn`w'=0
 replace in`w'=1 if !missing(ERRP`w')
 replace nmpearn`w'=1 if !missing(altpearn`w')
 replace nmhearn`w'=1 if !missing(althearn`w')
+replace nmupearn`w'=1 if !missing(ualtpearn`w')
+replace nmuhearn`w'=1 if !missing(ualtfearn`w')
 }
 
 * create indicators of number of observations in each year, where a year is a collection 
@@ -54,6 +55,8 @@ forvalues y=1/5 {
   gen inyear`y'=0
   gen nmpyear`y'=0
   gen nmhyear`y'=0
+  gen nmpuyear`y'=0
+  gen nmhuyear`y'=0
   gen nobsmom`y'=0
   gen nobsmomminor`y'=0
   forvalues o=1/3 {
@@ -61,6 +64,8 @@ forvalues y=1/5 {
     replace inyear`y'=inyear`y'+1 if in`w'==1 
 	replace nmpyear`y'=nmpyear`y'+1 if nmpearn`w'==1
 	replace nmhyear`y'=nmhyear`y'+1 if nmhearn`w'==1
+	replace nmpuyear`y'=nmpuyear`y'+1 if nmupearn`w'==1
+	replace nmhuyear`y'=nmhuyear`y'+1 if nmuhearn`w'==1
 	replace nobsmom`y'=nobsmom`y'+1 if momtoany`w'==1
 	replace nobsmomminor`y'=nobsmomminor`y'+1 if momtoanyminor`w'==1
   }
@@ -85,10 +90,14 @@ foreach w of numlist 1 4 7 8 13 {
 forvalues y=1/5 {
   gen nmyear_pearn`y'=0
   gen nmyear_hearn`y'=0
+  gen nmyear_upearn`y'=0
+  gen nmyear_uhearn`y'=0
   forvalues o=1/3 {
     local w=(`y'-1)*3 + `o'
     replace nmyear_pearn`y'=nmyear_pearn`y'+altpearn`w' if !missing(altpearn`w')
-	replace nmyear_hearn`y'=nmyear_hearn`y'+althearn`w' if !missing(althearn`w')
+    replace nmyear_hearn`y'=nmyear_hearn`y'+althearn`w' if !missing(althearn`w')
+    replace nmyear_upearn`y'=nmyear_upearn`y'+ualtpearn`w' if !missing(ualtpearn`w')
+    replace nmyear_uhearn`y'=nmyear_uhearn`y'+ualthearn`w' if !missing(ualthearn`w')   
   }
 }
  * annualize (both to match variable name and to adjust for missing observations)
@@ -101,6 +110,14 @@ forvalues y=1/5 {
    gen year_hearn`y'=nmyear_hearn`y'*4 if inyear`y'==3 /* if observed 3 times in the year */
    replace year_hearn`y'=nmyear_hearn`y'*6 if inyear`y'==2 /* if observed twice */
    replace year_hearn`y'=nmyear_hearn`y'*12 if inyear`y'==1 /* if observed once */
+
+   gen year_upearn`y'=nmyear_upearn`y'*4 if nmpuyear`y'==3 /* if observed 3 times in the year */
+   replace year_upearn`y'=nmyear_upearn`y'*6 if nmpuyear`y'==2 /* if observed twice */
+   replace year_upearn`y'=nmyear_upearn`y'*12 if nmpuyear`y'==1 /* if observed once */
+   
+   gen year_uhearn`y'=nmyear_uhearn`y'*4 if nmhuyear`y'==3 /* if observed 3 times in the year */
+   replace year_uhearn`y'=nmyear_uhearn`y'*6 if nmhuyear`y'==2 /* if observed twice */
+   replace year_uhearn`y'=nmyear_uhearn`y'*12 if nmhuyear`y'==1 /* if observed once */
  }
  
  * create breadwinner dummies at > 50% and > 60 % of household income
@@ -108,15 +125,21 @@ forvalues y=1/5 {
 forvalues y=1/5 {
   gen yearbw50`y'=0 if !missing(year_pearn`y') & !missing(year_hearn`y')
   gen yearbw60`y'=0 if !missing(year_pearn`y') & !missing(year_hearn`y')
+
   replace yearbw50`y'=1 if year_pearn`y' > 0.5*year_hearn`y' & yearbw50`y'==0
   replace yearbw60`y'=1 if year_pearn`y' > 0.6*year_hearn`y' & yearbw60`y'==0
   
-  sum year_pearn`y'
-  sum year_hearn`y'
-  tab yearbw50`y' 
-  
   replace yearbw50`y'=9 if inyear`y'==0
   replace yearbw60`y'=9 if inyear`y'==0
+  
+  gen uyearbw50`y'=0 if !missing(year_upearn`y') & !missing(year_uhearn`y')
+  gen uyearbw60`y'=0 if !missing(year_upearn`y') & !missing(year_uhearn`y')
+
+  replace uyearbw50`y'=1 if year_upearn`y' > 0.5*year_uhearn`y' & uyearbw50`y'==0
+  replace uyearbw60`y'=1 if year_upearn`y' > 0.6*year_uhearn`y' & uyearbw60`y'==0
+  
+  replace uyearbw50`y'=9 if nmhuyear`y'==0
+  replace uyearbw60`y'=9 if nmhuyear`y'==0
  }
  
  forvalues y=1/4 {
@@ -139,9 +162,9 @@ egen bw60profile = concat (yearbw601 yearbw602 yearbw603 yearbw604 yearbw605)
  tab bw50profile
  tab bw60profile
  
- keep ssuid epppnum year_pearn* year_hearn* yearbw50* yearbw60* inyear* nmpyear* nmhyear* yearage* ybecome_bw50* ybecome_bw60* nobsmom* yearspartner* my_racealt my_sex *profile weight*
+ keep ssuid epppnum year_pearn* year_hearn* year_upearn* year_uhearn* yearbw50* yearbw60* uyearbw50* uyearbw60* inyear* nmpyear* nmhyear* yearage* ybecome_bw50* ybecome_bw60* nobsmom* yearspartner* my_racealt my_sex *profile weight* ageoldest*
  
- reshape long year_pearn year_hearn yearbw50 yearbw60 inyear nmpyear nmhyear yearage ybecome_bw50 ybecome_bw60 nobsmom nobsmomminor yearspartner weight, i(`i_variables') j(year)
+ reshape long year_pearn year_hearn yearbw50 yearbw60 inyear nmpyear nmhyear yearage ybecome_bw50 ybecome_bw60 nobsmom nobsmomminor yearspartner weight ageyc year_upearn year_uhearn uyearbw50 uyearbw60 ageoldest, i(`i_variables') j(year)
 
 label define trans 0 "Not breadwinner" 1 "Became breadwinner" 2 "Already breadwinner"
 
