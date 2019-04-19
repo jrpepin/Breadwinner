@@ -172,19 +172,15 @@ new_data   <- left_join(new_data,   marstat)
 
 remove(marstat)
   
-## Breadwinning
+# R's Income
 
-### Personal Income of R by year
+## Personal Income of R by year
 
 # YINC-1400 - R RECEIVE INCOME FROM JOB IN PAST YEAR? (incd)
 # YINC-1500 - INCOME IN WAGES, SALARY, TIPS FROM REGULAR OR ODD JOBS (incd2)
 # YINC-1700 - TOTAL INCOME FROM WAGES AND SALARY IN PAST YEAR (wages)
 # YINC-1800 - ESTIMATED INCOME FROM WAGES AND SALARY IN PAST YEAR (wages_est)
-# YINC-2000 - ANY INCOME FROM OWN BUSINESS OR FARM IN PAST YEAR (bizincd)
-# YINC-2100 - TOTAL INCOME FROM BUSINESS OR FARM IN PAST YEAR (bizinc)
-# YINC-2200 - ESTIMATED INCOME FROM BUSINESS OR FARM IN PAST YEAR (bizinc_est)
 
-# Mom's personal income
 mominc <- new_data %>%
   select(PUBID_1997, starts_with("YINC-1700"), starts_with("YINC-1400"), starts_with("YINC-1500"), starts_with("YINC-1800")) %>%
   gather(var, val, -PUBID_1997) %>%
@@ -198,7 +194,7 @@ mominc <- mominc %>%
   group_by(PUBID_1997, year) %>% 
   summarise(wages = first(wages), incd = nth(incd, 2), incd2 = last(incd2), wages_est = last(wages_est))
 
-##  Give people an income if they reported it, and 0 if they reported they had no income. Other is missing
+###  Give people an income if they reported it, and 0 if they reported they had no income. Other is missing
 ### This code chunk has extra codes in it unless the missing codes were added. Doesn't mess up results to just leave it.
 mominc <- mominc %>%
   group_by(PUBID_1997, year) %>%
@@ -213,7 +209,7 @@ mominc <- mominc %>%
                            TRUE             ~ NA_integer_
                       ))
 
-## Let's give people the estimated income if they reported it. Use the mean of the range selected, as done for the Gross Income variables.
+### Let's give people the estimated income if they reported it. Use the mean of the range selected, as done for the Gross Income variables.
 ### https://www.nlsinfo.org/content/cohorts/nlsy97/other-documentation/codebook-supplement/appendix-5-income-and-assets-variab-3
 mominc <- mominc %>%
   group_by(PUBID_1997, year) %>%
@@ -232,69 +228,573 @@ mominc <- mominc %>%
 mominc <- arrange(mominc, year, PUBID_1997)
 mominc$birth_year   <- new_data$birth_year
 
-# Mom's business earnings
+## Spouse/Partner Income by year
+
+### YINC-2400 - SP/P RECEIVE INCOME FROM JOB IN PAST YEAR? (incd)
+### YINC-2600 - TOTAL INCOME FROM WAGES AND SALARY IN PAST YEAR (wages)
+### YINC-2700 - ESTIMATED INCOME FROM WAGES AND SALARY IN PAST YEAR (wages_est)
+
+spinc <- new_data %>%
+  select(PUBID_1997, starts_with("YINC-2400"), starts_with("YINC-2600"), starts_with("YINC-2700")) %>%
+  gather(var, val, -PUBID_1997) %>%
+  separate(var, c("type", "year"), "_")
+
+spinc <- spinc %>%
+  mutate(spwages     = case_when(type == "YINC-2600" ~ val),
+         spwages_est = case_when(type == "YINC-2700" ~ val),
+         spincd      = case_when(type == "YINC-2400" ~ val)) %>%
+  group_by(PUBID_1997, year) %>% 
+  summarise(spincd = first(spincd), spwages = nth(spwages, 2), spwages_est = last(spwages_est))
+
+
+### Give people an income if they reported it, and 0 if they reported they had no income. Other is missing
+### This code chunk has extra codes in it unless the missing codes were added. Doesn't mess up results to just leave it.
+spinc <- spinc %>%
+  group_by(PUBID_1997, year) %>%
+  mutate(wages = case_when(incd   == "1"    ~ wages,
+                           incd   == "0"    ~ 0L,
+                           incd   == "-5"   ~ -5L,
+                           incd   == "-4"   ~ -4L,
+                           incd   == "-3"   ~ -3L,
+                           incd   == "-2"   ~ -2L,
+                           incd   == "-1"   ~ -1L,
+                           TRUE             ~ NA_integer_
+  ))
+
+### Let's give people the estimated income if they reported it. Use the mean of the range selected, as done for the Gross Income variables.
+### https://www.nlsinfo.org/content/cohorts/nlsy97/other-documentation/codebook-supplement/appendix-5-income-and-assets-variab-3
+spinc <- spinc %>%
+  group_by(PUBID_1997, year) %>%
+  mutate(wages = case_when(!is.na(wages) & (wages< -5L | wages >=0L)  ~ wages,
+                           wages_est == 1L ~ 2500L,
+                           wages_est == 2L ~ 7500L,
+                           wages_est == 3L ~ 17500L,
+                           wages_est == 4L ~ 37500L,
+                           wages_est == 5L ~ 75000L,
+                           wages_est == 6L ~ 175000L,
+                           wages_est == 7L ~ 250001L,
+                           (wages >= -5L & wages <= -1) & wages_est<= -1L ~ wages,
+                           TRUE            ~ NA_integer_))
+
+## Mom's business earnings
+### YINC-2000 - ANY INCOME FROM OWN BUSINESS OR FARM IN PAST YEAR (mombizd)
+### YINC-2100 - TOTAL INCOME FROM BUSINESS OR FARM IN PAST YEAR (mombiz)
+### YINC-2200 - ESTIMATED INCOME FROM BUSINESS OR FARM IN PAST YEAR (mombiz_est)
+
 mombiz <- new_data %>%
   select(PUBID_1997, starts_with("YINC-2000"), starts_with("YINC-2100"), starts_with("YINC-2200")) %>%
   gather(var, val, -PUBID_1997) %>%
   separate(var, c("type", "year"), "_")
 
 mombiz <- mombiz %>%
-  mutate(bizinc     = case_when(type == "YINC-2100" ~ val),
-         bizinc_est = case_when(type == "YINC-2200" ~ val),
-         bizincd    = case_when(type == "YINC-2000" ~ val)) %>%
+  mutate(mombiz     = case_when(type == "YINC-2100" ~ val),
+         mombiz_est = case_when(type == "YINC-2200" ~ val),
+         mombizd    = case_when(type == "YINC-2000" ~ val)) %>%
   group_by(PUBID_1997, year) %>%
-  summarise(bizincd = first(bizincd), bizinc = nth(bizinc, 2), bizinc_est = last(bizinc_est))
+  summarise(mombizd = first(mombizd), mombiz = nth(mombiz, 2), mombiz_est = last(mombiz_est))
 
 mombiz <- mombiz %>%
   group_by(PUBID_1997, year) %>%
-  mutate(bizinc = case_when(bizincd    == "1"  ~ bizinc,
-                            bizincd    == "0"  ~ 0L,
-                            bizinc_est == "-1" ~ -2L,
-                            bizinc_est == "2"  ~ 2500L,
-                            bizinc_est == "3"  ~ 7500L,
-                            bizinc_est == "4"  ~ 17500L,
-                            bizinc_est == "5"  ~ 37500L,
-                            bizinc_est == "6"  ~ 75000L,
-                            bizinc_est == "7"  ~ 175000L,
-                            bizinc_est == "8"  ~ 250001L,
-                            (bizinc >= -5L & bizinc <= -1) & bizinc_est<= -1L ~ bizinc,
+  mutate(mombiz = case_when(mombizd    == "1"  ~ mombiz,
+                            mombizd    == "0"  ~ 0L,
+                            mombiz_est == "1"  ~ -2L,
+                            mombiz_est == "2"  ~ 2500L,
+                            mombiz_est == "3"  ~ 7500L,
+                            mombiz_est == "4"  ~ 17500L,
+                            mombiz_est == "5"  ~ 37500L,
+                            mombiz_est == "6"  ~ 75000L,
+                            mombiz_est == "7"  ~ 175000L,
+                            mombiz_est == "8"  ~ 250001L,
+                            (mombiz >= -5L & mombiz <= -1) & mombiz_est<= -1L ~ mombiz,
                             TRUE               ~ NA_integer_))
 
-# Create mom's total income variable
-## Add mombiz to mominc
-mombiz <- arrange(mombiz, year, PUBID_1997)
-mominc$bizinc   <- mombiz$bizinc
+## Spouse/Partner's business earnings
+### YINC-2900 - SP/P RECEIVE ANY INCOME FROM OWN BUSINESS OR FARM IN PAST YEAR (spbizd)
+### YINC-3000 - SP/P TOTAL INCOME FROM BUSINESS OR FARM IN PAST YEAR (spbiz)
+### YINC-3100 - SP/P ESTIMATED INCOME FROM BUSINESS OR FARM IN PAST YEAR (spbiz_est)
 
-## Combine income variables
-mominc <- mominc %>%
+spbiz <- new_data %>%
+  select(PUBID_1997, starts_with("YINC-2900"), starts_with("YINC-3000"), starts_with("YINC-3100")) %>%
+  gather(var, val, -PUBID_1997) %>%
+  separate(var, c("type", "year"), "_")
+
+spbiz <- spbiz %>%
+  mutate(spbiz     = case_when(type == "YINC-3000" ~ val),
+         spbiz_est = case_when(type == "YINC-3100" ~ val),
+         spbizd    = case_when(type == "YINC-2900" ~ val)) %>%
+  group_by(PUBID_1997, year) %>%
+  summarise(spbizd = first(spbizd), spbiz = nth(spbiz, 2), spbiz_est = last(spbiz_est))
+
+spbiz <- spbiz %>%
+  group_by(PUBID_1997, year) %>%
+  mutate(spbiz = case_when( spbizd    == "1"  ~ spbiz,
+                            spbizd    == "0"  ~ 0L,
+                            spbiz_est == "1"  ~ -2L,
+                            spbiz_est == "2"  ~ 2500L,
+                            spbiz_est == "3"  ~ 7500L,
+                            spbiz_est == "4"  ~ 17500L,
+                            spbiz_est == "5"  ~ 37500L,
+                            spbiz_est == "6"  ~ 75000L,
+                            spbiz_est == "7"  ~ 175000L,
+                            spbiz_est == "8"  ~ 250001L,
+                            (spbiz >= -5L & spbiz <= -1) & spbiz_est<= -1L ~ spbiz,
+                            TRUE               ~ NA_integer_))
+
+## Other family members' income who are living with R
+### YINC-11600 - TOTAL COMBINED INCOME OTHER ADULT HOUSEHOLD FAMILY MEMBERS IN PAST YEAR (hhinc)
+### YINC-11700 - ESTIMATED TOTAL INCOME WAGES/BUS/FARM PAST YEAR (OTHER HH MEMBERS) (hhinc_est)
+
+hhinc <- new_data %>%
+  select(PUBID_1997, starts_with("YINC-11600"), starts_with("YINC-11700")) %>%
+  gather(var, val, -PUBID_1997) %>%
+  separate(var, c("type", "year"), "_")
+
+hhinc <- hhinc %>%
+  mutate(hhinc     = case_when(type == "YINC-11600A" | type == "YINC-11600B" ~ val),
+         hhinc_est = case_when(type == "YINC-11700"  ~ val)) %>%
+  group_by(PUBID_1997, year) %>%
+  summarise(hhinc = first(hhinc), hhinc_est = last(hhinc_est))
+
+hhinc <- hhinc %>%
+  group_by(PUBID_1997, year) %>%
+  mutate(hhinc = case_when( hhinc     >= "0"  ~ hhinc,
+                            hhinc_est == "1"  ~ 2500L,
+                            hhinc_est == "2"  ~ 7500L,
+                            hhinc_est == "3"  ~ 17500L,
+                            hhinc_est == "4"  ~ 37500L,
+                            hhinc_est == "5"  ~ 75000L,
+                            hhinc_est == "6"  ~ 175000L,
+                            hhinc_est == "7"  ~ 250001L,
+                            (hhinc >= -5L & hhinc <= -1) & hhinc_est<= -1L ~ hhinc,
+                            TRUE               ~ NA_integer_))
+
+## Worker's Compensation 
+### YINC-2250 - DID R HAVE ANY INCOME FROM WORKER'S COMPENSATION IN PAST YEAR? (wcompd)
+### YINC-2260 - TOTAL INCOME FROM WORKER'S COMPENSATION IN PAST YEAR (wcomp)
+### YINC-2270 - ESTIMATED INCOME FROM WORKER'S COMPENSATION IN PAST YEAR (wcomp_est)
+
+wcomp <- new_data %>%
+  select(PUBID_1997, starts_with("YINC-2250"), starts_with("YINC-2260"), starts_with("YINC-2270")) %>%
+  gather(var, val, -PUBID_1997) %>%
+  separate(var, c("type", "year"), "_")
+
+wcomp <- wcomp %>%
+  mutate(wcompd     = case_when(type == "YINC-2250" ~ val),
+         wcomp      = case_when(type == "YINC-2260" ~ val),
+         wcomp_est  = case_when(type == "YINC-2270" ~ val)) %>%
+  group_by(PUBID_1997, year) %>%
+  summarise(wcompd = first(wcompd), wcomp = nth(wcomp, 2), wcomp_est = last(wcomp_est))
+
+wcomp <- wcomp %>%
+  group_by(PUBID_1997, year) %>%
+  mutate(wcomp = case_when (wcompd    == "1"  ~ wcomp,
+                            wcompd    == "0"  ~ 0L,
+                            wcomp_est == "1"  ~ 500L,
+                            wcomp_est == "2"  ~ 1750L,
+                            wcomp_est == "3"  ~ 3750L,
+                            wcomp_est == "4"  ~ 7500L,
+                            wcomp_est == "5"  ~ 17500L,
+                            wcomp_est == "6"  ~ 37500L,
+                            wcomp_est == "7"  ~ 50001L,
+                            (wcomp >= -5L & wcomp <= -1L) & (wcomp_est<= 0L | is.na(wcomp_est))~ wcomp,
+                            TRUE               ~ NA_integer_))
+
+## Spouse/Partner's Worker's Compensation 
+### YINC-3150 - DID SP/P HAVE ANY INCOME FROM WORKER'S COMPENSATION IN PAST YEAR? (wcomp_spd)
+### YINC-3160 - TOTAL SP/P INCOME FROM WORKER'S COMPENSATION IN PAST YEAR (wcomp_sp)
+### YINC-3170 - ESTIMATED SP/P INCOME FROM WORKER'S COMPENSATION IN PAST YEAR (wcomp_sp_est)
+
+wcomp_sp <- new_data %>%
+  select(PUBID_1997, starts_with("YINC-3150"), starts_with("YINC-3160"), starts_with("YINC-3170")) %>%
+  gather(var, val, -PUBID_1997) %>%
+  separate(var, c("type", "year"), "_")
+
+wcomp_sp <- wcomp_sp %>%
+  mutate(wcomp_spd     = case_when(type == "YINC-3150" ~ val),
+         wcomp_sp      = case_when(type == "YINC-3160" ~ val),
+         wcomp_sp_est  = case_when(type == "YINC-3170" ~ val)) %>%
+  group_by(PUBID_1997, year) %>%
+  summarise(wcomp_spd = first(wcomp_spd), wcomp_sp = nth(wcomp_sp, 2), wcomp_sp_est = last(wcomp_sp_est))
+
+wcomp_sp <- wcomp_sp %>%
+  group_by(PUBID_1997, year) %>%
+  mutate(wcomp_sp = case_when (wcomp_spd    == "1"  ~ wcomp_sp,
+                               wcomp_spd    == "0"  ~ 0L,
+                               wcomp_sp_est == "1"  ~ 500L,
+                               wcomp_sp_est == "2"  ~ 1750L, #This is wrong in the appendix. Says 1250
+                               wcomp_sp_est == "3"  ~ 3750L,
+                               wcomp_sp_est == "4"  ~ 7500L,
+                               wcomp_sp_est == "5"  ~ 17500L,
+                               wcomp_sp_est == "6"  ~ 37500L,
+                               wcomp_sp_est == "7"  ~ 50001L,
+                               (wcomp_sp >= -5L & wcomp_sp <= -1L) & (wcomp_sp_est<= 0L | is.na(wcomp_sp_est))~ wcomp_sp,
+                               TRUE               ~ NA_integer_))
+
+## Child Support
+### YINC-4000 - R/SPOUSE SUPPOSED TO RECEIVE CHILD SUPPORT? (chsupd)
+### YINC-4100 - TOTAL AMOUNT OF CHILD SUPPORT ACTUALLY RECEIVED (chsup)
+### YINC-4200 - ESTIMATED AMOUNT OF CHILD SUPPORT ACTUALLY RECEIVED (chsup_est)
+
+chsup <- new_data %>%
+  select(PUBID_1997, starts_with("YINC-4000"), starts_with("YINC-4100"), starts_with("YINC-4200")) %>%
+  gather(var, val, -PUBID_1997) %>%
+  separate(var, c("type", "year"), "_")
+
+chsup <- chsup %>%
+  mutate(chsupd     = case_when(type == "YINC-4000" ~ val),
+         chsup      = case_when(type == "YINC-4100" ~ val),
+         chsup_est  = case_when(type == "YINC-4200" ~ val)) %>%
+  group_by(PUBID_1997, year) %>%
+  summarise(chsupd = first(chsupd), chsup = nth(chsup, 2), chsup_est = last(chsup_est))
+
+chsup <- chsup %>%
+  group_by(PUBID_1997, year) %>%
+  mutate(chsup = case_when (chsupd    == "1"  ~ chsup,
+                            chsupd    == "0"  ~ 0L,
+                            chsup_est == "1"  ~ 500L,
+                            chsup_est == "2"  ~ 1750L,
+                            chsup_est == "3"  ~ 3750L,
+                            chsup_est == "4"  ~ 7500L,
+                            chsup_est == "5"  ~ 17500L,
+                            chsup_est == "6"  ~ 37500L,
+                            chsup_est == "7"  ~ 50001L,
+                            (chsup >= -5L & chsup <= -1L) & (chsup_est<= 0L | is.na(chsup_est))~ chsup,
+                            TRUE               ~ NA_integer_))
+
+## Interest payments
+### YINC-4300 - ANY INCOME INTEREST FROM BANK SOURCES AND ACCOUNTS? (intrstd)
+### YINC-4400 - TOTAL INCOME INTEREST FROM BANK ACCOUNTS (intrst)
+### YINC-4500 - EST INCOME INTEREST FROM BANK ACCOUNTS (intrst_est)
+
+intrst <- new_data %>%
+  select(PUBID_1997, starts_with("YINC-4300"), starts_with("YINC-4400"), starts_with("YINC-4500")) %>%
+  gather(var, val, -PUBID_1997) %>%
+  separate(var, c("type", "year"), "_")
+
+intrst <- intrst %>%
+  mutate(intrstd     = case_when(type == "YINC-4300" ~ val),
+         intrst      = case_when(type == "YINC-4400" ~ val),
+         intrst_est  = case_when(type == "YINC-4500" ~ val)) %>%
+  group_by(PUBID_1997, year) %>%
+  summarise(intrstd = first(intrstd), intrst = nth(intrst, 2), intrst_est = last(intrst_est))
+
+intrst <- intrst %>%
+  group_by(PUBID_1997, year) %>%
+  mutate(intrst = case_when (intrstd   == "1"  ~ intrst,
+                             intrstd    == "0"  ~ 0L,
+                             intrst_est == "1"  ~ 250L,
+                             intrst_est == "2"  ~ 750L,
+                             intrst_est == "3"  ~ 1750L,
+                             intrst_est == "4"  ~ 3750L,
+                             intrst_est == "5"  ~ 6250L,
+                             intrst_est == "6"  ~ 8750L,
+                             intrst_est == "7"  ~ 10001L,
+                             (intrst >= -5L & intrst <= -1L) & (intrst_est<= 0L | is.na(intrst_est))~ intrst,
+                             TRUE               ~ NA_integer_))
+
+## Stocks & mutual funds
+### YINC-4600 - ANY INCOME FROM DIVIDENDS FROM STOCKS OR MUTUAL FUNDS? (dvdendd)
+### YINC-4700 - TOTAL INCOME FROM DIVIDENDS FROM STOCKS OR MUTUAL FUNDS (dvdend)
+### YINC-4800 - ESTIMATED INCOME FROM DIVIDENDS FROM STOCKS OR MUTUAL FUNDS (dvdend_est)
+
+dvdend <- new_data %>%
+  select(PUBID_1997, starts_with("YINC-4600"), starts_with("YINC-4700"), starts_with("YINC-4800")) %>%
+  gather(var, val, -PUBID_1997) %>%
+  separate(var, c("type", "year"), "_")
+
+dvdend <- dvdend %>%
+  mutate(dvdendd     = case_when(type == "YINC-4600" ~ val),
+         dvdend      = case_when(type == "YINC-4700" ~ val),
+         dvdend_est  = case_when(type == "YINC-4800" ~ val)) %>%
+  group_by(PUBID_1997, year) %>%
+  summarise(dvdendd = first(dvdendd), dvdend = nth(dvdend, 2), dvdend_est = last(dvdend_est))
+
+dvdend <- dvdend %>%
+  group_by(PUBID_1997, year) %>%
+  mutate(dvdend = case_when(dvdendd    == "1"  ~ dvdend,
+                            dvdendd    == "0"  ~ 0L,
+                            dvdend_est == "1"  ~ 250L,
+                            dvdend_est == "2"  ~ 750L,
+                            dvdend_est == "3"  ~ 1750L,
+                            dvdend_est == "4"  ~ 3750L,
+                            dvdend_est == "5"  ~ 6250L,
+                            dvdend_est == "6"  ~ 8750L,
+                            dvdend_est == "7"  ~ 10001L,
+                            (dvdend >= -5L & dvdend <= -1L) & (dvdend_est<= 0L | is.na(dvdend_est))~ dvdend,
+                            TRUE               ~ NA_integer_))
+
+## Rental Income
+### YINC-4900 - ANY INCOME FROM RENTAL PROPERTY? (rntincd)
+### YINC-5000 - TOTAL INCOME FROM RENTAL PROPERTY (rntinc)
+### YINC-5100 - ESTIMATED INCOME FROM RENTAL PROPERTY (rntinc_est)
+
+rntinc <- new_data %>%
+  select(PUBID_1997, starts_with("YINC-4900"), starts_with("YINC-5000"), starts_with("YINC-5100")) %>%
+  gather(var, val, -PUBID_1997) %>%
+  separate(var, c("type", "year"), "_")
+
+rntinc <- rntinc %>%
+  mutate(rntincd     = case_when(type == "YINC-4900" ~ val),
+         rntinc      = case_when(type == "YINC-5000" ~ val),
+         rntinc_est  = case_when(type == "YINC-5100" ~ val)) %>%
+  group_by(PUBID_1997, year) %>%
+  summarise(rntincd = first(rntincd), rntinc = nth(rntinc, 2), rntinc_est = last(rntinc_est))
+
+rntinc <- rntinc %>%
+  group_by(PUBID_1997, year) %>%
+  mutate(rntinc = case_when(rntincd    == "1"  ~ rntinc,
+                            rntincd    == "0"  ~ 0L,
+                            rntinc_est == "1"  ~ 500L,
+                            rntinc_est == "2"  ~ 1750L,
+                            rntinc_est == "3"  ~ 3750L,
+                            rntinc_est == "4"  ~ 7500L,
+                            rntinc_est == "5"  ~ 17500L,
+                            rntinc_est == "6"  ~ 37500L,
+                            rntinc_est == "7"  ~ 50001L,
+                            (rntinc >= -5L & rntinc <= -1L) & (rntinc_est<= 0L | is.na(rntinc_est))~ rntinc,
+                            TRUE               ~ NA_integer_))
+
+## Estates, trusts
+### YINC-5200 - ANY INCOME OR PROPERTY FROM ESTATES, TRUSTS, INHERITANCE? (inhincd)
+### YINC-5300 - TOTAL MARKET VALUE OF ESTATES, TRUSTS, INHERITANCE (inhinc)
+### YINC-5400 - EST MARKET VALUE OF ESTATES, TRUSTS, INHERITANCE (inhinc_est)
+
+inhinc <- new_data %>%
+  select(PUBID_1997, starts_with("YINC-5200"), starts_with("YINC-5300"), starts_with("YINC-5400")) %>%
+  gather(var, val, -PUBID_1997) %>%
+  separate(var, c("type", "year"), "_")
+
+inhinc <- inhinc %>%
+  mutate(inhincd     = case_when(type == "YINC-5200" ~ val),
+         inhinc      = case_when(type == "YINC-5300" ~ val),
+         inhinc_est  = case_when(type == "YINC-5400" ~ val)) %>%
+  group_by(PUBID_1997, year) %>%
+  summarise(inhincd = first(inhincd), inhinc = nth(inhinc, 2), inhinc_est = last(inhinc_est))
+
+inhinc <- inhinc %>%
+  group_by(PUBID_1997, year) %>%
+  mutate(inhinc = case_when (inhincd    == "1"  ~ inhinc,
+                             inhincd    == "0"  ~ 0L,
+                             inhinc_est == "1"  ~ 2500L,
+                             inhinc_est == "2"  ~ 7500L,
+                             inhinc_est == "3"  ~ 17500L,
+                             inhinc_est == "4"  ~ 37500L,
+                             inhinc_est == "5"  ~ 75000L,
+                             inhinc_est == "6"  ~ 175000L,
+                             inhinc_est == "7"  ~ 250001L,
+                             (inhinc >= -5L & inhinc <= -1L) & (inhinc_est<= 0L | is.na(inhinc_est))~ inhinc,
+                             TRUE               ~ NA_integer_))
+
+## Gift income
+### YINC-5700 - PARENTS GIVE R ANY MONEY, NOT ALLOWANCE? (gtfincd)
+### YINC-5800 - TOTAL AMOUNT OF INCOME PARENTS GAVE R (gftinc)
+### YINC-5900 - ESTIMATED AMOUNT OF INCOME PARENTS GAVE R (gftinc_est)
+
+gftinc <- new_data %>%
+  select(PUBID_1997, starts_with("YINC-5700"), starts_with("YINC-5800"), starts_with("YINC-5900")) %>%
+  gather(var, val, -PUBID_1997) %>%
+  separate(var, c("type", "year"), "_")
+
+gftinc <- gftinc %>%
+  mutate(gftincd     = case_when(type == "YINC-5700" ~ val),
+         gftinc      = case_when(type == "YINC-5800" ~ val),
+         gftinc_est  = case_when(type == "YINC-5900" ~ val)) %>%
+  group_by(PUBID_1997, year) %>%
+  summarise(gftincd = first(gftincd), gftinc = nth(gftinc, 2), gftinc_est = last(gftinc_est))
+
+gftinc <- gftinc %>%
+  group_by(PUBID_1997, year) %>%
+  mutate(gftinc = case_when(gftincd    == "1"  ~ gftinc,
+                            gftincd    == "0"  ~ 0L,
+                            gftinc_est == "1"  ~ 250L,
+                            gftinc_est == "2"  ~ 750L,
+                            gftinc_est == "3"  ~ 1750L,
+                            gftinc_est == "4"  ~ 3750L,
+                            gftinc_est == "5"  ~ 6250L,
+                            gftinc_est == "6"  ~ 8750L,
+                            gftinc_est == "7"  ~ 10001L,
+                            (gftinc >= -5L & gftinc <= -1L) & (gftinc_est<= 0L | is.na(gftinc_est))~ gftincd, #replace with dum var for this var
+                            TRUE               ~ NA_integer_))
+
+## Other income
+### YINC-7600 - INCOME FROM OTHER SOURCES SUCH AS SOCIAL SECURITY, PENSION, INSURANCE? (othincd)
+### YINC-7700 - TOTAL INCOME FROM OTHER SOURCES PAST YEAR (othinc)
+### YINC-7800 - ESTIMATED INCOME FROM OTHER SOURCES PAST YEAR (othinc_est)
+
+othinc <- new_data %>%
+  select(PUBID_1997, starts_with("YINC-7600"), starts_with("YINC-7700"), starts_with("YINC-7800")) %>%
+  gather(var, val, -PUBID_1997) %>%
+  separate(var, c("type", "year"), "_")
+
+othinc <- othinc %>%
+  mutate(othincd     = case_when(type == "YINC-7600" ~ val),
+         othinc      = case_when(type == "YINC-7700" ~ val),
+         othinc_est  = case_when(type == "YINC-7800" ~ val)) %>%
+  group_by(PUBID_1997, year) %>%
+  summarise(othincd = first(othincd), othinc = nth(othinc, 2), othinc_est = last(othinc_est))
+
+othinc <- othinc %>%
+  group_by(PUBID_1997, year) %>%
+  mutate(othinc = case_when(othincd    == "1"  ~ othinc,
+                            othincd    == "0"  ~ 0L,
+                            othinc_est == "1"  ~ 500L,
+                            othinc_est == "2"  ~ 1750L,
+                            othinc_est == "3"  ~ 3750L,
+                            othinc_est == "4"  ~ 7500L,
+                            othinc_est == "5"  ~ 17500L,
+                            othinc_est == "6"  ~ 37500L,
+                            othinc_est == "7"  ~ 50001L,
+                            (othinc >= -5L & othinc <= -1L) & (othinc_est<= 0L | is.na(othinc_est))~ othinc,
+                            TRUE               ~ NA_integer_))
+
+## Cash Assistance
+### YINC-6000A - ANY CASH ASSISTANCE FROM GOVERNMENT PROGRAMS SUCH AS SSI TANF, ETC.?
+### YINC-6100A - 	AMOUNT OF CASH ASSISTANCE FROM GOVERNMENT PROGRAMS
+
+govpro1 <- new_data %>%
+  select(PUBID_1997, starts_with("YINC-6000A"), starts_with("YINC-6100A")) %>%
+  gather(var, val, -PUBID_1997) %>%
+  separate(var, c("type", "year"), "_")
+
+govpro1 <- govpro1 %>%
+  mutate(govpro1d     = case_when(type == "YINC-6000A" ~ val),
+         govpro1      = case_when(type == "YINC-6100A" ~ val)) %>%
+  group_by(PUBID_1997, year) %>%
+  summarise(govpro1d = first(govpro1d), govpro1 = nth(govpro1, 2))
+
+govpro1 <- govpro1 %>%
+  group_by(PUBID_1997, year) %>%
+  mutate(govpro1 = case_when(govpro1d   == "0"  ~ 0L,
+                             govpro1     == "1"  ~ 250L,
+                             govpro1     == "2"  ~ 750L,
+                             govpro1     == "3"  ~ 1750L,
+                             govpro1     == "4"  ~ 3750L,
+                             govpro1     == "5"  ~ 6250L,
+                             govpro1     == "6"  ~ 8750L,
+                             govpro1     == "7"  ~ 10001L,
+                             (govpro1 >= -5L & govpro1 <= -1L) ~ govpro1,
+                             (govpro1d >= -5L & govpro1d <= -1L) ~ govpro1d,
+                             TRUE                ~ NA_integer_))
+
+## Cash Assistance from WIC, SNA, or Food Stamps
+### YINC-6200A - CASH ASSISTANCE FROM WIC, SNAP, OR FOOD STAMPS?
+### YINC-6300A - AMOUNT OF CASH ASSISTANCE FROM WIC, SNAP, OR FOOD STAMPS
+
+govpro2 <- new_data %>%
+  select(PUBID_1997, starts_with("YINC-6200A"), starts_with("YINC-6300A")) %>%
+  gather(var, val, -PUBID_1997) %>%
+  separate(var, c("type", "year"), "_")
+
+govpro2 <- govpro2 %>%
+  mutate(govpro2d     = case_when(type == "YINC-6200A" ~ val),
+         govpro2      = case_when(type == "YINC-6300A" ~ val)) %>%
+  group_by(PUBID_1997, year) %>%
+  summarise(govpro2d = first(govpro2d), govpro2 = nth(govpro2, 2))
+
+govpro2 <- govpro2 %>%
+  group_by(PUBID_1997, year) %>%
+  mutate(govpro2 = case_when(govpro2d   == "0"  ~ 0L,
+                             govpro2     == "1"  ~ 250L,
+                             govpro2     == "2"  ~ 750L,
+                             govpro2     == "3"  ~ 1750L,
+                             govpro2     == "4"  ~ 3750L,
+                             govpro2     == "5"  ~ 6250L,
+                             govpro2     == "6"  ~ 8750L,
+                             govpro2     == "7"  ~ 10001L,
+                             (govpro2 >= -5L & govpro2 <= -1L) ~ govpro2,
+                             (govpro2d >= -5L & govpro2d <= -1L) ~ govpro2d,
+                             TRUE                ~ NA_integer_))
+
+## Any other benefits from government programs
+### YINC-6400A - ANY OTHER BENEFITS FROM GOVERNMENT PROGRAMS?
+### YINC-6500A - CASH VALUE OF OTHER BENEFITS FROM GOVERNMENT PROGRAMS
+
+govpro3 <- new_data %>%
+  select(PUBID_1997, starts_with("YINC-6400A"), starts_with("YINC-6500A")) %>%
+  gather(var, val, -PUBID_1997) %>%
+  separate(var, c("type", "year"), "_")
+
+govpro3 <- govpro3 %>%
+  mutate(govpro3d     = case_when(type == "YINC-6400A" ~ val),
+         govpro3      = case_when(type == "YINC-6500A" ~ val)) %>%
+  group_by(PUBID_1997, year) %>%
+  summarise(govpro3d = first(govpro3d), govpro3 = nth(govpro3, 2))
+
+govpro3 <- govpro3 %>%
+  group_by(PUBID_1997, year) %>%
+  mutate(govpro3 = case_when(govpro3d    == "0"  ~ 0L,
+                             govpro3     == "1"  ~ 250L,
+                             govpro3     == "2"  ~ 750L,
+                             govpro3     == "3"  ~ 1750L,
+                             govpro3     == "4"  ~ 3750L,
+                             govpro3     == "5"  ~ 6250L,
+                             govpro3     == "6"  ~ 8750L,
+                             govpro3     == "7"  ~ 10001L,
+                             (govpro3 >= -5L & govpro3 <= -1L)  ~ govpro3,
+                             (govpro3d >= -5L & govpro3d <= -1L) ~ govpro3d,
+                             TRUE                ~ NA_integer_))
+
+## Create mom's total income variable
+##  wages, mombiz, chsup, dvdend, gftinc, govpro1, govpro2, govpro3, inhinc, intrst, othinc, rntinc, wcomp
+### mombiz <- arrange(mombiz, year, PUBID_1997)
+### mominc$mombiz   <- mombiz$mombiz
+
+
+inc_data   <- mominc
+inc_data   <- left_join(inc_data,   mombiz)
+inc_data   <- left_join(inc_data,   chsup)
+inc_data   <- left_join(inc_data,   dvdend)
+inc_data   <- left_join(inc_data,   gftinc)
+inc_data   <- left_join(inc_data,   govpro1)
+inc_data   <- left_join(inc_data,   govpro2)
+inc_data   <- left_join(inc_data,   govpro3)
+inc_data   <- left_join(inc_data,   inhinc)
+inc_data   <- left_join(inc_data,   intrst)
+inc_data   <- left_join(inc_data,   othinc)
+inc_data   <- left_join(inc_data,   rntinc)
+inc_data   <- left_join(inc_data,   wcomp)
+
+inc_data <- inc_data %>%
+  select(PUBID_1997, year, birth_year, wages, mombiz, chsup, dvdend, gftinc, govpro1, govpro2, govpro3, inhinc, intrst, othinc, rntinc, wcomp)
+
+#I'm going to need to handle the missing data for all of these variables before combining them.......
+inc_data[inc_data == -4] = 0  # Valid missing
+
+inc_data <- inc_data %>%
+  filter(wages != -5)         # Non-interview
+
+inc_data[is.na(inc_data)] = 0 # Make missing 0 so don't drop them just because variable didn't exist that year
+
+inc_data[inc_data == -3] <- NA # Invalid missing 
+inc_data[inc_data == -2] <- NA # Dont know 
+inc_data[inc_data == -1] <- NA # Refused 
+
+inc_data <- inc_data %>%
   group_by(PUBID_1997, year) %>%  
-  mutate(momtot = case_when(wages >-1     & (bizinc<=-6 | bizinc >=0)  ~ wages + bizinc,
-                            !is.na(wages) & (bizinc>=-5 | bizinc <=-1) ~ wages,
-                            wages < 0     &  bizinc>=0                 ~ bizinc,
-                            TRUE                                       ~ NA_integer_))
+  mutate(momtot = wages + mombiz + chsup + dvdend + gftinc + govpro1 + govpro2 + govpro3 + inhinc + intrst + othinc + rntinc + wcomp)
 
 # Create the birth year plus 1 variables
-mominc$birth_year1   <- mominc$birth_year + 1
-mominc$birth_year2   <- mominc$birth_year + 2
-mominc$birth_year3   <- mominc$birth_year + 3
-mominc$birth_year4   <- mominc$birth_year + 4
-mominc$birth_year5   <- mominc$birth_year + 5
-mominc$birth_year6   <- mominc$birth_year + 6
-mominc$birth_year7   <- mominc$birth_year + 7
-mominc$birth_year8   <- mominc$birth_year + 8
-mominc$birth_year9   <- mominc$birth_year + 9
-mominc$birth_year10  <- mominc$birth_year + 10
-mominc$birth_year11  <- mominc$birth_year + 11
+inc_data$birth_year1   <- inc_data$birth_year + 1
+inc_data$birth_year2   <- inc_data$birth_year + 2
+inc_data$birth_year3   <- inc_data$birth_year + 3
+inc_data$birth_year4   <- inc_data$birth_year + 4
+inc_data$birth_year5   <- inc_data$birth_year + 5
+inc_data$birth_year6   <- inc_data$birth_year + 6
+inc_data$birth_year7   <- inc_data$birth_year + 7
+inc_data$birth_year8   <- inc_data$birth_year + 8
+inc_data$birth_year9   <- inc_data$birth_year + 9
+inc_data$birth_year10  <- inc_data$birth_year + 10
+inc_data$birth_year11  <- inc_data$birth_year + 11
 
-mominc$birth_minus1 <- mominc$birth_year - 1
-mominc$birth_minus2 <- mominc$birth_year - 2
-mominc$birth_minus3 <- mominc$birth_year - 3
-mominc$birth_minus4 <- mominc$birth_year - 4
+inc_data$birth_minus1 <- inc_data$birth_year - 1
+inc_data$birth_minus2 <- inc_data$birth_year - 2
+inc_data$birth_minus3 <- inc_data$birth_year - 3
+inc_data$birth_minus4 <- inc_data$birth_year - 4
 
 
 # give people the income they reported for each of the income plus 1 variables
 ## Careful - t0 is birth year plus 1 for income because respondents report income from the previous year
-mominc <- mominc %>%
+inc_data <- inc_data %>%
   group_by(PUBID_1997) %>% 
   mutate(inc_t0  = case_when(birth_year1   == year ~ momtot),
          inc_t1  = case_when(birth_year2   == year ~ momtot),
@@ -309,7 +809,7 @@ mominc <- mominc %>%
          inc_t10 = case_when(birth_year11  == year ~ momtot))
 
 # give people the income they reported for each of the income minus 1 variables
-mominc <- mominc %>%
+inc_data <- inc_data %>%
   group_by(PUBID_1997) %>% 
   mutate(inc_m1 = case_when(birth_year   == year ~ momtot),
          inc_m2 = case_when(birth_minus1 == year ~ momtot),
@@ -318,35 +818,46 @@ mominc <- mominc %>%
          inc_m5 = case_when(birth_minus4 == year ~ momtot))
 
 # aggregate the data so there is 1 row per person
-mominc <- mominc %>%
+inc_data <- inc_data %>%
 group_by(PUBID_1997) %>% 
   summarise_at(c("inc_t0", "inc_t1", "inc_t2", "inc_t3", "inc_t4", "inc_t5", 
                  "inc_t6", "inc_t7", "inc_t8", "inc_t9", "inc_t10",
                  "inc_m1", "inc_m2", "inc_m3", "inc_m4", "inc_m5"), mean, na.rm = TRUE)
 
 ## replace the NaN with NA to address the missing
-mominc$inc_t0[is.nan(mominc$inc_t0)] <- NA
-mominc$inc_t1[is.nan(mominc$inc_t1)] <- NA
-mominc$inc_t2[is.nan(mominc$inc_t2)] <- NA
-mominc$inc_t3[is.nan(mominc$inc_t3)] <- NA
-mominc$inc_t4[is.nan(mominc$inc_t4)] <- NA
-mominc$inc_t5[is.nan(mominc$inc_t5)] <- NA
-mominc$inc_t6[is.nan(mominc$inc_t6)] <- NA
-mominc$inc_t7[is.nan(mominc$inc_t7)] <- NA
-mominc$inc_t8[is.nan(mominc$inc_t8)] <- NA
-mominc$inc_t9[is.nan(mominc$inc_t9)] <- NA
-mominc$inc_t10[is.nan(mominc$inc_t10)] <- NA
+inc_data$inc_t0[is.nan(inc_data$inc_t0)] <- NA
+inc_data$inc_t1[is.nan(inc_data$inc_t1)] <- NA
+inc_data$inc_t2[is.nan(inc_data$inc_t2)] <- NA
+inc_data$inc_t3[is.nan(inc_data$inc_t3)] <- NA
+inc_data$inc_t4[is.nan(inc_data$inc_t4)] <- NA
+inc_data$inc_t5[is.nan(inc_data$inc_t5)] <- NA
+inc_data$inc_t6[is.nan(inc_data$inc_t6)] <- NA
+inc_data$inc_t7[is.nan(inc_data$inc_t7)] <- NA
+inc_data$inc_t8[is.nan(inc_data$inc_t8)] <- NA
+inc_data$inc_t9[is.nan(inc_data$inc_t9)] <- NA
+inc_data$inc_t10[is.nan(inc_data$inc_t10)] <- NA
 
-mominc$inc_m1[is.nan(mominc$inc_m1)] <- NA
-mominc$inc_m2[is.nan(mominc$inc_m2)] <- NA
-mominc$inc_m3[is.nan(mominc$inc_m3)] <- NA
-mominc$inc_m4[is.nan(mominc$inc_m4)] <- NA
-mominc$inc_m5[is.nan(mominc$inc_m5)] <- NA
+inc_data$inc_m1[is.nan(inc_data$inc_m1)] <- NA
+inc_data$inc_m2[is.nan(inc_data$inc_m2)] <- NA
+inc_data$inc_m3[is.nan(inc_data$inc_m3)] <- NA
+inc_data$inc_m4[is.nan(inc_data$inc_m4)] <- NA
+inc_data$inc_m5[is.nan(inc_data$inc_m5)] <- NA
 
 ### Add new variables to original dataset
-new_data   <- left_join(new_data,   mominc, by = "PUBID_1997")
+new_data  <- left_join(new_data,   inc_data, by = "PUBID_1997")
+remove(chsup)
+remove(dvdend)
+remove(gftinc)
+remove(govpro1)
+remove(govpro2)
+remove(govpro3)
+remove(inhinc)
+remove(intrst)
 remove(mominc)
-remove(mombiz)
+remove(othinc)
+remove(rntinc)
+remove(wcomp)
+
 
 ### R's Total Household Income by year
 # https://www.nlsinfo.org/content/cohorts/nlsy97/topical-guide/income/income
@@ -441,7 +952,7 @@ which( colnames(nlsy97)=="dob" )
 which( colnames(nlsy97)=="hhinc_m5" )
 
 nlsy97 <- nlsy97 %>%
-  select(1, 253:294) # This needs to be updated each time new variables are added/created.
+  select(1, 735:776) # This needs to be updated each time new variables are added/created.
 
 # sample <- nlsy97 %>%
   # select(PUBID_1997, birth_year, age_birth, mar_t1:bw_m4)
@@ -491,111 +1002,203 @@ nlsy97 %>%
   ggplot(aes(inc_t1)) +
   geom_histogram()
 
-# BREADWINNER
+# BREADWINNER 50%
 nlsy97 <- nlsy97 %>%
   mutate(
-    bw_t0 = case_when(
+    bw5_t0 = case_when(
+      (nlsy97$inc_t0/nlsy97$hhinc_t0) > .5 ~ "Breadwinner",
+      (nlsy97$inc_t0/nlsy97$hhinc_t0) < .5 ~ "Not a breadwinner",
+      TRUE                                   ~  NA_character_),
+    bw5_t1 = case_when(
+      (nlsy97$inc_t1/nlsy97$hhinc_t1) > .5 ~ "Breadwinner",
+      (nlsy97$inc_t1/nlsy97$hhinc_t1) < .5 ~ "Not a breadwinner",
+      TRUE                                   ~  NA_character_),
+    bw5_t2 = case_when(
+      (nlsy97$inc_t2/nlsy97$hhinc_t2) > .5 ~ "Breadwinner",
+      (nlsy97$inc_t2/nlsy97$hhinc_t2) < .5 ~ "Not a breadwinner",
+      TRUE                                   ~  NA_character_),
+    bw5_t3 = case_when(
+      (nlsy97$inc_t3/nlsy97$hhinc_t3) > .5 ~ "Breadwinner",
+      (nlsy97$inc_t3/nlsy97$hhinc_t3) < .5 ~ "Not a breadwinner",
+      TRUE                                   ~  NA_character_),
+    bw5_t4 = case_when(
+      (nlsy97$inc_t4/nlsy97$hhinc_t4) > .5 ~ "Breadwinner",
+      (nlsy97$inc_t4/nlsy97$hhinc_t4) < .5 ~ "Not a breadwinner",
+      TRUE                                   ~  NA_character_),
+    bw5_t5 = case_when(
+      (nlsy97$inc_t5/nlsy97$hhinc_t5) > .5 ~ "Breadwinner",
+      (nlsy97$inc_t5/nlsy97$hhinc_t5) < .5 ~ "Not a breadwinner",
+      TRUE                                   ~  NA_character_),
+    bw5_t6 = case_when(
+      (nlsy97$inc_t6/nlsy97$hhinc_t6) > .5 ~ "Breadwinner",
+      (nlsy97$inc_t6/nlsy97$hhinc_t6) < .5 ~ "Not a breadwinner",
+      TRUE                                   ~  NA_character_),
+    bw5_t7 = case_when(
+      (nlsy97$inc_t7/nlsy97$hhinc_t7) > .5 ~ "Breadwinner",
+      (nlsy97$inc_t7/nlsy97$hhinc_t7) < .5 ~ "Not a breadwinner",
+      TRUE                                   ~  NA_character_),
+    bw5_t8 = case_when(
+      (nlsy97$inc_t8/nlsy97$hhinc_t8) > .5 ~ "Breadwinner",
+      (nlsy97$inc_t8/nlsy97$hhinc_t8) < .5 ~ "Not a breadwinner",
+      TRUE                                   ~  NA_character_),
+    bw5_t9 = case_when(
+      (nlsy97$inc_t9/nlsy97$hhinc_t9) > .5 ~ "Breadwinner",
+      (nlsy97$inc_t9/nlsy97$hhinc_t9) < .5 ~ "Not a breadwinner",
+      TRUE                                   ~  NA_character_),
+    bw5_t10 = case_when(
+      (nlsy97$inc_t10/nlsy97$hhinc_t10) > .5 ~ "Breadwinner",
+      (nlsy97$inc_t10/nlsy97$hhinc_t10) < .5 ~ "Not a breadwinner",
+      TRUE                                   ~  NA_character_)
+  )
+nlsy97$bw5_t0 <- factor(nlsy97$bw5_t0, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw5_t1 <- factor(nlsy97$bw5_t1, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw5_t2 <- factor(nlsy97$bw5_t2, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw5_t3 <- factor(nlsy97$bw5_t3, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw5_t4 <- factor(nlsy97$bw5_t4, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw5_t5 <- factor(nlsy97$bw5_t5, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw5_t6 <- factor(nlsy97$bw5_t6, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw5_t7 <- factor(nlsy97$bw5_t7, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw5_t8 <- factor(nlsy97$bw5_t8, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw5_t9 <- factor(nlsy97$bw5_t9, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw5_t10 <- factor(nlsy97$bw5_t10, levels = c("Breadwinner", "Not a breadwinner"))
+
+
+nlsy97 <- nlsy97 %>%
+  mutate(
+    bw5_m1 = case_when(
+      (nlsy97$inc_m1/nlsy97$hhinc_m1) > .5 ~ "Breadwinner",
+      (nlsy97$inc_m1/nlsy97$hhinc_m1) < .5 ~ "Not a breadwinner",
+      TRUE                                   ~  NA_character_),
+    bw5_m2 = case_when(
+      (nlsy97$inc_m2/nlsy97$hhinc_m2) > .5 ~ "Breadwinner",
+      (nlsy97$inc_m2/nlsy97$hhinc_m2) < .5 ~ "Not a breadwinner",
+      TRUE                                   ~  NA_character_),
+    bw5_m3 = case_when(
+      (nlsy97$inc_m3/nlsy97$hhinc_m3) > .5 ~ "Breadwinner",
+      (nlsy97$inc_m3/nlsy97$hhinc_m3) < .5 ~ "Not a breadwinner",
+      TRUE                                   ~  NA_character_),
+    bw5_m4 = case_when(
+      (nlsy97$inc_m4/nlsy97$hhinc_m4) > .5 ~ "Breadwinner",
+      (nlsy97$inc_m4/nlsy97$hhinc_m4) < .5 ~ "Not a breadwinner",
+      TRUE                                   ~  NA_character_),
+    bw5_m5 = case_when(
+      (nlsy97$hhinc_m5/nlsy97$inc_m5) > .5 ~ "Breadwinner",
+      (nlsy97$hhinc_m5/nlsy97$inc_m5) < .5 ~ "Not a breadwinner",
+      TRUE                                   ~  NA_character_),
+  )
+
+nlsy97$bw5_m1 <- factor(nlsy97$bw5_m1, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw5_m2 <- factor(nlsy97$bw5_m2, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw5_m3 <- factor(nlsy97$bw5_m3, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw5_m4 <- factor(nlsy97$bw5_m4, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw5_m5 <- factor(nlsy97$bw5_m5, levels = c("Breadwinner", "Not a breadwinner"))
+
+# BREADWINNER 60%
+nlsy97 <- nlsy97 %>%
+  mutate(
+    bw6_t0 = case_when(
       (nlsy97$inc_t0/nlsy97$hhinc_t0) > .6 ~ "Breadwinner",
       (nlsy97$inc_t0/nlsy97$hhinc_t0) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
-    bw_t1 = case_when(
+    bw6_t1 = case_when(
       (nlsy97$inc_t1/nlsy97$hhinc_t1) > .6 ~ "Breadwinner",
       (nlsy97$inc_t1/nlsy97$hhinc_t1) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
-    bw_t2 = case_when(
+    bw6_t2 = case_when(
       (nlsy97$inc_t2/nlsy97$hhinc_t2) > .6 ~ "Breadwinner",
       (nlsy97$inc_t2/nlsy97$hhinc_t2) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
-    bw_t3 = case_when(
+    bw6_t3 = case_when(
       (nlsy97$inc_t3/nlsy97$hhinc_t3) > .6 ~ "Breadwinner",
       (nlsy97$inc_t3/nlsy97$hhinc_t3) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
-    bw_t4 = case_when(
+    bw6_t4 = case_when(
       (nlsy97$inc_t4/nlsy97$hhinc_t4) > .6 ~ "Breadwinner",
       (nlsy97$inc_t4/nlsy97$hhinc_t4) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
-    bw_t5 = case_when(
+    bw6_t5 = case_when(
       (nlsy97$inc_t5/nlsy97$hhinc_t5) > .6 ~ "Breadwinner",
       (nlsy97$inc_t5/nlsy97$hhinc_t5) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
-    bw_t6 = case_when(
+    bw6_t6 = case_when(
       (nlsy97$inc_t6/nlsy97$hhinc_t6) > .6 ~ "Breadwinner",
       (nlsy97$inc_t6/nlsy97$hhinc_t6) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
-    bw_t7 = case_when(
+    bw6_t7 = case_when(
       (nlsy97$inc_t7/nlsy97$hhinc_t7) > .6 ~ "Breadwinner",
       (nlsy97$inc_t7/nlsy97$hhinc_t7) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
-    bw_t8 = case_when(
+    bw6_t8 = case_when(
       (nlsy97$inc_t8/nlsy97$hhinc_t8) > .6 ~ "Breadwinner",
       (nlsy97$inc_t8/nlsy97$hhinc_t8) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
-    bw_t9 = case_when(
+    bw6_t9 = case_when(
       (nlsy97$inc_t9/nlsy97$hhinc_t9) > .6 ~ "Breadwinner",
       (nlsy97$inc_t9/nlsy97$hhinc_t9) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
-    bw_t10 = case_when(
+    bw6_t10 = case_when(
       (nlsy97$inc_t10/nlsy97$hhinc_t10) > .6 ~ "Breadwinner",
       (nlsy97$inc_t10/nlsy97$hhinc_t10) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_)
   )
-nlsy97$bw_t0 <- factor(nlsy97$bw_t0, levels = c("Breadwinner", "Not a breadwinner"))
-nlsy97$bw_t1 <- factor(nlsy97$bw_t1, levels = c("Breadwinner", "Not a breadwinner"))
-nlsy97$bw_t2 <- factor(nlsy97$bw_t2, levels = c("Breadwinner", "Not a breadwinner"))
-nlsy97$bw_t3 <- factor(nlsy97$bw_t3, levels = c("Breadwinner", "Not a breadwinner"))
-nlsy97$bw_t4 <- factor(nlsy97$bw_t4, levels = c("Breadwinner", "Not a breadwinner"))
-nlsy97$bw_t5 <- factor(nlsy97$bw_t5, levels = c("Breadwinner", "Not a breadwinner"))
-nlsy97$bw_t6 <- factor(nlsy97$bw_t6, levels = c("Breadwinner", "Not a breadwinner"))
-nlsy97$bw_t7 <- factor(nlsy97$bw_t7, levels = c("Breadwinner", "Not a breadwinner"))
-nlsy97$bw_t8 <- factor(nlsy97$bw_t8, levels = c("Breadwinner", "Not a breadwinner"))
-nlsy97$bw_t9 <- factor(nlsy97$bw_t9, levels = c("Breadwinner", "Not a breadwinner"))
-nlsy97$bw_t10 <- factor(nlsy97$bw_t10, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw6_t0 <- factor(nlsy97$bw6_t0, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw6_t1 <- factor(nlsy97$bw6_t1, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw6_t2 <- factor(nlsy97$bw6_t2, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw6_t3 <- factor(nlsy97$bw6_t3, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw6_t4 <- factor(nlsy97$bw6_t4, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw6_t5 <- factor(nlsy97$bw6_t5, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw6_t6 <- factor(nlsy97$bw6_t6, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw6_t7 <- factor(nlsy97$bw6_t7, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw6_t8 <- factor(nlsy97$bw6_t8, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw6_t9 <- factor(nlsy97$bw6_t9, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw6_t10 <- factor(nlsy97$bw6_t10, levels = c("Breadwinner", "Not a breadwinner"))
 
 
 nlsy97 <- nlsy97 %>%
   mutate(
-    bw_m1 = case_when(
+    bw6_m1 = case_when(
       (nlsy97$inc_m1/nlsy97$hhinc_m1) > .6 ~ "Breadwinner",
       (nlsy97$inc_m1/nlsy97$hhinc_m1) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
-    bw_m2 = case_when(
+    bw6_m2 = case_when(
       (nlsy97$inc_m2/nlsy97$hhinc_m2) > .6 ~ "Breadwinner",
       (nlsy97$inc_m2/nlsy97$hhinc_m2) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
-    bw_m3 = case_when(
+    bw6_m3 = case_when(
       (nlsy97$inc_m3/nlsy97$hhinc_m3) > .6 ~ "Breadwinner",
       (nlsy97$inc_m3/nlsy97$hhinc_m3) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
-    bw_m4 = case_when(
+    bw6_m4 = case_when(
       (nlsy97$inc_m4/nlsy97$hhinc_m4) > .6 ~ "Breadwinner",
       (nlsy97$inc_m4/nlsy97$hhinc_m4) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
-    bw_m5 = case_when(
+    bw6_m5 = case_when(
       (nlsy97$hhinc_m5/nlsy97$inc_m5) > .6 ~ "Breadwinner",
       (nlsy97$hhinc_m5/nlsy97$inc_m5) < .6 ~ "Not a breadwinner",
       TRUE                                   ~  NA_character_),
   )
 
-nlsy97$bw_m1 <- factor(nlsy97$bw_m1, levels = c("Breadwinner", "Not a breadwinner"))
-nlsy97$bw_m2 <- factor(nlsy97$bw_m2, levels = c("Breadwinner", "Not a breadwinner"))
-nlsy97$bw_m3 <- factor(nlsy97$bw_m3, levels = c("Breadwinner", "Not a breadwinner"))
-nlsy97$bw_m4 <- factor(nlsy97$bw_m4, levels = c("Breadwinner", "Not a breadwinner"))
-nlsy97$bw_m5 <- factor(nlsy97$bw_m5, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw6_m1 <- factor(nlsy97$bw6_m1, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw6_m2 <- factor(nlsy97$bw6_m2, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw6_m3 <- factor(nlsy97$bw6_m3, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw6_m4 <- factor(nlsy97$bw6_m4, levels = c("Breadwinner", "Not a breadwinner"))
+nlsy97$bw6_m5 <- factor(nlsy97$bw6_m5, levels = c("Breadwinner", "Not a breadwinner"))
 
-## Ever breadwinning
+
+## Ever breadwinning 50%
 nlsy97 <- nlsy97 %>%
   mutate(everbw = case_when(
-      bw_t0  == "Breadwinner" |
-      bw_t1  == "Breadwinner" |  
-      bw_t2  == "Breadwinner" |
-      bw_t3  == "Breadwinner" |
-      bw_t4  == "Breadwinner" |
-      bw_t5  == "Breadwinner" |
-      bw_t6  == "Breadwinner" |
-      bw_t7  == "Breadwinner" |
-      bw_t8  == "Breadwinner" |
-      bw_t9  == "Breadwinner" |
-      bw_t10 == "Breadwinner" ~ 1))
+      bw5_t0  == "Breadwinner" |
+      bw5_t1  == "Breadwinner" |  
+      bw5_t2  == "Breadwinner" |
+      bw5_t3  == "Breadwinner" |
+      bw5_t4  == "Breadwinner" |
+      bw5_t5  == "Breadwinner" |
+      bw5_t6  == "Breadwinner" |
+      bw5_t7  == "Breadwinner" |
+      bw5_t8  == "Breadwinner" |
+      bw5_t9  == "Breadwinner" |
+      bw5_t10 == "Breadwinner" ~ 1))
 
 nlsy97$everbw[is.na(nlsy97$everbw)] <- 0
 
@@ -614,25 +1217,37 @@ table(nlsy97$birth_year, nlsy97$bw_t5)
 table(nlsy97$birth_year, nlsy97$bw_t6)
 table(nlsy97$birth_year, nlsy97$bw_m1)
 
-table(nlsy97$bw_t0)
-table(nlsy97$bw_t1)
-table(nlsy97$bw_t2)
-table(nlsy97$bw_t3)
-table(nlsy97$bw_t4)
-table(nlsy97$bw_t5)
-table(nlsy97$bw_t6)
-table(nlsy97$bw_t7)
-table(nlsy97$bw_t8)
-table(nlsy97$bw_t9)
-table(nlsy97$bw_t10)
+table(nlsy97$bw5_t0)
+table(nlsy97$bw5_t1)
+table(nlsy97$bw5_t2)
+table(nlsy97$bw5_t3)
+table(nlsy97$bw5_t4)
+table(nlsy97$bw5_t5)
+table(nlsy97$bw5_t6)
+table(nlsy97$bw5_t7)
+table(nlsy97$bw5_t8)
+table(nlsy97$bw5_t9)
+table(nlsy97$bw5_t10)
+
+table(nlsy97$bw6_t0)
+table(nlsy97$bw6_t1)
+table(nlsy97$bw6_t2)
+table(nlsy97$bw6_t3)
+table(nlsy97$bw6_t4)
+table(nlsy97$bw6_t5)
+table(nlsy97$bw6_t6)
+table(nlsy97$bw6_t7)
+table(nlsy97$bw6_t8)
+table(nlsy97$bw6_t9)
+table(nlsy97$bw6_t10)
 
 
-table(nlsy97$bw_t0, exclude = NULL)
-table(nlsy97$bw_t1, exclude = NULL)
-table(nlsy97$bw_t2, exclude = NULL)
-table(nlsy97$bw_t3, exclude = NULL)
-table(nlsy97$bw_t4, exclude = NULL)
-table(nlsy97$bw_t5, exclude = NULL)
+table(nlsy97$bw5_t0, exclude = NULL)
+table(nlsy97$bw5_t1, exclude = NULL)
+table(nlsy97$bw5_t2, exclude = NULL)
+table(nlsy97$bw5_t3, exclude = NULL)
+table(nlsy97$bw5_t4, exclude = NULL)
+table(nlsy97$bw5_t5, exclude = NULL)
 
 ## How many cases do we have 3 years of breadwinning in a row?
 nlsy97 <- nlsy97 %>%

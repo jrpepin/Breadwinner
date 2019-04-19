@@ -30,7 +30,15 @@ setwd("C:/Users/Joanna/Dropbox/NLSY97")
 ``` {r setup, echo = FALSE}
 knitr::opts_knit$set(root.dir = 'C:/Users/Joanna/Dropbox/Repositories/NLSY97_Breadwinning/NLSY97_tagset')
 ```
-Search for the missing codes and remove the '#' so we can see why values are missing.
+Search for the missing codes and add the '#' before the lines so we can see why values are missing.
+
+# Handle missing values
+
+#  new_data[new_data == -1] = NA  # Refused 
+#  new_data[new_data == -2] = NA  # Dont know 
+#  new_data[new_data == -3] = NA  # Invalid missing 
+#  new_data[new_data == -4] = NA  # Valid missing 
+#  new_data[new_data == -5] = NA  # Non-interview 
   
 At the bottom of the script, remove three '#' signs to create a data file called "categories" with value labels and to rename variables using Qnames instead of Reference Numbers. Then, run the entire script.
 
