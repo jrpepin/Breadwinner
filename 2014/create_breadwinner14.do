@@ -77,8 +77,9 @@ count if contrib < 0
 //Where contrib > 1, is the mother contributing more than the household total?
 //recalculate a contribution with mothers' positive contributions included
 //separate calculations for mother's contribution of 0 in a household income of 0
-gen contrib2 = .
-replace contrib2 = contrib if contrib <= 1 & contrib >= 0
+gen contrib2 = contrib if contrib <= 1 & contrib >= 0
+gen negpinc=1 if TPTOTINC < 0
+gen neghinc=1 if THTOTINC < 0
 count if TPTOTINC == 0
 //1226 respondents contributed $0 of personal income
 count if TPTOTINC == 0 & THTOTINC == 0
@@ -98,21 +99,12 @@ count if contrib != contrib2
 gen breadwin50 = .
 replace breadwin50 = 1 if contrib2 >= .5
 replace breadwin50 = 0 if contrib2 < .5
-tab breadwin50
+
 gen breadwin60 = .
 replace breadwin60 = 1 if contrib2 >= .6
 replace breadwin60 = 0 if contrib2 < .6
-tab breadwin60
 
-tab breadwin50 motherhoodyear, row
-tab breadwin60 motherhoodyear, row
-tab motherhoodyear if breadwin50 == 1
-tab motherhoodyear if breadwin60 == 1
-
-tab breadwin50, m
-tab motherhoodyear, m
-
-//Include educational status
+//create educational status
 gen educstatus = .
 //Educational Status levels of: 1 = less than high school degree; 2 = high school degree but less than a 4-year college degree; 
 //3 = 4-year college degree; 5 = advanced degree
@@ -120,22 +112,18 @@ replace educstatus = 1 if EEDUC <= 38
 replace educstatus = 2 if EEDUC == 39 | EEDUC == 40 | EEDUC == 41 | EEDUC == 42
 replace educstatus = 3 if EEDUC == 43
 replace educstatus = 4 if EEDUC >= 44
-tab educstatus, m
 
-tab motherhoodyear educstatus if breadwin50 == 1
-tab motherhoodyear educstatus if breadwin60 == 1
-tab motherhoodyear educstatus, row
+label define educ 1 "< high school" 2 "High School and Some College" 3 "College Grad" 4 "Post Bach"
+label values educstatus educ
 
-
-//Include marital status
-tab EMS, m
-gen married = .
-//1 = married, 2 = not married
-replace married = 1 if EMS == 1 | EMS == 2 
+//create marital status
+gen married = 1 if EMS == 1 | EMS == 2 
 replace married = 2 if EMS == 3 | EMS == 4 | EMS == 5 | EMS == 6 | EMS == .
-tab married, m
-tab EMS, m
-tab EPNSPOUSE, m
+
+label define married 1 "married" 2 "not married"
+label values married married
+
+save using "$SIPP14keep/breadwinner14.dta", $replace
 
 tab motherhoodyear married if breadwin50 == 1
 tab motherhoodyear married if breadwin60 == 1
