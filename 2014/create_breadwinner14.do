@@ -123,7 +123,18 @@ replace married = 2 if EMS == 3 | EMS == 4 | EMS == 5 | EMS == 6 | EMS == .
 label define married 1 "married" 2 "not married"
 label values married married
 
-save using "$SIPP14keep/breadwinner14.dta", $replace
+save "$SIPP14keep/breadwinner14.dta", $replace
+
+tab neghinc, m
+tab negpinc, m
+
+drop if neghinc==1 
+
+keep if motherhoodyear > 0 & motherhoodyear < 18
+
+sum breadwin50
+sum breadwin60
+
 
 tab motherhoodyear married if breadwin50 == 1
 tab motherhoodyear married if breadwin60 == 1

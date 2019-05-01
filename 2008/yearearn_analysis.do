@@ -1,7 +1,6 @@
 use "$tempdir/relearn_year.dta", clear
 
 * select if started observation a mother or became a mother during observation window
-
 tab nobsmomminor
 
 keep if nobsmomminor > 0 
@@ -14,6 +13,20 @@ gen year_upHHearn=year_upearn/year_uhearn if !missing(year_upearn) & !missing(ye
 replace year_upearn=0 if !missing(year_upearn) & !missing(year_uhearn) & year_upearn < 0 & year_uhearn > 0
 replace year_upHHearn=. if year_upearn > year_uhearn
 
+gen negpinc=1 if year_upearn < 0
+gen neghinc=1 if year_uhearn < 0
+
+tab negpinc
+tab neghinc
+
+* drop cases with negative household income
+drop if neghinc==1
+
+sort year
+by year: sum yearbw50 if ageoldest >=0 & ageoldest <=17
+by year: sum yearbw60 if ageoldest >=0 & ageoldest <=17
+
+/*
 sort yearspartner
 
 by yearspartner: sum year_pearn year_hearn year_pHHearn [aweight=weight], detail
@@ -34,8 +47,8 @@ sort yearspartner
 
 by yearspartner: tab yearage ybecome_bw50, nofreq row
 
-tab ageoldest yearbw50 [aweight=weight] if ageoldest <=10, nofreq row 
-tab ageoldest yearbw60 [aweight=weight] if ageoldest <=10, nofreq row
+tab ageoldest yearbw50 [aweight=weight] if ageoldest <=17, nofreq row 
+tab ageoldest yearbw60 [aweight=weight] if ageoldest <=17, nofreq row
 
-tab ageoldest uyearbw50 [aweight=weight] if ageoldest <=10, nofreq row 
-tab ageoldest uyearbw60 [aweight=weight] if ageoldest <=10, nofreq row
+tab ageoldest uyearbw50 [aweight=weight] if ageoldest <=17, nofreq row 
+tab ageoldest uyearbw60 [aweight=weight] if ageoldest <=17, nofreq row

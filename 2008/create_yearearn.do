@@ -14,25 +14,6 @@ keep `j_variables' `i_variables' `other_variables' my_racealt my_sex
 
 reshape wide `other_variables', i(`i_variables') j(`j_variables')
 
-/*
-* we aren't using this
-* create inter-wave transition variables
-forvalues w=1/14 {
-local x=`w'+1
-gen become_bw50`w'=1 if bw50`w'==0 & bw50`x'==1
-replace become_bw50`w'=0 if !missing(bw50`w') & !missing(bw50`x') & (bw50`w'==1 | bw50`x'==0)
-
-gen leave_bw50`w'=1 if bw50`w'==1 & bw50`x'==0
-replace leave_bw50`w'=0 if !missing(bw50`w') & !missing(bw50`x') & (bw50`w'==0 | bw50`x'==1)
-
-gen become_bw60`w'=1 if bw60`w'==0 & bw60`x'==1
-replace become_bw60`w'=0 if !missing(bw60`w') & !missing(bw60`x') & (bw60`w'==1 | bw60`x'==0)
-
-gen leave_bw60`w'=1 if bw60`w'==1 & bw60`x'==0
-replace leave_bw60`w'=0 if !missing(bw60`w') & !missing(bw60`x') & (bw60`w'==0 | bw60`x'==1)
-}
-*/
-
 * create indicators for in each wave (w)
 
 forvalues w=1/15 {
@@ -126,8 +107,8 @@ forvalues y=1/5 {
   gen yearbw50`y'=0 if !missing(year_pearn`y') & !missing(year_hearn`y')
   gen yearbw60`y'=0 if !missing(year_pearn`y') & !missing(year_hearn`y')
 
-  replace yearbw50`y'=1 if year_pearn`y' > 0.5*year_hearn`y' & yearbw50`y'==0
-  replace yearbw60`y'=1 if year_pearn`y' > 0.6*year_hearn`y' & yearbw60`y'==0
+  replace yearbw50`y'=1 if year_pearn`y' >= 0.5*year_hearn`y' & yearbw50`y'==0
+  replace yearbw60`y'=1 if year_pearn`y' >= 0.6*year_hearn`y' & yearbw60`y'==0
   
   replace yearbw50`y'=9 if inyear`y'==0
   replace yearbw60`y'=9 if inyear`y'==0
@@ -135,8 +116,8 @@ forvalues y=1/5 {
   gen uyearbw50`y'=0 if !missing(year_upearn`y') & !missing(year_uhearn`y')
   gen uyearbw60`y'=0 if !missing(year_upearn`y') & !missing(year_uhearn`y')
 
-  replace uyearbw50`y'=1 if year_upearn`y' > 0.5*year_uhearn`y' & uyearbw50`y'==0
-  replace uyearbw60`y'=1 if year_upearn`y' > 0.6*year_uhearn`y' & uyearbw60`y'==0
+  replace uyearbw50`y'=1 if year_upearn`y' >= 0.5*year_uhearn`y' & uyearbw50`y'==0
+  replace uyearbw60`y'=1 if year_upearn`y' >= 0.6*year_uhearn`y' & uyearbw60`y'==0
   
   replace uyearbw50`y'=9 if nmhuyear`y'==0
   replace uyearbw60`y'=9 if nmhuyear`y'==0
@@ -166,9 +147,21 @@ egen bw60profile = concat (yearbw601 yearbw602 yearbw603 yearbw604 yearbw605)
  
  reshape long year_pearn year_hearn yearbw50 yearbw60 inyear nmpyear nmhyear yearage ybecome_bw50 ybecome_bw60 nobsmom nobsmomminor yearspartner weight ageyc year_upearn year_uhearn uyearbw50 uyearbw60 ageoldest, i(`i_variables') j(year)
 
+* drops cases not observed in a year plus all the data organized by wave
+drop if missing(inyear)
+ 
 label define trans 0 "Not breadwinner" 1 "Became breadwinner" 2 "Already breadwinner"
 
 label values ybecome_bw50 ybecome_bw60 trans
+
+label variable uyearbw50 "Breadwinning status (> 50%) without allocated data"
+label variable uyearbw60 "Breadwinning status (> 60%) without allocated data"
+
+label variable yearbw50 "Breadwinning status (> 50%) with allocated data"
+label variable yearbw60 "Breadwinning status (> 60%) with allocated data"
+
+label define year 1 "Q4 08" 2 "Q4 09" 3 "Q4 10" 4 "Q4 11" 5 "Q4 12"
+label variable year "year of observation"
 
 save "$tempdir/relearn_year.dta", replace
 
