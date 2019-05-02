@@ -3,12 +3,19 @@
 *******************************************
 
 *relearn stands for relative earnings (not re-learn)
-log using "$logdir/relearn_analysis.log", $replace
 
 use "$tempdir/relearn.dta", clear
 
 tab momtoanyminor spartner, nofreq row col
 
+drop if thearn < 0
+
+gen ratio=tpearn/thearn
+
+sum bw50 tpearn thearn ratio if ageoldest > 0 & ageoldest < 18, detail
+
+
+/*
 sum tpearn thearn pHHearn, detail
 
 sum tpearn thearn pHHearn if momtoanyminor==1, detail

@@ -50,5 +50,15 @@ gen difffearn=altfearn-tfearn
 
 sum diffpearn diffhearn difffearn, detail
 
+* bw50 is missing if thearn is negative
+gen bw50=1 if tpearn/thearn >= .50 & thearn > 0
+replace bw50=0 if tpearn/thearn < .5 & thearn > 0
+
+gen abw50=1 if altpearn/althearn >= .50 & thearn > 0
+replace abw50=0 if altpearn/althearn < .5 & thearn > 0
+
 save "$tempdir/altearn.dta", $replace
 
+gen ratio=tpearn/thearn & thearn > 0
+
+sum bw50 abw50 ratio, detail
