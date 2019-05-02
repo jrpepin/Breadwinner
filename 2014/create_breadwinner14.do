@@ -5,6 +5,20 @@
 * Read in data extract
 use "$SIPPextracts/breadwinning_extract_SIPP14.dta", clear
 
+*******************************************************************************
+* Create earnings variables 
+*******************************************************************************
+
+* need to create household and personal annual earnings before dropping any individuals or months
+
+egen year_pearn=total(TPEARN), by(SSUID PNUM)
+egen THEARN=total(TPEARN), by(SSUID MONTHCODE)
+egen year_hearn=total(TPEARN), by(SSUID)
+
+label variable THEARN "monthly household earnings"
+label variable year_pearn "Personal annual earnings 2013"
+label variable year_hearn "Household annual earnings 2013"
+
 ********************************************************************************
 * Sample selection
 ********************************************************************************
@@ -68,8 +82,7 @@ count if THTOTINC < 0
 //18 people with a negative household income, ranging from -27 to -30,767
 
 //Create a variable for household contribution
-gen contrib = .
-replace contrib = TPTOTINC/THTOTINC
+gen contrib = year_pearn/year_hearn
 sum contrib
 count if contrib > 1
 count if contrib < 0
@@ -78,21 +91,21 @@ count if contrib < 0
 //recalculate a contribution with mothers' positive contributions included
 //separate calculations for mother's contribution of 0 in a household income of 0
 gen contrib2 = contrib if contrib <= 1 & contrib >= 0
-gen negpinc=1 if TPTOTINC < 0
-gen neghinc=1 if THTOTINC < 0
-count if TPTOTINC == 0
+gen negpinc=1 if year_pearn < 0
+gen neghinc=1 if year_hearn < 0
+count if year_pearn == 0
 //1226 respondents contributed $0 of personal income
-count if TPTOTINC == 0 & THTOTINC == 0
+count if year_pearn == 0 & year_hearn == 0
 //164 respondents contributed $0 to a household income of $0
-count if TPTOTINC < 0
+count if year_pearn < 0
 //38 respondents reported a negative personal income
-replace contrib2 = 0 if TPTOTINC <= 0
-count if TPTOTINC > 0 & THTOTINC < 0
+replace contrib2 = 0 if year_pearn <= 0
+count if year_pearn > 0 & year_hearn < 0
 //8 respondents contributed positive personal income but had a negative household income
-replace contrib2 = 1 if TPTOTINC > 0 & THTOTINC < 0
-count if TPTOTINC > THTOTINC
+replace contrib2 = 1 if year_pearn > 0 & year_hearn < 0
+count if year_pearn > year_hearn
 //33 respondents contributed more personal income than their total household income
-replace contrib2 = 1 if TPTOTINC > THTOTINC
+replace contrib2 = 1 if year_pearn > year_hearn
 count if contrib != contrib2
 
 //create variables for breadwinning
@@ -132,8 +145,10 @@ drop if neghinc==1
 
 keep if motherhoodyear > 0 & motherhoodyear < 18
 
-sum breadwin50
-sum breadwin60
+gen ratio=year_pearn/year_hearn
+
+sum breadwin50 year_pearn year_hearn TPEARN THEARN ratio
+
 
 
 tab motherhoodyear married if breadwin50 == 1
