@@ -5,16 +5,8 @@ tab nobsmomminor
 
 keep if nobsmomminor > 0 
 
-gen year_pHHearn=year_pearn/year_hearn if !missing(year_pearn) & !missing(year_hearn) & year_pearn > 0 & year_hearn > 0
-replace year_pearn=0 if !missing(year_pearn) & !missing(year_hearn) & year_pearn < 0 & year_hearn > 0
-replace year_pHHearn=. if year_pearn > year_hearn
-
-gen year_upHHearn=year_upearn/year_uhearn if !missing(year_upearn) & !missing(year_uhearn) & year_upearn > 0 & year_uhearn > 0
-replace year_upearn=0 if !missing(year_upearn) & !missing(year_uhearn) & year_upearn < 0 & year_uhearn > 0
-replace year_upHHearn=. if year_upearn > year_uhearn
-
-gen negpinc=1 if year_upearn < 0
-gen neghinc=1 if year_uhearn < 0
+gen negpinc=1 if year_pearn < 0
+gen neghinc=1 if year_hearn < 0
 
 tab negpinc
 tab neghinc
@@ -22,9 +14,12 @@ tab neghinc
 * drop cases with negative household income
 drop if neghinc==1
 
+gen ratio=year_pearn/year_hearn
+
 sort year
-by year: sum yearbw50 if ageoldest >=0 & ageoldest <=17
-by year: sum yearbw60 if ageoldest >=0 & ageoldest <=17
+
+by year: sum yearbw50 year_pearn year_hearn ratio if ageoldest >=0 & ageoldest <=17
+
 
 /*
 sort yearspartner

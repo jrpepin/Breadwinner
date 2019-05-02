@@ -32,7 +32,7 @@ gen nHHkids=1 if adj_age < 18
 
 gen HHsize=1
 
-* age of youngest son or daughter in the household
+* age of oldest son or daughter in the household
 gen agechild=to_age if inlist(relationship,2,3,8,22,23)
 
 * spouse or partner

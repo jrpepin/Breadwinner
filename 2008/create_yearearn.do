@@ -43,16 +43,16 @@ forvalues y=1/5 {
   forvalues o=1/3 {
     local w=(`y'-1)*3 + `o'
     replace inyear`y'=inyear`y'+1 if in`w'==1 
-	replace nmpyear`y'=nmpyear`y'+1 if nmpearn`w'==1
-	replace nmhyear`y'=nmhyear`y'+1 if nmhearn`w'==1
-	replace nmpuyear`y'=nmpuyear`y'+1 if nmupearn`w'==1
-	replace nmhuyear`y'=nmhuyear`y'+1 if nmuhearn`w'==1
-	replace nobsmom`y'=nobsmom`y'+1 if momtoany`w'==1
-	replace nobsmomminor`y'=nobsmomminor`y'+1 if momtoanyminor`w'==1
+    replace nmpyear`y'=nmpyear`y'+1 if nmpearn`w'==1
+    replace nmhyear`y'=nmhyear`y'+1 if nmhearn`w'==1
+    replace nmpuyear`y'=nmpuyear`y'+1 if nmupearn`w'==1
+    replace nmhuyear`y'=nmhuyear`y'+1 if nmuhearn`w'==1
+    replace nobsmom`y'=nobsmom`y'+1 if momtoany`w'==1
+    replace nobsmomminor`y'=nobsmomminor`y'+1 if momtoanyminor`w'==1
   }
   tab inyear`y'
   tab nobsmomminor`y'
-  }
+ }
 
 local y=0 
 foreach w of numlist 1 4 7 8 13 {
@@ -75,12 +75,15 @@ forvalues y=1/5 {
   gen nmyear_uhearn`y'=0
   forvalues o=1/3 {
     local w=(`y'-1)*3 + `o'
-    replace nmyear_pearn`y'=nmyear_pearn`y'+altpearn`w' if !missing(altpearn`w')
-    replace nmyear_hearn`y'=nmyear_hearn`y'+althearn`w' if !missing(althearn`w')
+    replace nmyear_pearn`y'=nmyear_pearn`y'+tpearn`w' if !missing(tpearn`w')
+    replace nmyear_hearn`y'=nmyear_hearn`y'+thearn`w' if !missing(thearn`w')
     replace nmyear_upearn`y'=nmyear_upearn`y'+ualtpearn`w' if !missing(ualtpearn`w')
     replace nmyear_uhearn`y'=nmyear_uhearn`y'+ualthearn`w' if !missing(ualthearn`w')   
   }
 }
+* are any values negative?
+sum nmyear_pearn1-nmyear_pearn5
+
  * annualize (both to match variable name and to adjust for missing observations)
  
  forvalues y=1/5 {
@@ -139,9 +142,9 @@ egen momminorprofile = concat (nobsmomminor1 nobsmomminor2 nobsmomminor3 nobsmom
 egen bw50profile = concat (yearbw501 yearbw502 yearbw503 yearbw504 yearbw505)
 egen bw60profile = concat (yearbw601 yearbw602 yearbw603 yearbw604 yearbw605)
  
- tab momminorprofile
- tab bw50profile
- tab bw60profile
+* tab momminorprofile
+* tab bw50profile
+* tab bw60profile
  
  keep ssuid epppnum year_pearn* year_hearn* year_upearn* year_uhearn* yearbw50* yearbw60* uyearbw50* uyearbw60* inyear* nmpyear* nmhyear* yearage* ybecome_bw50* ybecome_bw60* nobsmom* yearspartner* my_racealt my_sex *profile weight* ageoldest*
  
