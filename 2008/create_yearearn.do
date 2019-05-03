@@ -26,7 +26,7 @@ replace in`w'=1 if !missing(ERRP`w')
 replace nmpearn`w'=1 if !missing(altpearn`w')
 replace nmhearn`w'=1 if !missing(althearn`w')
 replace nmupearn`w'=1 if !missing(ualtpearn`w')
-replace nmuhearn`w'=1 if !missing(ualtfearn`w')
+replace nmuhearn`w'=1 if !missing(ualthearn`w')
 }
 
 * create indicators of number of observations in each year, where a year is a collection 
@@ -50,8 +50,6 @@ forvalues y=1/5 {
     replace nobsmom`y'=nobsmom`y'+1 if momtoany`w'==1
     replace nobsmomminor`y'=nobsmomminor`y'+1 if momtoanyminor`w'==1
   }
-  tab inyear`y'
-  tab nobsmomminor`y'
  }
 
 local y=0 
@@ -75,14 +73,12 @@ forvalues y=1/5 {
   gen nmyear_uhearn`y'=0
   forvalues o=1/3 {
     local w=(`y'-1)*3 + `o'
-    replace nmyear_pearn`y'=nmyear_pearn`y'+tpearn`w' if !missing(tpearn`w')
-    replace nmyear_hearn`y'=nmyear_hearn`y'+thearn`w' if !missing(thearn`w')
+    replace nmyear_pearn`y'=nmyear_pearn`y'+altpearn`w' if !missing(altpearn`w')
+    replace nmyear_hearn`y'=nmyear_hearn`y'+althearn`w' if !missing(althearn`w')
     replace nmyear_upearn`y'=nmyear_upearn`y'+ualtpearn`w' if !missing(ualtpearn`w')
     replace nmyear_uhearn`y'=nmyear_uhearn`y'+ualthearn`w' if !missing(ualthearn`w')   
   }
 }
-* are any values negative?
-sum nmyear_pearn1-nmyear_pearn5
 
  * annualize (both to match variable name and to adjust for missing observations)
  
@@ -113,8 +109,8 @@ forvalues y=1/5 {
   replace yearbw50`y'=1 if year_pearn`y' >= 0.5*year_hearn`y' & yearbw50`y'==0
   replace yearbw60`y'=1 if year_pearn`y' >= 0.6*year_hearn`y' & yearbw60`y'==0
   
-  replace yearbw50`y'=9 if inyear`y'==0
-  replace yearbw60`y'=9 if inyear`y'==0
+  replace yearbw50`y'=9 if nmhyear`y'==0
+  replace yearbw60`y'=9 if nmhyear`y'==0
   
   gen uyearbw50`y'=0 if !missing(year_upearn`y') & !missing(year_uhearn`y')
   gen uyearbw60`y'=0 if !missing(year_upearn`y') & !missing(year_uhearn`y')
@@ -126,6 +122,10 @@ forvalues y=1/5 {
   replace uyearbw60`y'=9 if nmhuyear`y'==0
  }
  
+ *the proportion breadwinning is much higher with unallocated data. The reason
+ * why isn't simple. 
+ tab yearbw501 uyearbw501, m
+ 
  forvalues y=1/4 {
    local z=`y'+1
    gen ybecome_bw50`y'=0 if !missing(yearbw50`y')
@@ -135,6 +135,14 @@ forvalues y=1/5 {
    gen ybecome_bw60`y'=0 if !missing(yearbw60`y')
    replace ybecome_bw60`y'=1 if ybecome_bw60`y'==0 & yearbw60`y'==0 & yearbw60`z'==1
    replace ybecome_bw60`y'=2 if ybecome_bw60`y'==0 & yearbw60`y'==1
+   
+   gen uybecome_bw50`y'=0 if !missing(yearbw50`y')
+   replace uybecome_bw50`y'=1 if uybecome_bw50`y'==0 & uyearbw50`y'==0 & uyearbw50`z'==1
+   replace uybecome_bw50`y'=2 if uybecome_bw50`y'==0 & uyearbw50`y'==1
+   
+   gen uybecome_bw60`y'=0 if !missing(yearbw60`y')
+   replace uybecome_bw60`y'=1 if uybecome_bw60`y'==0 & uyearbw60`y'==0 & uyearbw60`z'==1
+   replace uybecome_bw60`y'=2 if uybecome_bw60`y'==0 & uyearbw60`y'==1
  }
 
 egen momprofile = concat (nobsmom1 nobsmom2 nobsmom3 nobsmom4 nobsmom5)
@@ -146,9 +154,9 @@ egen bw60profile = concat (yearbw601 yearbw602 yearbw603 yearbw604 yearbw605)
 * tab bw50profile
 * tab bw60profile
  
- keep ssuid epppnum year_pearn* year_hearn* year_upearn* year_uhearn* yearbw50* yearbw60* uyearbw50* uyearbw60* inyear* nmpyear* nmhyear* yearage* ybecome_bw50* ybecome_bw60* nobsmom* yearspartner* my_racealt my_sex *profile weight* ageoldest*
+ keep ssuid epppnum year_pearn* year_hearn* year_upearn* year_uhearn* yearbw50* yearbw60* uyearbw50* uyearbw60* inyear* nmpyear* nmhyear* yearage* ybecome_bw50* ybecome_bw60* uybecome_bw50* uybecome_bw60* nobsmom* yearspartner* my_racealt my_sex *profile weight* ageoldest*
  
- reshape long year_pearn year_hearn yearbw50 yearbw60 inyear nmpyear nmhyear yearage ybecome_bw50 ybecome_bw60 nobsmom nobsmomminor yearspartner weight ageyc year_upearn year_uhearn uyearbw50 uyearbw60 ageoldest, i(`i_variables') j(year)
+ reshape long year_pearn year_hearn yearbw50 yearbw60 inyear nmpyear nmhyear yearage ybecome_bw50 ybecome_bw60 uybecome_bw50 uybecome_bw60 nobsmom nobsmomminor yearspartner weight ageyc year_upearn year_uhearn uyearbw50 uyearbw60 ageoldest, i(`i_variables') j(year)
 
 * drops cases not observed in a year plus all the data organized by wave
 drop if missing(inyear)

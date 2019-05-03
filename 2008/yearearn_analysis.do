@@ -15,6 +15,7 @@ tab neghinc
 drop if neghinc==1
 
 gen ratio=year_pearn/year_hearn
+gen uratio=year_upearn/year_uhearn
 
 gen catratio=int(ratio*10) if ratio >= 0 & ratio <= 1
 replace catratio=-1 if ratio < 0
@@ -22,11 +23,46 @@ replace catratio=20 if ratio > 1
 
 *sort year
 
-sum yearbw50 year_pearn year_hearn ratio if ageoldest >=0 & ageoldest <=17
+sum yearbw50 yearbw60 uyearbw50 uyearbw60 if ageoldest >=0 & ageoldest <=17
 
-tab catratio if ageoldest >=0 & ageoldest <=17
+*******************************************************************************
+* calculate cumulative risk of breadwinning 
+*******************************************************************************
+
+rename ybecome_bw50 becbw50
+rename ybecome_bw60 becbw60
+rename uybecome_bw50 ubecbw50
+rename uybecome_bw60 ubecbw60
+
+local transition "becbw50 becbw60 ubecbw50 ubecbw60"
+
+foreach var in `transition'{
+	forvalues a=0/17{
+		egen `var'`a'=mean(`var') if ageoldest==`a' & `var' !=2
+		tab `var'`a'
+	}
+}
+
+foreach var in `transition'{
+	gen e`var'=1-`var'0
+}
+
+tab ebecbw50
+replace ebecbw50=becbw50*1-becbw501
+tab ebecbw50
+replace ebecbw50=becbw50*1-becbw502
+tab ebecbw50
+replace ebecbw50=becbw50*1-becbw503
+tab ebecbw50
 
 /*
+
+	forvalues a=1/17{
+		tab `var'`a'
+		replace e`var'=(e`var')*(1-`var'`a')
+	}
+	tab e`var'
+}
 sort yearspartner
 
 by yearspartner: sum year_pearn year_hearn year_pHHearn [aweight=weight], detail
@@ -41,14 +77,3 @@ tab yearage yearbw60 if yearspartner==1 [aweight=weight], nofreq row
 
 tab yearage yearbw60 if yearspartner==0 [aweight=weight], nofreq row
 
-tab yearage ybecome_bw50, nofreq row
-
-sort yearspartner
-
-by yearspartner: tab yearage ybecome_bw50, nofreq row
-
-tab ageoldest yearbw50 [aweight=weight] if ageoldest <=17, nofreq row 
-tab ageoldest yearbw60 [aweight=weight] if ageoldest <=17, nofreq row
-
-tab ageoldest uyearbw50 [aweight=weight] if ageoldest <=17, nofreq row 
-tab ageoldest uyearbw60 [aweight=weight] if ageoldest <=17, nofreq row

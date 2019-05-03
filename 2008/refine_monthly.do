@@ -15,6 +15,8 @@ foreach var in `allocate'{
 	replace anyallocate=1 if `var' !=0
 }
 
+tab anyallocate
+
 * set ualtpearn to missing if it is based on allocated data
 gen ualtpearn=altpearn
 replace ualtpearn=. if anyallocate==1
@@ -31,6 +33,12 @@ egen altfearn=total(altpearn), by(ssuid shhadid rfid swave)
 
 egen ualthearn=total(ualtpearn), by(ssuid shhadid swave)
 egen ualtfearn=total(ualtpearn), by(ssuid shhadid rfid swave)
+egen anyalloh=total(anyallocate), by(ssuid shhadid swave)
+replace ualthearn=. if anyalloh > 0
+
+tab anyalloh
+
+label variable anyalloh "any allocated earnings data for household"
 
 gen negearn=1 if tpearn < 0
 
