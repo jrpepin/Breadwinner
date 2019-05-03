@@ -147,11 +147,16 @@ keep if motherhoodyear > 0 & motherhoodyear < 18
 
 gen ratio=year_pearn/year_hearn
 
-sum breadwin50 year_pearn year_hearn TPEARN THEARN ratio
+gen catratio=int(ratio*10) if ratio >= 0 & ratio <= 1
+replace catratio=-1 if ratio < 0
+replace catratio=20 if ratio > 1
 
+sum breadwin50 year_pearn year_hearn TPEARN THEARN ratio contrib2
 
+tab catratio
 
-tab motherhoodyear married if breadwin50 == 1
-tab motherhoodyear married if breadwin60 == 1
-tab motherhoodyear married, row
+*tab motherhoodyear breadwin50 
+*tab motherhoodyear breadwin50 if married==0
+*tab motherhoodyear breadwin50 if married==1
+
 

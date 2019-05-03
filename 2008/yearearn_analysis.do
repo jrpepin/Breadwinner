@@ -16,10 +16,15 @@ drop if neghinc==1
 
 gen ratio=year_pearn/year_hearn
 
-sort year
+gen catratio=int(ratio*10) if ratio >= 0 & ratio <= 1
+replace catratio=-1 if ratio < 0
+replace catratio=20 if ratio > 1
 
-by year: sum yearbw50 year_pearn year_hearn ratio if ageoldest >=0 & ageoldest <=17
+*sort year
 
+sum yearbw50 year_pearn year_hearn ratio if ageoldest >=0 & ageoldest <=17
+
+tab catratio if ageoldest >=0 & ageoldest <=17
 
 /*
 sort yearspartner
