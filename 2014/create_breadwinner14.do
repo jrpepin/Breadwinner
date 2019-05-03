@@ -94,27 +94,26 @@ gen contrib2 = contrib if contrib <= 1 & contrib >= 0
 gen negpinc=1 if year_pearn < 0
 gen neghinc=1 if year_hearn < 0
 count if year_pearn == 0
-//1226 respondents contributed $0 of personal income
+//XXXX respondents contributed $0 of personal income
 count if year_pearn == 0 & year_hearn == 0
-//164 respondents contributed $0 to a household income of $0
+replace contrib2=0 if year_pearn==0 & year_hearn==0
+//XXX respondents contributed $0 to a household income of $0
 count if year_pearn < 0
-//38 respondents reported a negative personal income
+//XX respondents reported a negative personal income
 replace contrib2 = 0 if year_pearn <= 0
 count if year_pearn > 0 & year_hearn < 0
-//8 respondents contributed positive personal income but had a negative household income
+//X respondents contributed positive personal income but had a negative household income
 replace contrib2 = 1 if year_pearn > 0 & year_hearn < 0
 count if year_pearn > year_hearn
-//33 respondents contributed more personal income than their total household income
+//XX respondents contributed more personal income than their total household income
 replace contrib2 = 1 if year_pearn > year_hearn
 count if contrib != contrib2
 
 //create variables for breadwinning
-gen breadwin50 = .
-replace breadwin50 = 1 if contrib2 >= .5
+gen breadwin50 = 1 if contrib2 >= .5
 replace breadwin50 = 0 if contrib2 < .5
 
-gen breadwin60 = .
-replace breadwin60 = 1 if contrib2 >= .6
+gen breadwin60 = 1 if contrib2 >= .6
 replace breadwin60 = 0 if contrib2 < .6
 
 //create educational status
@@ -146,6 +145,7 @@ drop if neghinc==1
 keep if motherhoodyear > 0 & motherhoodyear < 18
 
 gen ratio=year_pearn/year_hearn
+if year_pearn==0 & year_hearn==0 then ratio==0
 
 gen catratio=int(ratio*10) if ratio >= 0 & ratio <= 1
 replace catratio=-1 if ratio < 0
@@ -153,7 +153,7 @@ replace catratio=20 if ratio > 1
 
 sum breadwin50 year_pearn year_hearn TPEARN THEARN ratio contrib2
 
-tab catratio
+tab catratio breadwin50
 
 *tab motherhoodyear breadwin50 
 *tab motherhoodyear breadwin50 if married==0
