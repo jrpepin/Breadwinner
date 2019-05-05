@@ -10,7 +10,7 @@ local i_variables " ssuid epppnum "
 local j_variables " swave "
 local other_variables "nmomto nbiomomto HHsize nHHkids spartner adj_age EBORNUS EMS EORIGIN ERRP thearn tfearn thothinc tpearn momtoany momtoanyminor nHHadults WPFINWGT altpearn altfearn althearn ualtpearn ualtfearn ualthearn anyallocate ageoldest"
 
-keep `j_variables' `i_variables' `other_variables' my_racealt my_sex
+keep `j_variables' `i_variables' `other_variables' my_race my_sex
 
 reshape wide `other_variables', i(`i_variables') j(`j_variables')
 
@@ -109,8 +109,8 @@ forvalues y=1/5 {
   replace yearbw50`y'=1 if year_pearn`y' >= 0.5*year_hearn`y' & yearbw50`y'==0
   replace yearbw60`y'=1 if year_pearn`y' >= 0.6*year_hearn`y' & yearbw60`y'==0
   
-  replace yearbw50`y'=9 if nmhyear`y'==0
-  replace yearbw60`y'=9 if nmhyear`y'==0
+  replace yearbw50`y'=. if nmhyear`y'==0
+  replace yearbw60`y'=. if nmhyear`y'==0
   
   gen uyearbw50`y'=0 if !missing(year_upearn`y') & !missing(year_uhearn`y')
   gen uyearbw60`y'=0 if !missing(year_upearn`y') & !missing(year_uhearn`y')
@@ -118,45 +118,64 @@ forvalues y=1/5 {
   replace uyearbw50`y'=1 if year_upearn`y' >= 0.5*year_uhearn`y' & uyearbw50`y'==0
   replace uyearbw60`y'=1 if year_upearn`y' >= 0.6*year_uhearn`y' & uyearbw60`y'==0
   
-  replace uyearbw50`y'=9 if nmhuyear`y'==0
-  replace uyearbw60`y'=9 if nmhuyear`y'==0
+  replace uyearbw50`y'=. if nmhuyear`y'==0
+  replace uyearbw60`y'=. if nmhuyear`y'==0
  }
  
- *the proportion breadwinning is much higher with unallocated data. The reason
- * why isn't simple. 
- tab yearbw501 uyearbw501, m
- 
+gen everbw50=.
+gen everbw60=.
+gen ueverbw50=.
+gen ueverbw60=.
+
  forvalues y=1/4 {
-   local z=`y'+1
-   gen ybecome_bw50`y'=0 if !missing(yearbw50`y')
-   replace ybecome_bw50`y'=1 if ybecome_bw50`y'==0 & yearbw50`y'==0 & yearbw50`z'==1
+     local z=`y'+1
+   replace everbw50=0 if missing(everbw50) & !missing(yearbw50`y') 
+   gen ybecome_bw50`y'=0 if !missing(yearbw50`y') & everbw50!=1
+   replace ybecome_bw50`y'=1 if ybecome_bw50`y'==0 & yearbw50`y'==0 & yearbw50`z'==1 
    replace ybecome_bw50`y'=2 if ybecome_bw50`y'==0 & yearbw50`y'==1
-   
-   gen ybecome_bw60`y'=0 if !missing(yearbw60`y')
-   replace ybecome_bw60`y'=1 if ybecome_bw60`y'==0 & yearbw60`y'==0 & yearbw60`z'==1
+   replace everbw50=1 if inlist(ybecome_bw50`y',1,2) // marking so that ineligble to become bw again
+
+   replace everbw60=0 if missing(everbw60) & !missing(yearbw60`y')
+   gen ybecome_bw60`y'=0 if !missing(yearbw60`y') & everbw60!=1
+   replace ybecome_bw60`y'=1 if ybecome_bw60`y'==0 & yearbw60`y'==0 & yearbw60`z'==1 
    replace ybecome_bw60`y'=2 if ybecome_bw60`y'==0 & yearbw60`y'==1
-   
-   gen uybecome_bw50`y'=0 if !missing(yearbw50`y')
-   replace uybecome_bw50`y'=1 if uybecome_bw50`y'==0 & uyearbw50`y'==0 & uyearbw50`z'==1
+   replace everbw60=1 if inlist(ybecome_bw60`y',1,2) // marking so that ineligble to become bw again
+
+   replace ueverbw50=0 if missing(ueverbw50) & !missing(uyearbw50`y')
+   gen uybecome_bw50`y'=0 if !missing(yearbw50`y') & ueverbw50!=1
+   replace uybecome_bw50`y'=1 if uybecome_bw50`y'==0 & uyearbw50`y'==0 & uyearbw50`z'==1 
    replace uybecome_bw50`y'=2 if uybecome_bw50`y'==0 & uyearbw50`y'==1
-   
-   gen uybecome_bw60`y'=0 if !missing(yearbw60`y')
+   replace ueverbw50=1 if inlist(uybecome_bw50`y',1,2) // marking so that ineligble to become bw again
+
+   replace ueverbw60=0 if missing(ueverbw60) & !missing(uyearbw60`y')
+   gen uybecome_bw60`y'=0 if !missing(yearbw60`y') & ueverbw60!=1
    replace uybecome_bw60`y'=1 if uybecome_bw60`y'==0 & uyearbw60`y'==0 & uyearbw60`z'==1
    replace uybecome_bw60`y'=2 if uybecome_bw60`y'==0 & uyearbw60`y'==1
+   replace ueverbw60=1 if inlist(uybecome_bw60`y',1,2) // marking so that ineligble to become bw again
  }
+
+ *the proportion breadwinning is 1-3 points different (direction depends on cut-off)  with just unallocated data. 
+tab everbw50
+tab everbw60
+tab ueverbw50
+tab ueverbw60
+tab yearbw501 uyearbw501
+tab ybecome_bw501 uybecome_bw501, m
+tab ybecome_bw504 uybecome_bw504, m
+
 
 egen momprofile = concat (nobsmom1 nobsmom2 nobsmom3 nobsmom4 nobsmom5)
 egen momminorprofile = concat (nobsmomminor1 nobsmomminor2 nobsmomminor3 nobsmomminor4 nobsmomminor5)
 egen bw50profile = concat (yearbw501 yearbw502 yearbw503 yearbw504 yearbw505)
-egen bw60profile = concat (yearbw601 yearbw602 yearbw603 yearbw604 yearbw605)
- 
+egen ubw60profile = concat (uyearbw601 uyearbw602 uyearbw603 uyearbw604 uyearbw605)
+
 * tab momminorprofile
-* tab bw50profile
-* tab bw60profile
+tab bw50profile
+tab ubw60profile
  
- keep ssuid epppnum year_pearn* year_hearn* year_upearn* year_uhearn* yearbw50* yearbw60* uyearbw50* uyearbw60* inyear* nmpyear* nmhyear* yearage* ybecome_bw50* ybecome_bw60* uybecome_bw50* uybecome_bw60* nobsmom* yearspartner* my_racealt my_sex *profile weight* ageoldest*
+ keep ssuid epppnum year_pearn* year_hearn* year_upearn* year_uhearn* yearbw50* yearbw60* uyearbw50* uyearbw60* inyear* nmpyear* nmhyear* yearage* ybecome_bw50* ybecome_bw60* uybecome_bw50* uybecome_bw60* nobsmom* yearspartner* my_race my_sex *profile weight* ageoldest*
  
- reshape long year_pearn year_hearn yearbw50 yearbw60 inyear nmpyear nmhyear yearage ybecome_bw50 ybecome_bw60 uybecome_bw50 uybecome_bw60 nobsmom nobsmomminor yearspartner weight ageyc year_upearn year_uhearn uyearbw50 uyearbw60 ageoldest, i(`i_variables') j(year)
+ reshape long year_pearn year_hearn yearbw50 yearbw60 inyear nmpyear nmhyear yearage ybecome_bw50 ybecome_bw60 uybecome_bw50 uybecome_bw60 nobsmom nobsmomminor yearspartner weight year_upearn year_uhearn uyearbw50 uyearbw60 ageoldest, i(`i_variables') j(year)
 
 * drops cases not observed in a year plus all the data organized by wave
 drop if missing(inyear)
