@@ -11,7 +11,7 @@ keep if srefmon==4
 
 keep ssuid shhadid rfid epppnum swave tpearn thearn tfearn thothinc tftotinc tbm* ///
 abmsum* tpm* apmsum* tmlmsum amlmsum tprftb* aprftb* eslryb1 eslryb2 aslryb* ///
-eoincb1 eoincb2 aoincb* tpprpinc tptrninc tpothinc efnp t15amt
+eoincb1 eoincb2 aoincb* tpprpinc tptrninc tpothinc efnp t15amt eeducate 
 save "$tempdir/sipp08tpearn`w'", replace
 }
 

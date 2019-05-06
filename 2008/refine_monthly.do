@@ -65,6 +65,11 @@ replace bw50=0 if tpearn/thearn < .5 & thearn > 0
 gen abw50=1 if altpearn/althearn >= .50 & thearn > 0
 replace abw50=0 if altpearn/althearn < .5 & thearn > 0
 
+recode eeducate (-1=-1)(31/38=1)(39=2)(40/43=3)(44/47=4), gen(educ)
+
+label define educ -1 "not in universe" 1 "< HS" 2 "HS Grad" 3 "Some College" 4 "College Grad"
+label values educ educ
+
 save "$tempdir/altearn.dta", $replace
 
 gen ratio=tpearn/thearn & thearn > 0

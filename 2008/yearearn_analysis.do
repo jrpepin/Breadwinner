@@ -1,27 +1,13 @@
 use "$tempdir/relearn_year.dta", clear
 
 * select if started observation a mother or became a mother during observation window
-tab nobsmomminor
-
 keep if nobsmomminor > 0 
 
 gen negpinc=1 if year_pearn < 0
 gen neghinc=1 if year_hearn < 0
 
-tab negpinc
-tab neghinc
-
 * drop cases with negative household income
 drop if neghinc==1
-
-gen ratio=year_pearn/year_hearn
-gen uratio=year_upearn/year_uhearn
-
-gen catratio=int(ratio*10) if ratio >= 0 & ratio <= 1
-replace catratio=-1 if ratio < 0
-replace catratio=20 if ratio > 1
-
-*sort year
 
 sum yearbw50 yearbw60 uyearbw50 uyearbw60 if ageoldest >=0 & ageoldest <=17
 
@@ -30,11 +16,6 @@ sum yearbw50 yearbw60 uyearbw50 uyearbw60 if ageoldest >=0 & ageoldest <=17
 *******************************************************************************
 
 keep if ageoldest < 19
-
-rename ybecome_bw50 becbw50
-rename ybecome_bw60 becbw60
-rename uybecome_bw50 ubecbw50
-rename uybecome_bw60 ubecbw60
 
 tab yearbw50 uyearbw50, m
 
@@ -47,9 +28,6 @@ tab becbw50 ubecbw50, m
 tab ageoldest ubecbw50 if inlist(ubecbw50,0,1), nofreq row 
 tab ageoldest ubecbw60 if inlist(ubecbw50,0,1), nofreq row 
 
-local transition "ubecbw50 ubecbw60"
-
-
 *Create dummy indicators for whether woman entered breadwinning between year when oldest child
 * is aged a and aged a+1. Note that by limiting analysis to `var' = 0 or 1 (ie. !=2), we are in essence
 * dropping cases that were breadwinning in year 1.
@@ -58,6 +36,11 @@ local transition "ubecbw50 ubecbw60"
 
 preserve
 
+local transition "ubecbw50 ubecbw60"
+
+gen ubw50atbir=uyearbw50 if ageoldest==0
+gen ubw60atbir=uyearbw60 if ageoldest==0
+	
 foreach var in `transition'{
 	forvalues a=0/17{
 		quietly egen `var'`a'=mean(`var') if ageoldest==`a' & `var' !=2
@@ -65,12 +48,14 @@ foreach var in `transition'{
 	}
 }
 
-collapse (max) ubecbw50* ubecbw60*
+collapse (max) ubecbw50* ubecbw60* (mean) ubw50atbir ubw60atbir
+
+gen eubecbw50=1-ubw50atbir
+gen eubecbw60=1-ubw60atbir  
 
 foreach var in `transition'{
-	quietly gen e`var'=1-`var'0
-	forvalues a=1/17{
-		quietly replace e`var'=(e`var')*(1-`var'`a')
+	forvalues a=0/17{
+		replace e`var'=(e`var')*(1-`var'`a')
 	}
 	tab e`var'
 }
@@ -80,6 +65,11 @@ preserve
 
 keep if my_race==1
 
+local transition "ubecbw50 ubecbw60"
+
+gen ubw50atbir=uyearbw50 if ageoldest==0
+gen ubw60atbir=uyearbw60 if ageoldest==0
+	
 foreach var in `transition'{
 	forvalues a=0/17{
 		quietly egen `var'`a'=mean(`var') if ageoldest==`a' & `var' !=2
@@ -87,12 +77,14 @@ foreach var in `transition'{
 	}
 }
 
-collapse (max) ubecbw50* ubecbw60* 
+collapse (max) ubecbw50* ubecbw60* (mean) ubw50atbir ubw60atbir
+
+gen eubecbw50=1-ubw50atbir
+gen eubecbw60=1-ubw60atbir  
 
 foreach var in `transition'{
-	quietly gen e`var'=1-`var'0
-	forvalues a=1/17{
-		quietly replace e`var'=(e`var')*(1-`var'`a')
+	forvalues a=0/17{
+		replace e`var'=(e`var')*(1-`var'`a')
 	}
 	tab e`var'
 }
@@ -102,6 +94,11 @@ preserve
 
 keep if my_race==2
 
+local transition "ubecbw50 ubecbw60"
+
+gen ubw50atbir=uyearbw50 if ageoldest==0
+gen ubw60atbir=uyearbw60 if ageoldest==0
+	
 foreach var in `transition'{
 	forvalues a=0/17{
 		quietly egen `var'`a'=mean(`var') if ageoldest==`a' & `var' !=2
@@ -109,12 +106,14 @@ foreach var in `transition'{
 	}
 }
 
-collapse (max) ubecbw50* ubecbw60* 
+collapse (max) ubecbw50* ubecbw60* (mean) ubw50atbir ubw60atbir
+
+gen eubecbw50=1-ubw50atbir
+gen eubecbw60=1-ubw60atbir  
 
 foreach var in `transition'{
-	quietly gen e`var'=1-`var'0
-	forvalues a=1/17{
-		quietly replace e`var'=(e`var')*(1-`var'`a')
+	forvalues a=0/17{
+		replace e`var'=(e`var')*(1-`var'`a')
 	}
 	tab e`var'
 }
@@ -124,6 +123,11 @@ preserve
 
 keep if my_race==3
 
+local transition "ubecbw50 ubecbw60"
+
+gen ubw50atbir=uyearbw50 if ageoldest==0
+gen ubw60atbir=uyearbw60 if ageoldest==0
+	
 foreach var in `transition'{
 	forvalues a=0/17{
 		quietly egen `var'`a'=mean(`var') if ageoldest==`a' & `var' !=2
@@ -131,12 +135,14 @@ foreach var in `transition'{
 	}
 }
 
-collapse (max) ubecbw50* ubecbw60* 
+collapse (max) ubecbw50* ubecbw60* (mean) ubw50atbir ubw60atbir
+
+gen eubecbw50=1-ubw50atbir
+gen eubecbw60=1-ubw60atbir  
 
 foreach var in `transition'{
-	quietly gen e`var'=1-`var'0
-	forvalues a=1/17{
-		quietly replace e`var'=(e`var')*(1-`var'`a')
+	forvalues a=0/17{
+		replace e`var'=(e`var')*(1-`var'`a')
 	}
 	tab e`var'
 }
@@ -146,6 +152,11 @@ preserve
 
 keep if my_race==4
 
+local transition "ubecbw50 ubecbw60"
+
+gen ubw50atbir=uyearbw50 if ageoldest==0
+gen ubw60atbir=uyearbw60 if ageoldest==0
+	
 foreach var in `transition'{
 	forvalues a=0/17{
 		quietly egen `var'`a'=mean(`var') if ageoldest==`a' & `var' !=2
@@ -153,12 +164,14 @@ foreach var in `transition'{
 	}
 }
 
-collapse (max) ubecbw50* ubecbw60* 
+collapse (max) ubecbw50* ubecbw60* (mean) ubw50atbir ubw60atbir
+
+gen eubecbw50=1-ubw50atbir
+gen eubecbw60=1-ubw60atbir  
 
 foreach var in `transition'{
-	quietly gen e`var'=1-`var'0
-	forvalues a=1/17{
-		quietly replace e`var'=(e`var')*(1-`var'`a')
+	forvalues a=0/17{
+		replace e`var'=(e`var')*(1-`var'`a')
 	}
 	tab e`var'
 }

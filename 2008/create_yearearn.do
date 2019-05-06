@@ -8,11 +8,16 @@ use "$tempdir/relearn.dta", clear
 
 local i_variables " ssuid epppnum "
 local j_variables " swave "
-local other_variables "nmomto nbiomomto HHsize nHHkids spartner adj_age EBORNUS EMS EORIGIN ERRP thearn tfearn thothinc tpearn momtoany momtoanyminor nHHadults WPFINWGT altpearn altfearn althearn ualtpearn ualtfearn ualthearn anyallocate ageoldest"
+local other_variables "nmomto nbiomomto HHsize nHHkids spartner adj_age EBORNUS EMS EORIGIN ERRP thearn tfearn thothinc tpearn momtoany momtoanyminor nHHadults WPFINWGT altpearn altfearn althearn ualtpearn ualtfearn ualthearn anyallocate ageoldest educ"
 
-keep `j_variables' `i_variables' `other_variables' my_race my_sex
+keep `j_variables' `i_variables' `other_variables' my_race
 
 reshape wide `other_variables', i(`i_variables') j(`j_variables')
+
+gen hieduc=educ1
+forvalues w=2/15{
+ replace hieduc=educ`w' if educ`w' > hieduc
+}
 
 * create indicators for in each wave (w)
 
@@ -130,28 +135,28 @@ gen ueverbw60=.
  forvalues y=1/4 {
      local z=`y'+1
    replace everbw50=0 if missing(everbw50) & !missing(yearbw50`y') 
-   gen ybecome_bw50`y'=0 if !missing(yearbw50`y') & everbw50!=1
-   replace ybecome_bw50`y'=1 if ybecome_bw50`y'==0 & yearbw50`y'==0 & yearbw50`z'==1 
-   replace ybecome_bw50`y'=2 if ybecome_bw50`y'==0 & yearbw50`y'==1
-   replace everbw50=1 if inlist(ybecome_bw50`y',1,2) // marking so that ineligble to become bw again
+   gen becbw50`y'=0 if !missing(yearbw50`y') & everbw50!=1
+   replace becbw50`y'=1 if becbw50`y'==0 & yearbw50`y'==0 & yearbw50`z'==1 
+   replace becbw50`y'=2 if becbw50`y'==0 & yearbw50`y'==1
+   replace everbw50=1 if inlist(becbw50`y',1,2) // marking so that ineligble to become bw again
 
    replace everbw60=0 if missing(everbw60) & !missing(yearbw60`y')
-   gen ybecome_bw60`y'=0 if !missing(yearbw60`y') & everbw60!=1
-   replace ybecome_bw60`y'=1 if ybecome_bw60`y'==0 & yearbw60`y'==0 & yearbw60`z'==1 
-   replace ybecome_bw60`y'=2 if ybecome_bw60`y'==0 & yearbw60`y'==1
-   replace everbw60=1 if inlist(ybecome_bw60`y',1,2) // marking so that ineligble to become bw again
+   gen becbw60`y'=0 if !missing(yearbw60`y') & everbw60!=1
+   replace becbw60`y'=1 if becbw60`y'==0 & yearbw60`y'==0 & yearbw60`z'==1 
+   replace becbw60`y'=2 if becbw60`y'==0 & yearbw60`y'==1
+   replace everbw60=1 if inlist(becbw60`y',1,2) // marking so that ineligble to become bw again
 
    replace ueverbw50=0 if missing(ueverbw50) & !missing(uyearbw50`y')
-   gen uybecome_bw50`y'=0 if !missing(yearbw50`y') & ueverbw50!=1
-   replace uybecome_bw50`y'=1 if uybecome_bw50`y'==0 & uyearbw50`y'==0 & uyearbw50`z'==1 
-   replace uybecome_bw50`y'=2 if uybecome_bw50`y'==0 & uyearbw50`y'==1
-   replace ueverbw50=1 if inlist(uybecome_bw50`y',1,2) // marking so that ineligble to become bw again
+   gen ubecbw50`y'=0 if !missing(yearbw50`y') & ueverbw50!=1
+   replace ubecbw50`y'=1 if ubecbw50`y'==0 & uyearbw50`y'==0 & uyearbw50`z'==1 
+   replace ubecbw50`y'=2 if ubecbw50`y'==0 & uyearbw50`y'==1
+   replace ueverbw50=1 if inlist(ubecbw50`y',1,2) // marking so that ineligble to become bw again
 
    replace ueverbw60=0 if missing(ueverbw60) & !missing(uyearbw60`y')
-   gen uybecome_bw60`y'=0 if !missing(yearbw60`y') & ueverbw60!=1
-   replace uybecome_bw60`y'=1 if uybecome_bw60`y'==0 & uyearbw60`y'==0 & uyearbw60`z'==1
-   replace uybecome_bw60`y'=2 if uybecome_bw60`y'==0 & uyearbw60`y'==1
-   replace ueverbw60=1 if inlist(uybecome_bw60`y',1,2) // marking so that ineligble to become bw again
+   gen ubecbw60`y'=0 if !missing(yearbw60`y') & ueverbw60!=1
+   replace ubecbw60`y'=1 if ubecbw60`y'==0 & uyearbw60`y'==0 & uyearbw60`z'==1
+   replace ubecbw60`y'=2 if ubecbw60`y'==0 & uyearbw60`y'==1
+   replace ueverbw60=1 if inlist(ubecbw60`y',1,2) // marking so that ineligble to become bw again
  }
 
  *the proportion breadwinning is 1-3 points different (direction depends on cut-off)  with just unallocated data. 
@@ -160,8 +165,8 @@ tab everbw60
 tab ueverbw50
 tab ueverbw60
 tab yearbw501 uyearbw501
-tab ybecome_bw501 uybecome_bw501, m
-tab ybecome_bw504 uybecome_bw504, m
+tab becbw501 ubecbw501, m
+tab becbw504 ubecbw504, m
 
 
 egen momprofile = concat (nobsmom1 nobsmom2 nobsmom3 nobsmom4 nobsmom5)
@@ -173,16 +178,16 @@ egen ubw60profile = concat (uyearbw601 uyearbw602 uyearbw603 uyearbw604 uyearbw6
 tab bw50profile
 tab ubw60profile
  
- keep ssuid epppnum year_pearn* year_hearn* year_upearn* year_uhearn* yearbw50* yearbw60* uyearbw50* uyearbw60* inyear* nmpyear* nmhyear* yearage* ybecome_bw50* ybecome_bw60* uybecome_bw50* uybecome_bw60* nobsmom* yearspartner* my_race my_sex *profile weight* ageoldest*
+ keep ssuid epppnum year_pearn* year_hearn* year_upearn* year_uhearn* yearbw50* yearbw60* uyearbw50* uyearbw60* inyear* nmpyear* nmhyear* yearage* becbw50* becbw60* ubecbw50* ubecbw60* nobsmom* yearspartner* my_race hieduc *profile weight* ageoldest*
  
- reshape long year_pearn year_hearn yearbw50 yearbw60 inyear nmpyear nmhyear yearage ybecome_bw50 ybecome_bw60 uybecome_bw50 uybecome_bw60 nobsmom nobsmomminor yearspartner weight year_upearn year_uhearn uyearbw50 uyearbw60 ageoldest, i(`i_variables') j(year)
+ reshape long year_pearn year_hearn yearbw50 yearbw60 inyear nmpyear nmhyear yearage becbw50 becbw60 ubecbw50 ubecbw60 nobsmom nobsmomminor yearspartner weight year_upearn year_uhearn uyearbw50 uyearbw60 ageoldest, i(`i_variables') j(year)
 
 * drops cases not observed in a year plus all the data organized by wave
 drop if missing(inyear)
  
 label define trans 0 "Not breadwinner" 1 "Became breadwinner" 2 "Already breadwinner"
 
-label values ybecome_bw50 ybecome_bw60 trans
+label values becbw50 becbw60 trans
 
 label variable uyearbw50 "Breadwinning status (> 50%) without allocated data"
 label variable uyearbw60 "Breadwinning status (> 60%) without allocated data"
@@ -192,6 +197,13 @@ label variable yearbw60 "Breadwinning status (> 60%) with allocated data"
 
 label define year 1 "Q4 08" 2 "Q4 09" 3 "Q4 10" 4 "Q4 11" 5 "Q4 12"
 label variable year "year of observation"
+
+gen ratio=year_pearn/year_hearn
+gen uratio=year_upearn/year_uhearn
+
+gen catratio=int(ratio*10) if ratio >= 0 & ratio <= 1
+replace catratio=-1 if ratio < 0
+replace catratio=20 if ratio > 1
 
 save "$tempdir/relearn_year.dta", replace
 
