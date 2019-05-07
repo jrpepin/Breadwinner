@@ -106,8 +106,9 @@ restore
 keep if status !=.
 
 // breadwinning at time 0 dependent on breadwinning at t1 and t2
-logit t0 ib3.time m1 		// Just t-minus 1
-logit t0 ib3.time m1 m2 	// t-minus 1 & t-minus 2
+// need a group var for person?
+logit t0 ib3.time m1 	 if time <=3	// Just t-minus 1
+logit t0 ib3.time m1 m2  if time <=3	// t-minus 1 & t-minus 2
 
 margins time
 marginsplot
