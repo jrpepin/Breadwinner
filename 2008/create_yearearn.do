@@ -10,7 +10,7 @@ local i_variables " ssuid epppnum "
 local j_variables " swave "
 local other_variables "nmomto nbiomomto HHsize nHHkids spartner adj_age EBORNUS EMS EORIGIN ERRP thearn tfearn thothinc tpearn momtoany momtoanyminor nHHadults WPFINWGT altpearn altfearn althearn ualtpearn ualtfearn ualthearn anyallocate ageoldest educ"
 
-keep `j_variables' `i_variables' `other_variables' my_race
+keep `j_variables' `i_variables' `other_variables' my_race msbirth
 
 reshape wide `other_variables', i(`i_variables') j(`j_variables')
 
@@ -178,7 +178,7 @@ egen ubw60profile = concat (uyearbw601 uyearbw602 uyearbw603 uyearbw604 uyearbw6
 tab bw50profile
 tab ubw60profile
  
- keep ssuid epppnum year_pearn* year_hearn* year_upearn* year_uhearn* yearbw50* yearbw60* uyearbw50* uyearbw60* inyear* nmpyear* nmhyear* yearage* becbw50* becbw60* ubecbw50* ubecbw60* nobsmom* yearspartner* my_race hieduc *profile weight* ageoldest*
+ keep ssuid epppnum year_pearn* year_hearn* year_upearn* year_uhearn* yearbw50* yearbw60* uyearbw50* uyearbw60* inyear* nmpyear* nmhyear* yearage* becbw50* becbw60* ubecbw50* ubecbw60* nobsmom* yearspartner* my_race hieduc *profile weight* ageoldest* msbirth
  
  reshape long year_pearn year_hearn yearbw50 yearbw60 inyear nmpyear nmhyear yearage becbw50 becbw60 ubecbw50 ubecbw60 nobsmom nobsmomminor yearspartner weight year_upearn year_uhearn uyearbw50 uyearbw60 ageoldest, i(`i_variables') j(year)
 

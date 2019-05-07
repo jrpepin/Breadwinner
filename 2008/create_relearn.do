@@ -4,6 +4,37 @@
 *******************************************************************************
 *******************************************************************************
 
+********************************************************************************
+* Create an extract with year of first birth and marital history
+********************************************************************************
+use "$SIPP2008/sippp08putm2", clear
+
+keep ssuid epppnum tfmyear tfsyear tftyear tsmyear tssyear tstyear tlmyear tlsyear tltyear tfbrthyr exmar ewidiv1 ewidiv2 ems esex tmomchl tage
+
+keep if esex==2
+
+gen anybirth=0
+replace anybirth=1 if tmomchl==1
+
+gen yrmar1=tlmyear if exmar==1
+replace yrmar1=tfmyear if exmar > 1
+replace yrmar1=999 if exmar < 1
+
+*gen yrmar1end=tlsyear if exmar==1 & tlsyear > 0
+*replace yrmar1end=tltyear if exmar==1 & tltyear < tlsyear & tltyear > 0
+*replace yrmar
+
+
+gen msbirth=-1 if tage >= 65
+replace msbirth=0 if ems==6 // never married
+replace msbirth=0 if tfbrthyr < yrmar1 & tfbrthyr > 0 // birth happened before first marriage
+replace msbirth=1 if tfbrthyr >= yrmar1 // birth happened after (or year of) first marriage
+replace msbirth=9 if anybirth==0
+
+destring epppnum, replace
+
+save "$SIPP08keep/famhis.dta", $replace
+
 *******************************************************************************
 * Section: Create Household Composition variables
 *******************************************************************************
@@ -86,6 +117,10 @@ sort ssuid epppnum swave
 * merging in a person-level data file with personal earnings and household earnings.
 merge 1:1 ssuid epppnum swave using "$tempdir/altearn.dta"
 
+assert _merge==3
+
+drop _merge
+
 gen momtoany=0 if nmomto==0
 replace momtoany=1 if nmomto > 0 & !missing(nmomto)
 
@@ -98,6 +133,13 @@ sum nHHadults
 
 keep if adj_age >= 18 & adj_age < 70
 keep if my_sex==2
+
+merge m:1 ssuid epppnum using "$SIPP08keep/famhis.dta"
+
+drop if _merge ==2
+
+* Those without msbirth because not matched in famhis were generally not observed in wave 2
+rename _merge mergefam
 
 save "$tempdir/relearn.dta", replace
 
