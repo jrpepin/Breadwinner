@@ -4,7 +4,7 @@ set more off
 local logdate = string( d(`c(current_date)'), "%dCY.N.D" )
 
 // Replace NA with nothing in CSV file.
-// Delete first column prodced by R output
+// Delete first column produced by R output
 // Replace m1 - t9 with numbers
 
 log using nlsy97_hh5_`logdate'.log, t replace
