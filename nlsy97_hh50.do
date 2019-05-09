@@ -3,7 +3,7 @@ clear
 set more off
 local logdate = string( d(`c(current_date)'), "%dCY.N.D" )
 
-log using nlsy97_hh50_`logdate'.log, t replace
+log using "C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning\logs\nlsy97_hh50_`logdate'.log", t replace
 
 use 	"C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning\nlsy97_hh50.dta", clear
 
