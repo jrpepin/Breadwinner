@@ -6,6 +6,8 @@
 
 use "$tempdir/relearn.dta", clear
 
+tab educ, m
+
 local i_variables " ssuid epppnum "
 local j_variables " swave "
 local other_variables "nmomto nbiomomto HHsize nHHkids spartner adj_age EBORNUS EMS EORIGIN ERRP thearn tfearn thothinc tpearn momtoany momtoanyminor nHHadults WPFINWGT altpearn altfearn althearn ualtpearn ualtfearn ualthearn anyallocate ageoldest educ"
@@ -16,7 +18,7 @@ reshape wide `other_variables', i(`i_variables') j(`j_variables')
 
 gen hieduc=educ1
 forvalues w=2/15{
- replace hieduc=educ`w' if educ`w' > hieduc
+ replace hieduc=educ`w' if educ`w' > hieduc & !missing(educ`w')
 }
 
 * create indicators for in each wave (w)
@@ -138,24 +140,28 @@ gen ueverbw60=.
    gen becbw50`y'=0 if !missing(yearbw50`y') & everbw50!=1
    replace becbw50`y'=1 if becbw50`y'==0 & yearbw50`y'==0 & yearbw50`z'==1 
    replace becbw50`y'=2 if becbw50`y'==0 & yearbw50`y'==1
+   replace becbw50`y'=2 if everbw50==1
    replace everbw50=1 if inlist(becbw50`y',1,2) // marking so that ineligble to become bw again
 
    replace everbw60=0 if missing(everbw60) & !missing(yearbw60`y')
    gen becbw60`y'=0 if !missing(yearbw60`y') & everbw60!=1
    replace becbw60`y'=1 if becbw60`y'==0 & yearbw60`y'==0 & yearbw60`z'==1 
    replace becbw60`y'=2 if becbw60`y'==0 & yearbw60`y'==1
+   replace becbw60`y'=2 if everbw60==1
    replace everbw60=1 if inlist(becbw60`y',1,2) // marking so that ineligble to become bw again
 
    replace ueverbw50=0 if missing(ueverbw50) & !missing(uyearbw50`y')
    gen ubecbw50`y'=0 if !missing(yearbw50`y') & ueverbw50!=1
    replace ubecbw50`y'=1 if ubecbw50`y'==0 & uyearbw50`y'==0 & uyearbw50`z'==1 
    replace ubecbw50`y'=2 if ubecbw50`y'==0 & uyearbw50`y'==1
+   replace ubecbw50`y'=2 if ueverbw50==1
    replace ueverbw50=1 if inlist(ubecbw50`y',1,2) // marking so that ineligble to become bw again
 
    replace ueverbw60=0 if missing(ueverbw60) & !missing(uyearbw60`y')
    gen ubecbw60`y'=0 if !missing(yearbw60`y') & ueverbw60!=1
    replace ubecbw60`y'=1 if ubecbw60`y'==0 & uyearbw60`y'==0 & uyearbw60`z'==1
    replace ubecbw60`y'=2 if ubecbw60`y'==0 & uyearbw60`y'==1
+   replace ubecbw60`y'=2 if ueverbw60==1
    replace ueverbw60=1 if inlist(ubecbw60`y',1,2) // marking so that ineligble to become bw again
  }
 

@@ -18,9 +18,9 @@ putexcel A13=(" Less than High School")
 putexcel A14=(" High School")
 putexcel A15=(" Some College")
 putexcel A16=(" College Grad")
-putexcel A18=("Marital Status at First Birth")
-putexcel A19=(" Not Married")
-putexcel A20=(" Married")
+putexcel A18=("Partnered")
+putexcel A19=(" Not Partnered")
+putexcel A20=(" Partnered")
 
 * select if started observation a mother or became a mother during observation window
 keep if nobsmomminor > 0 
@@ -37,7 +37,7 @@ sum yearbw50 yearbw60 uyearbw50 uyearbw60 if ageoldest >=0 & ageoldest <=17
 * calculate cumulative risk of breadwinning 
 *******************************************************************************
 
-keep if ageoldest < 19
+keep if ageoldest < 18
 
 *In any given year -- that is, in the cross-section -- the percentage breadwinning is higher with the actual reports and with allocated data and reports.
 *But they are less likely to transition into breadwinning with unallocated data. This suggests that the data allocations are introducing random error and
@@ -392,7 +392,7 @@ putexcel B16=(1-`bw50') D16=(1-`bw60')
 restore
 preserve
 
-keep if msbirth==0
+keep if yearspartner==0
 
 local transition "ubecbw50 ubecbw60"
 
@@ -426,7 +426,7 @@ putexcel B19=(1-`bw50') D19=(1-`bw60')
 restore
 preserve
 
-keep if msbirth==1
+keep if yearspartner==1
 
 local transition "ubecbw50 ubecbw60"
 
@@ -461,7 +461,22 @@ restore
 
 tab my_race
 tab hieduc
-tab msbirth
+tab yearspartner
+tab uyearbw50, m
+
+putexcel set "$results/LifetimeBreadwin.xlsx", sheet(BW50detail) modify
+putexcel B2=("Not") C2=("Breadwinning") D2=("already bw") G2=("not enter bw") H2=("cumulative survival")
+putexcel A3="Birth" 
+tab ageoldest ubecbw50, m
+tab uyearbw50 if ageoldest==0, matcell(atbir50)
+putexcel B24=matrix(atbir50)
+putexcel B3=formula(B25)
+putexcel C3=formula(B24)
+putexcel G3=formula(B24/(B24+B25))
+putexcel F3=formula(B25/(B24+B25))
+tab ageoldest ubecbw50, matcell(trans50)
+putexcel B4=matrix(trans50)
+
 /*
 
 sort yearspartner
