@@ -3,10 +3,11 @@
        log:  C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning\logs\nlsy97_hh50_2019.05.0
 > 8.log
   log type:  text
- opened on:   8 May 2019, 19:12:40
+ opened on:   8 May 2019, 19:22:34
 
 . 
-. use     "C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning\nlsy97_hh50.dta", clear
+. use     "C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning\stata\nlsy97_hh50.dta", clea
+> r
 (Written by R.              )
 
 . 
@@ -179,5 +180,5 @@ Year of 1st Birth  |   .3230375   .1124709     2.87   0.004     .1025985    .543
        log:  C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning\logs\nlsy97_hh50_2019.05.0
 > 8.log
   log type:  text
- closed on:   8 May 2019, 19:12:40
+ closed on:   8 May 2019, 19:22:36
 ------------------------------------------------------------------------------------------------

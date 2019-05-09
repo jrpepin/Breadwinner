@@ -1,11 +1,11 @@
-cd "C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning"
+cd "C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning\stata"
 clear
 set more off
 local logdate = string( d(`c(current_date)'), "%dCY.N.D" )
 
 log using "C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning\logs\nlsy97_hh50_`logdate'.log", t replace
 
-use 	"C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning\nlsy97_hh50.dta", clear
+use 	"C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning\stata\nlsy97_hh50.dta", clear
 
 *select only observations since first birth
 // JP: Don't we want the breadwinning status for the two years BEFORE firstbirth?
