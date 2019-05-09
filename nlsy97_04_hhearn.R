@@ -239,6 +239,7 @@ data_hh60 <- data_hh60[order(data_hh60$PUBID_1997, data_hh60$year),]
 
 
 #Create datasets
+
 require(foreign)
-write.dta(data_hh50, "NLSY97_hh50.dta")
-write.dta(data_hh60, "NLSY97_hh60.dta")
+write.dta(data_hh50, "stata/NLSY97_hh50.dta")
+write.dta(data_hh60, "stata/NLSY97_hh60.dta")
