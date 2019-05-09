@@ -8,21 +8,9 @@ log using "C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning\logs\nlsy97_
 use 	"C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning\stata\nlsy97_hh50.dta", clear
 
 *select only observations since first birth
-// JP: Don't we want the breadwinning status for the two years BEFORE firstbirth?
-// I changed this variable so 1 equals 2 years prior to first birth and every year after. Wrong?
-keep if firstbirth==1 	
+keep if firstbirth==1 	// selected on this in R already
 
 drop firstbirth 		// this variable has no variation now 
-
-// NOTE: Time is lagged by 1 year because respondents reported earnings the year before survery year (year)
-
-// Code won't run with negative values
-replace time = time + 2
-label define timelbl 	1 "Minus 2" 2 "Minus 1" 3 "Year of 1st Birth" 4 "Plus 1" 5 "Plus 2" 6 "Plus 3" ///
-						7 "Plus 4"	8 "Plus 5"	9 "Plus 6"	10 "Plus 7" 11 "Plus 8" 12 "Plus 9" 13 "Plus 10"
-label values time timelbl
-
-drop if time == . 		// Can't run next code with missing time data
 
 reshape wide year hhe50, i(PUBID_1997) j(time)
 
