@@ -817,3 +817,5 @@ incdata[is.na(incdata)] = 0 # Make missing 0 so don't drop them just because var
 incdata[incdata == -3] <- NA # Invalid missing 
 incdata[incdata == -2] <- NA # Dont know 
 incdata[incdata == -1] <- NA # Refused 
+
+incdata <- arrange(incdata, PUBID_1997, year)
