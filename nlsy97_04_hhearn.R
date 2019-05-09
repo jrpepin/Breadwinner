@@ -163,33 +163,82 @@ data_hh$hhe6_t8  <- factor(data_hh$hhe6_t8)
 data_hh$hhe6_t9  <- factor(data_hh$hhe6_t9)
 data_hh$hhe6_t10 <- factor(data_hh$hhe6_t10)
 
-# Restructure the data
+# Create firstbirth variable
+data_hh <- arrange(data_hh, PUBID_1997, year)
 
-## 50% Breadwinning data
-data_hh5 <- data_hh %>%
-  select(PUBID_1997, year, starts_with("hhe5")) %>%
+data_hh <- data_hh %>%
   group_by(PUBID_1997) %>%
-  gather(time, status, -PUBID_1997, -year) %>%
-  separate(time, c("type", "time"), "_")
+  mutate(
+    firstbirth = case_when(
+      (year >= birth_year -1)   ~ 1,
+      (year <  birth_year -1)   ~ 0))
 
-data_hh5$status[data_hh5$status == "Not a breadwinner"] = 0  # Not a breadwinner
-data_hh5$status[data_hh5$status == "Breadwinner"]       = 1  # Breadwinner
+# Create time variable
+data_hh <- data_hh %>%
+  group_by(PUBID_1997) %>%
+  mutate(
+    time = case_when(
+      (year == birth_year - 1)      ~ -2L, # These are lagged by 1 year because earnings were asked about the previous year
+      (year == birth_year - 0)      ~ -1L,
+      (year == birth_year + 1)      ~  0L,
+      (year == birth_year + 2)      ~  1L,
+      (year == birth_year + 3)      ~  2L,
+      (year == birth_year + 4)      ~  3L,
+      (year == birth_year + 5)      ~  4L,
+      (year == birth_year + 6)      ~  5L,
+      (year == birth_year + 7)      ~  6L,
+      (year == birth_year + 8)      ~  7L,
+      (year == birth_year + 9)      ~  8L,
+      (year == birth_year + 10)     ~  9L))
 
-data_hh5 <- data_hh5[order(data_hh5$PUBID_1997, data_hh5$year),]
+# Restructure the data
+## 50% Breadwinning data
+data_hh50 <- data_hh %>%
+  select(PUBID_1997, year, firstbirth, birth_year, time, starts_with("hhe5")) %>%
+  group_by(PUBID_1997) %>%
+  gather(status, hhe50, -PUBID_1997, -year, -firstbirth, -birth_year, -time) %>%
+  separate(status, c("type", "status"), "_")
+
+data_hh50$hhe50[data_hh50$hhe50 == "Not a breadwinner"] = 0L  # Not a breadwinner
+data_hh50$hhe50[data_hh50$hhe50 == "Breadwinner"]       = 1L  # Breadwinner
+
+data_hh50$hhe50 <- as.numeric(data_hh50$hhe50)
+
+data_hh50 <- data_hh50 %>%
+  group_by(PUBID_1997, year) %>%
+  summarise(firstbirth = first(firstbirth),
+            birthyear = first(birth_year),
+            time = first(time),
+            hhe50 = mean(hhe50, na.rm=TRUE))
+data_hh50$hhe50[is.nan(data_hh50$hhe50)] <- NA
+
+data_hh50 <- data_hh50[order(data_hh50$PUBID_1997, data_hh50$year),]
 
 
 ## 60% Breadwinning data
-data_hh6 <- data_hh %>%
-  select(PUBID_1997, year, starts_with("hhe6")) %>%
+data_hh60 <- data_hh %>%
+  select(PUBID_1997, year, firstbirth, birth_year, time, starts_with("hhe6")) %>%
   group_by(PUBID_1997) %>%
-  gather(time, status, -PUBID_1997, -year) %>%
-  separate(time, c("type", "time"), "_")
+  gather(status, hhe60, -PUBID_1997, -year, -firstbirth, -birth_year, -time) %>%
+  separate(status, c("type", "status"), "_")
 
-data_hh6$status[data_hh6$status == "Not a breadwinner"] = 0  # Not a breadwinner
-data_hh6$status[data_hh6$status == "Breadwinner"]       = 1  # Breadwinner
+data_hh60$hhe60[data_hh60$hhe60 == "Not a breadwinner"] = 0L  # Not a breadwinner
+data_hh60$hhe60[data_hh60$hhe60 == "Breadwinner"]       = 1L  # Breadwinner
 
-data_hh6 <- data_hh6[order(data_hh6$PUBID_1997, data_hh6$year),]
+data_hh60$hhe60 <- as.numeric(data_hh60$hhe60)
+
+data_hh60 <- data_hh60 %>%
+  group_by(PUBID_1997, year) %>%
+  summarise(firstbirth = first(firstbirth),
+            birthyear = first(birth_year),
+            time = first(time),
+            hhe60 = mean(hhe60, na.rm=TRUE))
+data_hh60$hhe60[is.nan(data_hh60$hhe60)] <- NA
+
+data_hh60 <- data_hh60[order(data_hh60$PUBID_1997, data_hh60$year),]
+
 
 #Create datasets
-write.csv(data_hh5, file = "NLSY97_hh5.csv")
-write.csv(data_hh6, file = "NLSY97_hh6.csv")
+require(foreign)
+write.dta(data_hh50, "NLSY97_hh50.dta")
+write.dta(data_hh60, "NLSY97_hh60.dta")
