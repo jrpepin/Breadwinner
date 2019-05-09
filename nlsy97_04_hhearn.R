@@ -12,7 +12,13 @@ data_hh  <- data_hh  %>%
 
 ## Tidy year vars
 data_hh$year       <- as.numeric(data_hh$year)
+data_hh <- data_hh %>% group_by(PUBID_1997) %>% complete(year=full_seq(year,1))
+
 data_hh$birth_year <- as.numeric(data_hh$birth_year)
+
+data_hh  <- data_hh  %>%
+  group_by(PUBID_1997) %>%  
+  mutate(birth_year = max(birth_year, na.rm = TRUE))
 
 ## Birth year breadwinning 50%
 ## Careful - t0 is birth year plus 1 for data_hh because respondents report data_hh from the previous year
@@ -70,6 +76,14 @@ data_hh <- data_hh %>%
     hhe5_t10 = case_when(
       ((momearn/hhearn) >  .5 & year == birth_year + 11)     ~ "Breadwinner",
       ((momearn/hhearn) <= .5 & year == birth_year + 11)     ~ "Not a breadwinner",
+      TRUE                                                   ~  NA_character_),
+    hhe5_t11 = case_when(
+      ((momearn/hhearn) >  .5 & year == birth_year + 12)     ~ "Breadwinner",
+      ((momearn/hhearn) <= .5 & year == birth_year + 12)     ~ "Not a breadwinner",
+      TRUE                                                   ~  NA_character_),
+    hhe5_t12 = case_when(
+      ((momearn/hhearn) >  .5 & year == birth_year + 13)     ~ "Breadwinner",
+      ((momearn/hhearn) <= .5 & year == birth_year + 13)     ~ "Not a breadwinner",
       TRUE                                                   ~  NA_character_))
 
 
@@ -129,7 +143,16 @@ data_hh <- data_hh %>%
     hhe6_t10 = case_when(
       ((momearn/hhearn) >  .6 & year == birth_year + 11)     ~ "Breadwinner",
       ((momearn/hhearn) <= .6 & year == birth_year + 11)     ~ "Not a breadwinner",
-      TRUE                                                   ~  NA_character_))
+      TRUE                                                   ~  NA_character_),
+    hhe6_t11 = case_when(
+      ((momearn/hhearn) >  .6 & year == birth_year + 12)     ~ "Breadwinner",
+      ((momearn/hhearn) <= .6 & year == birth_year + 12)     ~ "Not a breadwinner",
+      TRUE                                                   ~  NA_character_),
+    hhe6_t12 = case_when(
+      ((momearn/hhearn) >  .6 & year == birth_year + 13)     ~ "Breadwinner",
+      ((momearn/hhearn) <= .6 & year == birth_year + 13)     ~ "Not a breadwinner",
+      TRUE                                                   ~  NA_character_),
+    )
 
 ## Tidy data
 data_hh <- data_hh %>%
@@ -148,6 +171,8 @@ data_hh$hhe5_t7  <- factor(data_hh$hhe5_t7)
 data_hh$hhe5_t8  <- factor(data_hh$hhe5_t8)
 data_hh$hhe5_t9  <- factor(data_hh$hhe5_t9)
 data_hh$hhe5_t10 <- factor(data_hh$hhe5_t10)
+data_hh$hhe5_t11 <- factor(data_hh$hhe5_t11)
+data_hh$hhe5_t12 <- factor(data_hh$hhe5_t12)
 
 data_hh$hhe6_m2  <- factor(data_hh$hhe6_m2)
 data_hh$hhe6_m1  <- factor(data_hh$hhe6_m1)
@@ -162,6 +187,32 @@ data_hh$hhe6_t7  <- factor(data_hh$hhe6_t7)
 data_hh$hhe6_t8  <- factor(data_hh$hhe6_t8)
 data_hh$hhe6_t9  <- factor(data_hh$hhe6_t9)
 data_hh$hhe6_t10 <- factor(data_hh$hhe6_t10)
+data_hh$hhe6_t11 <- factor(data_hh$hhe6_t11)
+data_hh$hhe6_t12 <- factor(data_hh$hhe6_t12)
+
+# Create time variable
+data_hh <- data_hh %>%
+  group_by(PUBID_1997) %>%
+  mutate(
+    time = case_when(
+      (year == birth_year + 0)      ~  0L,
+      (year == birth_year + 1)      ~  1L,
+      (year == birth_year + 2)      ~  2L,
+      (year == birth_year + 3)      ~  3L,
+      (year == birth_year + 4)      ~  4L,
+      (year == birth_year + 5)      ~  5L,
+      (year == birth_year + 6)      ~  6L,
+      (year == birth_year + 7)      ~  7L,
+      (year == birth_year + 8)      ~  8L,
+      (year == birth_year + 9)      ~  9L,
+      (year == birth_year + 10)     ~  10L,
+      (year == birth_year + 11)     ~  11L,
+      (year == birth_year + 12)     ~  12L,
+      (year == birth_year + 13)     ~  13L,
+      (year == birth_year + 14)     ~  14L,
+      (year == birth_year + 15)     ~  15L,
+      (year == birth_year + 16)     ~  16L,
+      (year == birth_year + 17)     ~  17L))
 
 # Create firstbirth variable
 data_hh <- arrange(data_hh, PUBID_1997, year)
@@ -170,26 +221,8 @@ data_hh <- data_hh %>%
   group_by(PUBID_1997) %>%
   mutate(
     firstbirth = case_when(
-      (year >= birth_year -1)   ~ 1,
-      (year <  birth_year -1)   ~ 0))
-
-# Create time variable
-data_hh <- data_hh %>%
-  group_by(PUBID_1997) %>%
-  mutate(
-    time = case_when(
-      (year == birth_year - 1)      ~ -2L, # These are lagged by 1 year because earnings were asked about the previous year
-      (year == birth_year - 0)      ~ -1L,
-      (year == birth_year + 1)      ~  0L,
-      (year == birth_year + 2)      ~  1L,
-      (year == birth_year + 3)      ~  2L,
-      (year == birth_year + 4)      ~  3L,
-      (year == birth_year + 5)      ~  4L,
-      (year == birth_year + 6)      ~  5L,
-      (year == birth_year + 7)      ~  6L,
-      (year == birth_year + 8)      ~  7L,
-      (year == birth_year + 9)      ~  8L,
-      (year == birth_year + 10)     ~  9L))
+      (year >= birth_year)   ~ 1,
+      (year < birth_year)    ~ 0))
 
 # Restructure the data
 ## 50% Breadwinning data
@@ -204,17 +237,31 @@ data_hh50$hhe50[data_hh50$hhe50 == "Breadwinner"]       = 1L  # Breadwinner
 
 data_hh50$hhe50 <- as.numeric(data_hh50$hhe50)
 
+data_hh50 <- data_hh50
+
 data_hh50 <- data_hh50 %>%
-  group_by(PUBID_1997, year) %>%
-  summarise(firstbirth = first(firstbirth),
-            birthyear = first(birth_year),
-            time = first(time),
-            hhe50 = mean(hhe50, na.rm=TRUE))
-data_hh50$hhe50[is.nan(data_hh50$hhe50)] <- NA
+  group_by(PUBID_1997, status) %>%
+  mutate(hhe50  = max(hhe50, na.rm = TRUE))
 
-data_hh50 <- data_hh50[order(data_hh50$PUBID_1997, data_hh50$year),]
+data_hh50$hhe50[data_hh50$hhe50 == -Inf] <- NA
+
+data_hh50 <- data_hh50 %>%
+  filter(   (status == "t0" & time == 0) |
+            (status == "t1" & time == 1) |
+            (status == "t2" & time == 2) | 
+            (status == "t3" & time == 3) |
+            (status == "t4" & time == 4) |
+            (status == "t5" & time == 5) |
+            (status == "t6" & time == 6) | 
+            (status == "t7" & time == 7) |
+            (status == "t8" & time == 8) |
+            (status == "t9" & time == 9))
+
+data_hh50 <- arrange(data_hh50, PUBID_1997, year)
 
 
+
+# Restructure the data
 ## 60% Breadwinning data
 data_hh60 <- data_hh %>%
   select(PUBID_1997, year, firstbirth, birth_year, time, starts_with("hhe6")) %>%
@@ -227,18 +274,37 @@ data_hh60$hhe60[data_hh60$hhe60 == "Breadwinner"]       = 1L  # Breadwinner
 
 data_hh60$hhe60 <- as.numeric(data_hh60$hhe60)
 
-data_hh60 <- data_hh60 %>%
-  group_by(PUBID_1997, year) %>%
-  summarise(firstbirth = first(firstbirth),
-            birthyear = first(birth_year),
-            time = first(time),
-            hhe60 = mean(hhe60, na.rm=TRUE))
-data_hh60$hhe60[is.nan(data_hh60$hhe60)] <- NA
+data_hh60 <- data_hh60
 
-data_hh60 <- data_hh60[order(data_hh60$PUBID_1997, data_hh60$year),]
+data_hh60 <- data_hh60 %>%
+  group_by(PUBID_1997, status) %>%
+  mutate(hhe60  = max(hhe60, na.rm = TRUE))
+
+data_hh60$hhe60[data_hh60$hhe60 == -Inf] <- NA
+
+data_hh60 <- data_hh60 %>%
+  filter(       (status == "t0" & time == 0) |
+                (status == "t1" & time == 1) |
+                (status == "t2" & time == 2) | 
+                (status == "t3" & time == 3) |
+                (status == "t4" & time == 4) |
+                (status == "t5" & time == 5) |
+                (status == "t6" & time == 6) | 
+                (status == "t7" & time == 7) |
+                (status == "t8" & time == 8) |
+                (status == "t9" & time == 9))
+
+data_hh60 <- arrange(data_hh60, PUBID_1997, year)
 
 
 #Create datasets
+data_hh50 <- data_hh50 %>%
+  ungroup() %>%
+  select(PUBID_1997, year, firstbirth, hhe50, time)
+
+data_hh60 <- data_hh60 %>%
+  ungroup() %>%
+  select(PUBID_1997, year, firstbirth, hhe60, time)
 
 require(foreign)
 write.dta(data_hh50, "stata/NLSY97_hh50.dta")
