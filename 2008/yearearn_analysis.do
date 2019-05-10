@@ -21,6 +21,11 @@ putexcel A16=(" College Grad")
 putexcel A18=("Partnered")
 putexcel A19=(" Not Partnered")
 putexcel A20=(" Partnered")
+putexcel A21=("Age at first birth")
+putexcel A22=(" < 18")
+putexcel A23=(" 19-22")
+putexcel A24=(" 23-29")
+putexcel A25=(" 30+")
 
 * select if started observation a mother or became a mother during observation window
 keep if nobsmomminor > 0 
@@ -31,20 +36,42 @@ gen neghinc=1 if year_hearn < 0
 * drop cases with negative household income
 drop if neghinc==1
 
-sum yearbw50 yearbw60 uyearbw50 uyearbw60 if ageoldest >=0 & ageoldest <=17
+* calculate year of first birth with both wave 2 and household roster data
+
+gen yearb1=.
+gen year=2008
+forvalues y=1/5{
+	replace yearb1=2007+`y'-ageoldest if y==`y'
+	replace year=2007+`y' if y==`y'
+}
+
+tab year 
+
+egen yearbir1=min(yearb1), by(ssuid epppnum)
+
+tab year 
+
+gen durmom=year-tfbrthyr if tfbrthyr > 1900
+replace durmom=year-yearbir1 if missing(durmom)
+replace durmom=0 if durmom < 0 // much of this is imprecision due to years rather than months of interview and birth
+
+gen ageb1=yearage-durmom
+recode ageb1 (0/17=1)(18/22=2)(23/29=3)(30/56=1), gen(agebir1)
+
+tab agebir1
 
 *******************************************************************************
 * calculate cumulative risk of breadwinning 
 *******************************************************************************
 
-keep if ageoldest < 18
+keep if durmom < 18
 
 *In any given year -- that is, in the cross-section -- the percentage breadwinning is higher with the actual reports and with allocated data and reports.
 *But they are less likely to transition into breadwinning with unallocated data. This suggests that the data allocations are introducing random error and
 *creating artificial instability. We should limit the analysis to measuring using only unallocated data.
 
-tab ageoldest ubecbw50 if inlist(ubecbw50,0,1), nofreq row 
-tab ageoldest ubecbw60 if inlist(ubecbw50,0,1), nofreq row 
+tab durmom ubecbw50 if inlist(ubecbw50,0,1), nofreq row 
+tab durmom ubecbw60 if inlist(ubecbw50,0,1), nofreq row 
 
 *Create dummy indicators for whether woman entered breadwinning between year when oldest child
 * is aged a and aged a+1. Note that by limiting analysis to `var' = 0 or 1 (ie. !=2), we are in essence
@@ -56,12 +83,12 @@ preserve
 
 local transition "ubecbw50 ubecbw60"
 
-gen ubw50atbir=uyearbw50 if ageoldest==0
-gen ubw60atbir=uyearbw60 if ageoldest==0
+gen ubw50atbir=uyearbw50 if durmom==0
+gen ubw60atbir=uyearbw60 if durmom==0
 	
 foreach var in `transition'{
 	forvalues a=0/17{
-		quietly egen `var'`a'=mean(`var') if ageoldest==`a' & `var' !=2
+		quietly egen `var'`a'=mean(`var') if durmom==`a' & `var' !=2
 		tab `var'`a'
 	}
 }
@@ -90,12 +117,12 @@ keep if my_race==1
 
 local transition "ubecbw50 ubecbw60"
 
-gen ubw50atbir=uyearbw50 if ageoldest==0
-gen ubw60atbir=uyearbw60 if ageoldest==0
+gen ubw50atbir=uyearbw50 if durmom==0
+gen ubw60atbir=uyearbw60 if durmom==0
 	
 foreach var in `transition'{
 	forvalues a=0/17{
-		quietly egen `var'`a'=mean(`var') if ageoldest==`a' & `var' !=2
+		quietly egen `var'`a'=mean(`var') if durmom==`a' & `var' !=2
 		tab `var'`a'
 	}
 }
@@ -124,12 +151,12 @@ keep if my_race==2
 
 local transition "ubecbw50 ubecbw60"
 
-gen ubw50atbir=uyearbw50 if ageoldest==0
-gen ubw60atbir=uyearbw60 if ageoldest==0
+gen ubw50atbir=uyearbw50 if durmom==0
+gen ubw60atbir=uyearbw60 if durmom==0
 	
 foreach var in `transition'{
 	forvalues a=0/17{
-		quietly egen `var'`a'=mean(`var') if ageoldest==`a' & `var' !=2
+		quietly egen `var'`a'=mean(`var') if durmom==`a' & `var' !=2
 		tab `var'`a'
 	}
 }
@@ -158,12 +185,12 @@ keep if my_race==3
 
 local transition "ubecbw50 ubecbw60"
 
-gen ubw50atbir=uyearbw50 if ageoldest==0
-gen ubw60atbir=uyearbw60 if ageoldest==0
+gen ubw50atbir=uyearbw50 if durmom==0
+gen ubw60atbir=uyearbw60 if durmom==0
 	
 foreach var in `transition'{
 	forvalues a=0/17{
-		quietly egen `var'`a'=mean(`var') if ageoldest==`a' & `var' !=2
+		quietly egen `var'`a'=mean(`var') if durmom==`a' & `var' !=2
 		tab `var'`a'
 	}
 }
@@ -192,12 +219,12 @@ keep if my_race==4
 
 local transition "ubecbw50 ubecbw60"
 
-gen ubw50atbir=uyearbw50 if ageoldest==0
-gen ubw60atbir=uyearbw60 if ageoldest==0
+gen ubw50atbir=uyearbw50 if durmom==0
+gen ubw60atbir=uyearbw60 if durmom==0
 	
 foreach var in `transition'{
 	forvalues a=0/17{
-		quietly egen `var'`a'=mean(`var') if ageoldest==`a' & `var' !=2
+		quietly egen `var'`a'=mean(`var') if durmom==`a' & `var' !=2
 		tab `var'`a'
 	}
 }
@@ -226,12 +253,12 @@ keep if my_race==5
 
 local transition "ubecbw50 ubecbw60"
 
-gen ubw50atbir=uyearbw50 if ageoldest==0
-gen ubw60atbir=uyearbw60 if ageoldest==0
+gen ubw50atbir=uyearbw50 if durmom==0
+gen ubw60atbir=uyearbw60 if durmom==0
 	
 foreach var in `transition'{
 	forvalues a=0/17{
-		quietly egen `var'`a'=mean(`var') if ageoldest==`a' & `var' !=2
+		quietly egen `var'`a'=mean(`var') if durmom==`a' & `var' !=2
 		tab `var'`a'
 	}
 }
@@ -260,12 +287,12 @@ keep if hieduc==1
 
 local transition "ubecbw50 ubecbw60"
 
-gen ubw50atbir=uyearbw50 if ageoldest==0
-gen ubw60atbir=uyearbw60 if ageoldest==0
+gen ubw50atbir=uyearbw50 if durmom==0
+gen ubw60atbir=uyearbw60 if durmom==0
 	
 foreach var in `transition'{
 	forvalues a=0/17{
-		quietly egen `var'`a'=mean(`var') if ageoldest==`a' & `var' !=2
+		quietly egen `var'`a'=mean(`var') if durmom==`a' & `var' !=2
 		tab `var'`a'
 	}
 }
@@ -294,12 +321,12 @@ keep if hieduc==2
 
 local transition "ubecbw50 ubecbw60"
 
-gen ubw50atbir=uyearbw50 if ageoldest==0
-gen ubw60atbir=uyearbw60 if ageoldest==0
+gen ubw50atbir=uyearbw50 if durmom==0
+gen ubw60atbir=uyearbw60 if durmom==0
 	
 foreach var in `transition'{
 	forvalues a=0/17{
-		quietly egen `var'`a'=mean(`var') if ageoldest==`a' & `var' !=2
+		quietly egen `var'`a'=mean(`var') if durmom==`a' & `var' !=2
 		tab `var'`a'
 	}
 }
@@ -328,12 +355,12 @@ keep if hieduc==3
 
 local transition "ubecbw50 ubecbw60"
 
-gen ubw50atbir=uyearbw50 if ageoldest==0
-gen ubw60atbir=uyearbw60 if ageoldest==0
+gen ubw50atbir=uyearbw50 if durmom==0
+gen ubw60atbir=uyearbw60 if durmom==0
 	
 foreach var in `transition'{
 	forvalues a=0/17{
-		quietly egen `var'`a'=mean(`var') if ageoldest==`a' & `var' !=2
+		quietly egen `var'`a'=mean(`var') if durmom==`a' & `var' !=2
 		tab `var'`a'
 	}
 }
@@ -362,12 +389,12 @@ keep if hieduc==4
 
 local transition "ubecbw50 ubecbw60"
 
-gen ubw50atbir=uyearbw50 if ageoldest==0
-gen ubw60atbir=uyearbw60 if ageoldest==0
+gen ubw50atbir=uyearbw50 if durmom==0
+gen ubw60atbir=uyearbw60 if durmom==0
 	
 foreach var in `transition'{
 	forvalues a=0/17{
-		quietly egen `var'`a'=mean(`var') if ageoldest==`a' & `var' !=2
+		quietly egen `var'`a'=mean(`var') if durmom==`a' & `var' !=2
 		tab `var'`a'
 	}
 }
@@ -396,12 +423,12 @@ keep if yearspartner==0
 
 local transition "ubecbw50 ubecbw60"
 
-gen ubw50atbir=uyearbw50 if ageoldest==0
-gen ubw60atbir=uyearbw60 if ageoldest==0
+gen ubw50atbir=uyearbw50 if durmom==0
+gen ubw60atbir=uyearbw60 if durmom==0
 	
 foreach var in `transition'{
 	forvalues a=0/17{
-		quietly egen `var'`a'=mean(`var') if ageoldest==`a' & `var' !=2
+		quietly egen `var'`a'=mean(`var') if durmom==`a' & `var' !=2
 		tab `var'`a'
 	}
 }
@@ -430,12 +457,12 @@ keep if yearspartner==1
 
 local transition "ubecbw50 ubecbw60"
 
-gen ubw50atbir=uyearbw50 if ageoldest==0
-gen ubw60atbir=uyearbw60 if ageoldest==0
+gen ubw50atbir=uyearbw50 if durmom==0
+gen ubw60atbir=uyearbw60 if durmom==0
 	
 foreach var in `transition'{
 	forvalues a=0/17{
-		quietly egen `var'`a'=mean(`var') if ageoldest==`a' & `var' !=2
+		quietly egen `var'`a'=mean(`var') if durmom==`a' & `var' !=2
 		tab `var'`a'
 	}
 }
@@ -458,6 +485,142 @@ local bw60=eubecbw60
 putexcel B20=(1-`bw50') D20=(1-`bw60')
 
 restore
+preserve
+
+keep if agebir1==1
+
+local transition "ubecbw50 ubecbw60"
+
+gen ubw50atbir=uyearbw50 if durmom==0
+gen ubw60atbir=uyearbw60 if durmom==0
+	
+foreach var in `transition'{
+	forvalues a=0/17{
+		quietly egen `var'`a'=mean(`var') if durmom==`a' & `var' !=2
+		tab `var'`a'
+	}
+}
+
+collapse (max) ubecbw50* ubecbw60* (mean) ubw50atbir ubw60atbir
+
+gen eubecbw50=1-ubw50atbir
+gen eubecbw60=1-ubw60atbir  
+
+foreach var in `transition'{
+	forvalues a=0/17{
+		replace e`var'=(e`var')*(1-`var'`a')
+	}
+	tab e`var'
+}
+
+local bw50=eubecbw50
+local bw60=eubecbw60
+
+putexcel B22=(1-`bw50') D20=(1-`bw60')
+
+restore
+preserve
+
+keep if agebir1==2
+
+local transition "ubecbw50 ubecbw60"
+
+gen ubw50atbir=uyearbw50 if durmom==0
+gen ubw60atbir=uyearbw60 if durmom==0
+	
+foreach var in `transition'{
+	forvalues a=0/17{
+		quietly egen `var'`a'=mean(`var') if durmom==`a' & `var' !=2
+		tab `var'`a'
+	}
+}
+
+collapse (max) ubecbw50* ubecbw60* (mean) ubw50atbir ubw60atbir
+
+gen eubecbw50=1-ubw50atbir
+gen eubecbw60=1-ubw60atbir  
+
+foreach var in `transition'{
+	forvalues a=0/17{
+		replace e`var'=(e`var')*(1-`var'`a')
+	}
+	tab e`var'
+}
+
+local bw50=eubecbw50
+local bw60=eubecbw60
+
+putexcel B23=(1-`bw50') D20=(1-`bw60')
+
+restore
+preserve
+
+keep if agebir1==3
+
+local transition "ubecbw50 ubecbw60"
+
+gen ubw50atbir=uyearbw50 if durmom==0
+gen ubw60atbir=uyearbw60 if durmom==0
+	
+foreach var in `transition'{
+	forvalues a=0/17{
+		quietly egen `var'`a'=mean(`var') if durmom==`a' & `var' !=2
+		tab `var'`a'
+	}
+}
+
+collapse (max) ubecbw50* ubecbw60* (mean) ubw50atbir ubw60atbir
+
+gen eubecbw50=1-ubw50atbir
+gen eubecbw60=1-ubw60atbir  
+
+foreach var in `transition'{
+	forvalues a=0/17{
+		replace e`var'=(e`var')*(1-`var'`a')
+	}
+	tab e`var'
+}
+
+local bw50=eubecbw50
+local bw60=eubecbw60
+
+putexcel B24=(1-`bw50') D20=(1-`bw60')
+
+restore
+preserve
+
+keep if agebir1==4
+
+local transition "ubecbw50 ubecbw60"
+
+gen ubw50atbir=uyearbw50 if durmom==0
+gen ubw60atbir=uyearbw60 if durmom==0
+	
+foreach var in `transition'{
+	forvalues a=0/17{
+		quietly egen `var'`a'=mean(`var') if durmom==`a' & `var' !=2
+		tab `var'`a'
+	}
+}
+
+collapse (max) ubecbw50* ubecbw60* (mean) ubw50atbir ubw60atbir
+
+gen eubecbw50=1-ubw50atbir
+gen eubecbw60=1-ubw60atbir  
+
+foreach var in `transition'{
+	forvalues a=0/17{
+		replace e`var'=(e`var')*(1-`var'`a')
+	}
+	tab e`var'
+}
+
+local bw50=eubecbw50
+local bw60=eubecbw60
+
+putexcel B25=(1-`bw50') D20=(1-`bw60')
+
+restore
 
 tab my_race
 tab hieduc
@@ -467,7 +630,7 @@ tab uyearbw50, m
 putexcel set "$results/LifetimeBreadwin.xlsx", sheet(BW50detail) modify
 putexcel B2=("Not") C2=("Breadwinning") D2=("already bw") G2=("not enter bw") H2=("cumulative survival")
 putexcel A3="Birth" 
-tab ageoldest ubecbw50, m
+tab durmom ubecbw50, m
 tab uyearbw50 if ageoldest==0, matcell(atbir50)
 putexcel B24=matrix(atbir50)
 putexcel B3=formula(B25)

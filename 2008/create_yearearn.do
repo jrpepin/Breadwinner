@@ -12,7 +12,7 @@ local i_variables " ssuid epppnum "
 local j_variables " swave "
 local other_variables "nmomto nbiomomto HHsize nHHkids spartner adj_age EBORNUS EMS EORIGIN ERRP thearn tfearn thothinc tpearn momtoany momtoanyminor nHHadults WPFINWGT altpearn altfearn althearn ualtpearn ualtfearn ualthearn anyallocate ageoldest educ"
 
-keep `j_variables' `i_variables' `other_variables' my_race msbirth
+keep `j_variables' `i_variables' `other_variables' my_race msbirth tfbrthyr
 
 reshape wide `other_variables', i(`i_variables') j(`j_variables')
 
@@ -184,9 +184,9 @@ egen ubw60profile = concat (uyearbw601 uyearbw602 uyearbw603 uyearbw604 uyearbw6
 tab bw50profile
 tab ubw60profile
  
- keep ssuid epppnum year_pearn* year_hearn* year_upearn* year_uhearn* yearbw50* yearbw60* uyearbw50* uyearbw60* inyear* nmpyear* nmhyear* yearage* becbw50* becbw60* ubecbw50* ubecbw60* nobsmom* yearspartner* my_race hieduc *profile weight* ageoldest* msbirth
+ keep ssuid epppnum year_pearn* year_hearn* year_upearn* year_uhearn* yearbw50* yearbw60* uyearbw50* uyearbw60* inyear* nmpyear* nmhyear* yearage* becbw50* becbw60* ubecbw50* ubecbw60* nobsmom* yearspartner* my_race hieduc *profile weight* ageoldest* msbirth tfbrthyr
  
- reshape long year_pearn year_hearn yearbw50 yearbw60 inyear nmpyear nmhyear yearage becbw50 becbw60 ubecbw50 ubecbw60 nobsmom nobsmomminor yearspartner weight year_upearn year_uhearn uyearbw50 uyearbw60 ageoldest, i(`i_variables') j(year)
+ reshape long year_pearn year_hearn yearbw50 yearbw60 inyear nmpyear nmhyear yearage becbw50 becbw60 ubecbw50 ubecbw60 nobsmom nobsmomminor yearspartner weight year_upearn year_uhearn uyearbw50 uyearbw60 ageoldest, i(`i_variables') j(y)
 
 * drops cases not observed in a year plus all the data organized by wave
 drop if missing(inyear)
@@ -201,8 +201,8 @@ label variable uyearbw60 "Breadwinning status (> 60%) without allocated data"
 label variable yearbw50 "Breadwinning status (> 50%) with allocated data"
 label variable yearbw60 "Breadwinning status (> 60%) with allocated data"
 
-label define year 1 "Q4 08" 2 "Q4 09" 3 "Q4 10" 4 "Q4 11" 5 "Q4 12"
-label variable year "year of observation"
+label define y 1 "Q4 08" 2 "Q4 09" 3 "Q4 10" 4 "Q4 11" 5 "Q4 12"
+label variable y "year of observation"
 
 gen ratio=year_pearn/year_hearn
 gen uratio=year_upearn/year_uhearn
