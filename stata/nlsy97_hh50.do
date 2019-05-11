@@ -24,13 +24,18 @@ forvalues t=2/8{
     gen hhe50_minus2_`t'=hhe50`r' 
 }
 
-reshape long year hhe50 hhe50_minus1_ hhe50_minus2_, i(PUBID_1997) j(time)
+forvalues t=3/8{
+    local r=`t'-3
+    gen hhe50_minus3_`t'=hhe50`r' 
+}
+
+reshape long year hhe50 hhe50_minus1_ hhe50_minus2_ hhe50_minus3_, i(PUBID_1997) j(time)
 
 * clean up observations created because reshape creates some number of observations for each (PUBID_1997)
 drop if missing(year)
 
 logit hhe50 hhe50_minus1 i.time
 logit hhe50 hhe50_minus1 hhe50_minus2 i.time
-
+logit hhe50 hhe50_minus1 hhe50_minus2 hhe50_minus3 i.time
 
 log close
