@@ -1,13 +1,11 @@
-------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------
       name:  <unnamed>
-       log:  C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning\logs\nlsy97_hh60_2019.05.1
-> 0.log
+       log:  C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning\logs\nlsy97_hh60_2019.05.11.log
   log type:  text
- opened on:  10 May 2019, 22:12:29
+ opened on:  11 May 2019, 12:12:22
 
 . 
-. use     "C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning\stata\nlsy97_hh60.dta", clea
-> r
+. use     "C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning\stata\nlsy97_hh60.dta", clear
 (Written by R.              )
 
 . 
@@ -98,8 +96,8 @@ hhe60_minus3_0 hhe60_minus3_1 ... hhe60_minus3_9->hhe60_minus3_
 -----------------------------------------------------------------------------
 
 . 
-. * clean up observations created because reshape creates some number of observations for each (
-> PUBID_1997)
+. * clean up observations created because reshape creates some number of observations for each (PUBID_19
+> 97)
 . drop if missing(year)
 (1,532 observations deleted)
 
@@ -197,8 +195,7 @@ hhe60_minus3_ |   .5190565   .0979057     5.30   0.000     .3271648    .7109482
 . 
 . log close
       name:  <unnamed>
-       log:  C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning\logs\nlsy97_hh60_2019.05.1
-> 0.log
+       log:  C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning\logs\nlsy97_hh60_2019.05.11.log
   log type:  text
- closed on:  10 May 2019, 22:12:30
-------------------------------------------------------------------------------------------------
+ closed on:  11 May 2019, 12:12:23
+--------------------------------------------------------------------------------------------------------

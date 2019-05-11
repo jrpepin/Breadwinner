@@ -1,7 +1,12 @@
-cd "C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning\stata"
+cd "C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning\logs"
 clear
 set more off
 local logdate = string( d(`c(current_date)'), "%dCY.N.D" )
+
+local list : dir . files "*nlsy97_hh50_*.log"
+foreach f of local list {
+    erase "`f'"
+}
 
 log using "C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning\logs\nlsy97_hh50_`logdate'.log", t replace
 
