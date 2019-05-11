@@ -2,7 +2,7 @@
       name:  <unnamed>
        log:  C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning\logs\nlsy97_hh60_2019.05.11.log
   log type:  text
- opened on:  11 May 2019, 12:12:22
+ opened on:  11 May 2019, 16:32:20
 
 . 
 . use     "C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning\stata\nlsy97_hh60.dta", clear
@@ -59,8 +59,8 @@ xij variables:
 
 . 
 . forvalues t=3/8{
-  2.     local r=`t'-3
-  3.     gen hhe60_minus3_`t'=hhe60`r' 
+  2.     local u=`t'-3
+  3.     gen hhe60_minus3_`t'=hhe60`u' 
   4. }
 (536 missing values generated)
 (543 missing values generated)
@@ -70,22 +70,38 @@ xij variables:
 (744 missing values generated)
 
 . 
-. reshape long year hhe60 hhe60_minus1_ hhe60_minus2_ hhe60_minus3_, i(PUBID_1997) j(time)
+. forvalues t=4/8{
+  2.     local v=`t'-4
+  3.     gen hhe60_minus4_`t'=hhe60`v' 
+  4. }
+(536 missing values generated)
+(543 missing values generated)
+(535 missing values generated)
+(604 missing values generated)
+(614 missing values generated)
+
+. 
+. reshape long year hhe60 hhe60_minus1_ hhe60_minus2_ hhe60_minus3_ hhe60_minus4_, i(PUBID_1997) j(time)
 (note: j = 0 1 2 3 4 5 6 7 8 9)
 (note: hhe60_minus1_0 not found)
 (note: hhe60_minus2_0 not found)
 (note: hhe60_minus3_0 not found)
+(note: hhe60_minus4_0 not found)
 (note: hhe60_minus2_1 not found)
 (note: hhe60_minus3_1 not found)
+(note: hhe60_minus4_1 not found)
 (note: hhe60_minus3_2 not found)
+(note: hhe60_minus4_2 not found)
+(note: hhe60_minus4_3 not found)
 (note: hhe60_minus1_9 not found)
 (note: hhe60_minus2_9 not found)
 (note: hhe60_minus3_9 not found)
+(note: hhe60_minus4_9 not found)
 
 Data                               wide   ->   long
 -----------------------------------------------------------------------------
 Number of obs.                     1998   ->   19980
-Number of variables                  42   ->       7
+Number of variables                  47   ->       8
 j variable (10 values)                    ->   time
 xij variables:
                   year0 year1 ... year9   ->   year
@@ -93,6 +109,7 @@ xij variables:
 hhe60_minus1_0 hhe60_minus1_1 ... hhe60_minus1_9->hhe60_minus1_
 hhe60_minus2_0 hhe60_minus2_1 ... hhe60_minus2_9->hhe60_minus2_
 hhe60_minus3_0 hhe60_minus3_1 ... hhe60_minus3_9->hhe60_minus3_
+hhe60_minus4_0 hhe60_minus4_1 ... hhe60_minus4_9->hhe60_minus4_
 -----------------------------------------------------------------------------
 
 . 
@@ -192,10 +209,40 @@ hhe60_minus3_ |   .5190565   .0979057     5.30   0.000     .3271648    .7109482
         _cons |  -2.149376   .1031057   -20.85   0.000     -2.35146   -1.947292
 -------------------------------------------------------------------------------
 
+. logit hhe60 hhe60_minus1 hhe60_minus2 hhe60_minus3 hhe60_minus4 i.time
+
+Iteration 0:   log likelihood = -1787.4168  
+Iteration 1:   log likelihood = -1241.3037  
+Iteration 2:   log likelihood = -1227.7738  
+Iteration 3:   log likelihood = -1227.6995  
+Iteration 4:   log likelihood = -1227.6994  
+
+Logistic regression                             Number of obs     =      2,824
+                                                LR chi2(8)        =    1119.43
+                                                Prob > chi2       =     0.0000
+Log likelihood = -1227.6994                     Pseudo R2         =     0.3131
+
+-------------------------------------------------------------------------------
+        hhe60 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+--------------+----------------------------------------------------------------
+hhe60_minus1_ |   2.130026   .1111232    19.17   0.000     1.912229    2.347824
+hhe60_minus2_ |   .9584354   .1225057     7.82   0.000     .7183286    1.198542
+hhe60_minus3_ |   .3909359   .1292526     3.02   0.002     .1376054    .6442664
+hhe60_minus4_ |   .3197219    .123061     2.60   0.009     .0785267    .5609171
+              |
+         time |
+           5  |  -.1466673   .1489222    -0.98   0.325    -.4385494    .1452148
+           6  |   .0646159   .1518497     0.43   0.670    -.2330041    .3622359
+           7  |   .0671255   .1585689     0.42   0.672    -.2436638    .3779148
+           8  |   .1511105   .1708216     0.88   0.376    -.1836937    .4859147
+              |
+        _cons |  -2.243709   .1182864   -18.97   0.000    -2.475547   -2.011872
+-------------------------------------------------------------------------------
+
 . 
 . log close
       name:  <unnamed>
        log:  C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning\logs\nlsy97_hh60_2019.05.11.log
   log type:  text
- closed on:  11 May 2019, 12:12:23
+ closed on:  11 May 2019, 16:32:22
 --------------------------------------------------------------------------------------------------------
