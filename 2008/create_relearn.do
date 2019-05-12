@@ -74,9 +74,6 @@ gen spartner=1 if inlist(relationship,12,18)
 collapse (count) nmomto nmomtominor nbiomomto HHsize nHHkids spartner (max) agechild, by(SSUID EPPPNUM SWAVE)
 
 rename agechild ageoldest
-tab spartner, m
-tab ageoldest
-
 
 * some have more than one person in the household coded as spouse or partner. 
 recode spartner (0=0)(1/20=1)
@@ -131,7 +128,7 @@ gen nHHadults=HHsize-nHHkids
 
 sum nHHadults
 
-keep if adj_age >= 18 & adj_age < 70
+keep if adj_age >= 15 & adj_age < 70
 keep if my_sex==2
 
 merge m:1 ssuid epppnum using "$SIPP08keep/famhis.dta"

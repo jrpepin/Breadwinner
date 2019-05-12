@@ -21,7 +21,18 @@ forvalues w=2/15{
  replace hieduc=educ`w' if educ`w' > hieduc & !missing(educ`w')
 }
 
-* create indicators for in each wave (w)
+ *******************************************************************************
+ * Indicators for transitions into motherhood (1st births during panel)
+ *******************************************************************************
+
+ gen firstbirth=.
+ forvalues y=1/15{
+	replace firstbirth=`y' if missing(firstbirth) &  momtoanyminor`y'==1
+}
+	
+*******************************************************************************
+* indicators for in each wave (w)
+*******************************************************************************
 
 forvalues w=1/15 {
 gen in`w'=0
@@ -128,6 +139,31 @@ forvalues y=1/5 {
   replace uyearbw50`y'=. if nmhuyear`y'==0
   replace uyearbw60`y'=. if nmhuyear`y'==0
  }
+
+* Create lagged measures of breadwinning
+
+forvalues y=2/5 {
+	local x=`y'-1
+	gen uybw50L1_`y'=yearbw50`x'
+    gen uybw60L1_`y'=yearbw60`x'
+}
+
+forvalues y=3/5 {
+	local x=`y'-2
+	gen uybw50L2_`y'=yearbw50`x'
+    gen uybw60L2_`y'=yearbw60`x'
+}
+
+forvalues y=4/5 {
+	local x=`y'-3
+	gen uybw50L3_`y'=yearbw50`x'
+    gen uybw60L3_`y'=yearbw60`x'
+}
+
+gen uybw50L4_5=yearbw501
+gen uybw60L4_5=yearbw601
+
+* Indicators of ever having breadwon (to censor at first breadwinning)
  
 gen everbw50=.
 gen everbw60=.
@@ -165,28 +201,12 @@ gen ueverbw60=.
    replace ueverbw60=1 if inlist(ubecbw60`y',1,2) // marking so that ineligble to become bw again
  }
 
- *the proportion breadwinning is 1-3 points different (direction depends on cut-off)  with just unallocated data. 
-tab everbw50
-tab everbw60
-tab ueverbw50
-tab ueverbw60
-tab yearbw501 uyearbw501
-tab becbw501 ubecbw501, m
-tab becbw504 ubecbw504, m
-
-
-egen momprofile = concat (nobsmom1 nobsmom2 nobsmom3 nobsmom4 nobsmom5)
-egen momminorprofile = concat (nobsmomminor1 nobsmomminor2 nobsmomminor3 nobsmomminor4 nobsmomminor5)
 egen bw50profile = concat (yearbw501 yearbw502 yearbw503 yearbw504 yearbw505)
-egen ubw60profile = concat (uyearbw601 uyearbw602 uyearbw603 uyearbw604 uyearbw605)
 
-* tab momminorprofile
-tab bw50profile
-tab ubw60profile
  
- keep ssuid epppnum year_pearn* year_hearn* year_upearn* year_uhearn* yearbw50* yearbw60* uyearbw50* uyearbw60* inyear* nmpyear* nmhyear* yearage* becbw50* becbw60* ubecbw50* ubecbw60* nobsmom* yearspartner* my_race hieduc *profile weight* ageoldest* msbirth tfbrthyr
+ keep ssuid epppnum year_pearn* year_hearn* year_upearn* year_uhearn* yearbw50* yearbw60* uyearbw50* uyearbw60* inyear* nmpyear* nmhyear* yearage* becbw50* becbw60* ubecbw50* ubecbw60* nobsmom* yearspartner* my_race hieduc *profile weight* ageoldest* msbirth tfbrthyr uybw50L* uybw60L* firstbirth
  
- reshape long year_pearn year_hearn yearbw50 yearbw60 inyear nmpyear nmhyear yearage becbw50 becbw60 ubecbw50 ubecbw60 nobsmom nobsmomminor yearspartner weight year_upearn year_uhearn uyearbw50 uyearbw60 ageoldest, i(`i_variables') j(y)
+ reshape long year_pearn year_hearn yearbw50 yearbw60 inyear nmpyear nmhyear yearage becbw50 becbw60 ubecbw50 ubecbw60 nobsmom nobsmomminor yearspartner weight year_upearn year_uhearn uyearbw50 uyearbw60 ageoldest uybw50L1_ uybw50L2_ uybw50L3_ uybw50L4_ uybw60L1_ uybw60L2_ uybw60L3_ uybw60L4_, i(`i_variables') j(y)
 
 * drops cases not observed in a year plus all the data organized by wave
 drop if missing(inyear)
@@ -210,6 +230,8 @@ gen uratio=year_upearn/year_uhearn
 gen catratio=int(ratio*10) if ratio >= 0 & ratio <= 1
 replace catratio=-1 if ratio < 0
 replace catratio=20 if ratio > 1
+
+tab firstbirth
 
 save "$tempdir/relearn_year.dta", replace
 
