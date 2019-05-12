@@ -44,9 +44,15 @@ reshape long year hhe60 hhe60_minus1_ hhe60_minus2_ hhe60_minus3_ hhe60_minus4_,
 * clean up observations created because reshape creates some number of observations for each (PUBID_1997)
 drop if missing(year)
 
-logit hhe60 hhe60_minus1 i.time
-logit hhe60 hhe60_minus1 hhe60_minus2 i.time
-logit hhe60 hhe60_minus1 hhe60_minus2 hhe60_minus3 i.time
-logit hhe60 hhe60_minus1 hhe60_minus2 hhe60_minus3 hhe60_minus4 i.time
+logit hhe60 i.hhe60_minus1 i.time, or
+logit hhe60 i.hhe60_minus1 i.hhe60_minus2 i.time, or
+logit hhe60 i.hhe60_minus1 i.hhe60_minus2 i.hhe60_minus3 i.time, or
+logit hhe60 i.hhe60_minus1 i.hhe60_minus2 i.hhe60_minus3 i.hhe60_minus4 i.time, or
+
+margins hhe60_minus1_
+margins hhe60_minus2_
+margins hhe60_minus3_
+margins hhe60_minus4_
+
 
 log close
