@@ -146,6 +146,7 @@ forvalues y=2/5 {
 	local x=`y'-1
 	gen uybw50L1_`y'=yearbw50`x'
     gen uybw60L1_`y'=yearbw60`x'
+	gen nobsmomminorL1_`y'=nobsmomminor`x'
 }
 
 forvalues y=3/5 {
@@ -204,9 +205,9 @@ gen ueverbw60=.
 egen bw50profile = concat (yearbw501 yearbw502 yearbw503 yearbw504 yearbw505)
 
  
- keep ssuid epppnum year_pearn* year_hearn* year_upearn* year_uhearn* yearbw50* yearbw60* uyearbw50* uyearbw60* inyear* nmpyear* nmhyear* yearage* becbw50* becbw60* ubecbw50* ubecbw60* nobsmom* yearspartner* my_race hieduc *profile weight* ageoldest* msbirth tfbrthyr uybw50L* uybw60L* firstbirth
+ keep ssuid epppnum year_pearn* year_hearn* year_upearn* year_uhearn* yearbw50* yearbw60* uyearbw50* uyearbw60* inyear* nmpyear* nmhyear* yearage* becbw50* becbw60* ubecbw50* ubecbw60* nobsmom* yearspartner* my_race hieduc *profile weight* ageoldest* msbirth tfbrthyr uybw50L* uybw60L* nobsmomminorL1_* firstbirth
  
- reshape long year_pearn year_hearn yearbw50 yearbw60 inyear nmpyear nmhyear yearage becbw50 becbw60 ubecbw50 ubecbw60 nobsmom nobsmomminor yearspartner weight year_upearn year_uhearn uyearbw50 uyearbw60 ageoldest uybw50L1_ uybw50L2_ uybw50L3_ uybw50L4_ uybw60L1_ uybw60L2_ uybw60L3_ uybw60L4_, i(`i_variables') j(y)
+ reshape long year_pearn year_hearn yearbw50 yearbw60 inyear nmpyear nmhyear yearage becbw50 becbw60 ubecbw50 ubecbw60 nobsmom nobsmomminor yearspartner weight year_upearn year_uhearn uyearbw50 uyearbw60 ageoldest uybw50L1_ uybw50L2_ uybw50L3_ uybw50L4_ uybw60L1_ uybw60L2_ uybw60L3_ uybw60L4_ nobsmomminorL1_, i(`i_variables') j(y)
 
 * drops cases not observed in a year plus all the data organized by wave
 drop if missing(inyear)
