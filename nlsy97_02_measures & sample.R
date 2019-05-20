@@ -71,101 +71,46 @@ new_data$age_birth <-round((time_length(difftime(new_data$birth, new_data$dob), 
 marstat <- categories %>%
   select(PUBID_1997, starts_with("CV_MARSTAT_"))
 
-marstat[marstat >= -5 & marstat <= -1] = NA  # Missing
+marstat[marstat == "-5" | marstat == "-4" | marstat == "-3"| marstat == "-2"| marstat == "-1"] = NA  # Missing
 
 marstat <- marstat %>% 
-  gather(var, marst, -PUBID_1997)
-
-marstat <- marstat %>%
+  gather(var, marst, -PUBID_1997) %>%
   separate(var, c("type", "var", "year"), "_")
 
 marstat <- subset(marstat, select = -c(type, var))
 marstat$birth_year   <- new_data$birth_year
 
-# Create the birth year plus 1 variables
-marstat$birth_year1 <- marstat$birth_year + 1
-marstat$birth_year2 <- marstat$birth_year + 2
-marstat$birth_year3 <- marstat$birth_year + 3
-marstat$birth_year4 <- marstat$birth_year + 4
+marstat <- marstat %>%
+  mutate(
+    marst = case_when(
+      marst   == "Married, spouse present"       |  marst == "Married, spouse absent"       ~ "Married",
+      marst   == "Divorced, cohabiting"          |  marst == "Never married, cohabiting" |
+      marst   == "Separated, cohabiting"         |  marst == "Widowed, cohabiting"          ~ "Cohab",
+      marst   == "Never married, not cohabiting"                                            ~ "Never married",
+      marst   == "Divorced, not cohabiting"      |  marst == "Separated, not cohabiting" |
+      marst   == "Widowed, not cohabiting"                                                  ~ "Div/Sep/Wid",
+      TRUE                                                                                  ~  NA_character_
+    ))
 
-# This loses moms who became mothers before 1997// could assume mstatus in 1997 was mstatus at time of birth
+marstat$marst <- factor(marstat$marst, levels = c("Married", "Cohab", "Never married", "Div/Sep/Wid"))
+
 marstat <- marstat %>%
   group_by(PUBID_1997) %>% 
-  mutate(mar_t0 = case_when(birth_year  == year ~ marst),
-         mar_t1 = case_when(birth_year1 == year ~ marst),
-         mar_t2 = case_when(birth_year2 == year ~ marst),
-         mar_t3 = case_when(birth_year3 == year ~ marst),
-         mar_t4 = case_when(birth_year4 == year ~ marst))
-
-marstat <- marstat %>% group_by(PUBID_1997) %>% summarise_all(funs(max(., na.rm = TRUE)))
-marstat <- subset(marstat, select = -c(year, marst, birth_year4, birth_year3, birth_year2, birth_year1, birth_year)) # drop extra variables
-
-marstat <- marstat %>%
   mutate(
-    mar_t0 = case_when(
-      mar_t0   == "Married, spouse present"       |  mar_t0 == "Married, spouse absent"       ~ "Married",
-      mar_t0   == "Divorced, cohabiting"          |  mar_t0 == "Never married, cohabiting" |
-      mar_t0   == "Separated, cohabiting"         |  mar_t0 == "Widowed, cohabiting"          ~ "Cohab",
-      mar_t0   == "Never married, not cohabiting"                                             ~ "Never married",
-      mar_t0   == "Divorced, not cohabiting"      |  mar_t0 == "Separated, not cohabiting" |
-      mar_t0   == "Widowed, not cohabiting"                                                   ~ "Div/Sep/Wid",
-      TRUE                                                                                    ~  NA_character_
-    ))
-marstat$mar_t0 <- factor(marstat$mar_t0, levels = c("Married", "Cohab", "Never married", "Div/Sep/Wid"))
+    mar_t0 = case_when(year  == birth_year + 0 ~ marst),
+    mar_t1 = case_when(year  == birth_year + 1 ~ marst),
+    mar_t2 = case_when(year  == birth_year + 2 ~ marst),
+    mar_t3 = case_when(year  == birth_year + 3 ~ marst),
+    mar_t4 = case_when(year  == birth_year + 4 ~ marst),
+    mar_t5 = case_when(year  == birth_year + 5 ~ marst),
+    mar_t6 = case_when(year  == birth_year + 6 ~ marst),
+    mar_t7 = case_when(year  == birth_year + 7 ~ marst),
+    mar_t8 = case_when(year  == birth_year + 8 ~ marst),
+    mar_t9 = case_when(year  == birth_year + 9 ~ marst))
 
-marstat <- marstat %>%
-  mutate(
-      mar_t1 = case_when(
-      mar_t1   == "Married, spouse present"       |  mar_t1 == "Married, spouse absent"       ~ "Married",
-      mar_t1   == "Divorced, cohabiting"          |  mar_t1 == "Never married, cohabiting" |
-      mar_t1   == "Separated, cohabiting"         |  mar_t1 == "Widowed, cohabiting"          ~ "Cohab",
-      mar_t1   == "Never married, not cohabiting"                                             ~ "Never married",
-      mar_t1   == "Divorced, not cohabiting"      |  mar_t1 == "Separated, not cohabiting" |
-      mar_t1   == "Widowed, not cohabiting"                                                   ~ "Div/Sep/Wid",
-      TRUE                                                                                    ~  NA_character_
-    ))
-marstat$mar_t1 <- factor(marstat$mar_t1, levels = c("Married", "Cohab", "Never married", "Div/Sep/Wid"))
+marstat <- marstat %>% group_by(PUBID_1997) %>% summarise_all(funs(first(na.omit(.)))) # 1 row per person
 
-marstat <- marstat %>%
-  mutate(
-      mar_t2 = case_when(
-      mar_t2   == "Married, spouse present"       |  mar_t2 == "Married, spouse absent"       ~ "Married",
-      mar_t2   == "Divorced, cohabiting"          |  mar_t2 == "Never married, cohabiting" |
-      mar_t2   == "Separated, cohabiting"         |  mar_t2 == "Widowed, cohabiting"          ~ "Cohab",
-      mar_t2   == "Never married, not cohabiting"                                             ~ "Never married",
-      mar_t2   == "Divorced, not cohabiting"      |  mar_t2 == "Separated, not cohabiting" |
-      mar_t2   == "Widowed, not cohabiting"                                                   ~ "Div/Sep/Wid",
-      TRUE                                                                                    ~  NA_character_
-    ))
-marstat$mar_t2 <- factor(marstat$mar_t2, levels = c("Married", "Cohab", "Never married", "Div/Sep/Wid"))
-
-
-marstat <- marstat %>%
-  mutate(
-      mar_t3 = case_when(
-      mar_t3   == "Married, spouse present"       |  mar_t3 == "Married, spouse absent"       ~ "Married",
-      mar_t3   == "Divorced, cohabiting"          |  mar_t3 == "Never married, cohabiting" |
-      mar_t3   == "Separated, cohabiting"         |  mar_t3 == "Widowed, cohabiting"          ~ "Cohab",
-      mar_t3   == "Never married, not cohabiting"                                             ~ "Never married",
-      mar_t3   == "Divorced, not cohabiting"      |  mar_t3 == "Separated, not cohabiting" |
-      mar_t3   == "Widowed, not cohabiting"                                                   ~ "Div/Sep/Wid",
-      TRUE                                                                                    ~  NA_character_
-    ))
-marstat$mar_t3 <- factor(marstat$mar_t3, levels = c("Married", "Cohab", "Never married", "Div/Sep/Wid"))
-
-marstat <- marstat %>%
-  mutate(
-      mar_t4 = case_when(
-      mar_t4   == "Married, spouse present"       |  mar_t4 == "Married, spouse absent"       ~ "Married",
-      mar_t4   == "Divorced, cohabiting"          |  mar_t4 == "Never married, cohabiting" |
-      mar_t4   == "Separated, cohabiting"         |  mar_t4 == "Widowed, cohabiting"          ~ "Cohab",
-      mar_t4   == "Never married, not cohabiting"                                             ~ "Never married",
-      mar_t4   == "Divorced, not cohabiting"      |  mar_t4 == "Separated, not cohabiting" |
-      mar_t4   == "Widowed, not cohabiting"                                                   ~ "Div/Sep/Wid",
-      TRUE                                                                                    ~  NA_character_
-    ))
-marstat$mar_t4 <- factor(marstat$mar_t4, levels = c("Married", "Cohab", "Never married", "Div/Sep/Wid"))
-
+marstat <- subset(marstat, select = -c(year, marst, birth_year)) # drop extra variables
 
 ### Add new variables to original dataset
 new_data   <- left_join(new_data,   marstat)
