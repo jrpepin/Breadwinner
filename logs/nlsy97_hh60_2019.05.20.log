@@ -2,7 +2,7 @@
       name:  <unnamed>
        log:  C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning\logs\nlsy97_hh60_2019.05.20.log
   log type:  text
- opened on:  20 May 2019, 12:40:39
+ opened on:  20 May 2019, 16:52:47
 
 . 
 . use     "C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning\stata\nlsy97_hh60.dta", clear
@@ -314,5 +314,5 @@ hhe60_minus4_ |
       name:  <unnamed>
        log:  C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning\logs\nlsy97_hh60_2019.05.20.log
   log type:  text
- closed on:  20 May 2019, 12:40:42
+ closed on:  20 May 2019, 16:52:49
 --------------------------------------------------------------------------------------------------------
