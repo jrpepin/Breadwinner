@@ -130,6 +130,8 @@ forvalues y=1/5 {
   replace yearbw50`y'=. if nmhyear`y'==0
   replace yearbw60`y'=. if nmhyear`y'==0
   
+  * variables limited to unallocated data
+  
   gen uyearbw50`y'=0 if !missing(year_upearn`y') & !missing(year_uhearn`y')
   gen uyearbw60`y'=0 if !missing(year_upearn`y') & !missing(year_uhearn`y')
 

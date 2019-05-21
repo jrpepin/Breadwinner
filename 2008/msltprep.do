@@ -1,6 +1,6 @@
-*need to add n's to results table
+* This file creates transition rates based on status changes between years at duration durmom
 
-use "$tempdir/relearn_year.dta", clear
+use "$tempdir/relearn_year.dta", clear // a file produces by create_yearearn.do
 
 gen negpinc=1 if year_pearn < 0
 gen neghinc=1 if year_hearn < 0
@@ -39,6 +39,9 @@ tab uybw50L1_ y, m
 
 ********************************************************************************
 * adjust variables for transitions analysis
+*   - separate breadwinners into sole breadwinners versus primary breadwinners
+*	- create value for not living with a minor child (4)
+*   - create value for missing (5)
 ********************************************************************************
 
 rename uybw50L1_ uybw50L1
@@ -48,7 +51,10 @@ rename nobsmomminorL1_ nobsmomminorL1
 local nowvars "uyearbw50 uyearbw60"
 
 foreach var in `nowvars'{
+	replace `var'=0 if `var'==1 & year_upearn <= 0 // can't be breadwinner if earnings are 0
+	replace `var'=2 if !missing(`var') & `var'==1 & year_upearn==year_uhearn // sole breadwinner
 	replace `var'=3 if !missing(`var') & nobsmomminor==0 
+	replace `var'=3 if !missing(`var') & durmom < 0 
 	replace `var'=3 if durmom >=18
 	replace `var'=4 if missing(`var')
 }
@@ -56,52 +62,473 @@ foreach var in `nowvars'{
 local thenvars  "uybw50L1 uybw60L1"
 
 foreach var in `thenvars'{
+	replace `var'=0 if `var'==1 & year_upearn <= 0 // can't be breadwinner if earnings are 0
+	replace `var'=2 if !missing(`var') & `var'==1 & year_upearn==year_uhearn // sole breadwinner
 	replace `var'=3 if !missing(`var') & nobsmomminorL1==0
+	replace `var'=3 if !missing(`var') & durmom < 1 
 	replace `var'=3 if durmom >=19
 	replace `var'=4 if missing(`var')
 }
-keep if durmom <= 18 
+keep if durmom <= 19 
+
+#delimit ;
+
+label define bwstat 0 "non breadwinning mother"
+					1 "primary breadwinning mother"
+					2 "sole breadwinning mother"
+					3 "non-mother, oldest child > 18"
+					4 "missing";
+					
+# delimit cr
+
+label values uyearbw50 bwstat
+label values uyearbw60 bwstat
+label values uybw50L1 bwstat
+label values uybw60L1 bwstat
+
+* drop cases missing at either side of the interval
+* remove this to see how many years observations are missing (a lot)
+drop if uybw50L1==4 | uyearbw50==4
 
 *******************************************************************************
-* Table of breadwinning status this year by breadwinning status previous year
+* generate data files with measures of transition rates
 *******************************************************************************
-putexcel set "$results/transitions.xlsx", sheet(50%) modify
-putexcel A1="breadwinning status this year by breadwinning status previous year (50%)"
-putexcel A2=("duration") B2=("Not Breadwinning Mom") C2=("Became Breadwinning Mom") D2=("Not Breadwinning to non-mom") E2=("not breadwinning to missing")
-putexcel F2=("Became not breadwinning") G2=("Still Breadwinning") H2=("Breadwinning to non-mother") I2=("Breadwinning to missing") J2=("non-mother to non-breadwinning")
-putexcel K2=("non-mother to breadwinning") L2=("non-mother") M2=("non-mother to missing") N2=("missing to non-breadwinning") O2=("missing to breadwinning") 
-putexcel P2=("missing to non-mother") Q2=("missing")
+
+* Primary earner (50%)
+
+preserve
+
+*create numerators
 
 forvalues d=0/18{
-	local row=`d'+3
-	putexcel A`row'=`d'
 	forvalues cs=0/4{
 		forvalues ls=0/4{
-			egen t`ls'`cs'_`d'=count(y) if durmom==`d' & uyearbw50==`cs' & uybw50L1==`ls'
+			egen trans`ls'`cs'_`d'=count(y) if durmom==`d' & uyearbw50==`cs' & uybw50L1==`ls'
 		}
 	}
 }
 
-collapse (max) t00_0-t00_18 t-t444
+* create denominators
 
-/*
 forvalues d=0/18{
-	local row=`d'+3
-	putexcel B`row'=t00`d'
-	putexcel C`row'=t01`d'
-	putexcel D`row'=t02`d'
+	forvalues ls=0/4{
+		egen den`ls'_`d'=count(y) if durmom==`d' & uybw50L1==`ls'
+	}
 }
-	
-/*	
-	
-restore
 
-putexcel set "$results/transitions.xlsx", sheet(60%) modify
-putexcel A1="breadwinning status this year by breadwinning status previous year (60%)"
-putexcel A2=("duration") B2=("Not Breadwinning Mom") C2=("Became Breadwinning Mom") D2=("Not Breadwinning to non-mom") E2=("not breadwinning to missing")
-putexcel F2=("Became not breadwinning") G2=("Still Breadwinning") H2=("Breadwinning to non-mother") I2=("Breadwinning to missing") J2=("non-mother to non-breadwinning")
-putexcel K2=("non-mother to breadwinning") L2=("non-mother") M2=("non-mother to missing") N2=("missing to non-breadwinning") O2=("missing to breadwinning") 
-putexcel P2=("missing to non-mother") Q2=("missing")
+keep trans* den* 
+
+collapse _all
+
+* create rates
+
+forvalues d=0/18{
+	forvalues cs=0/4{
+		local fc=`cs'+1
+		forvalues ls=0/4{
+			local fl=`ls'+1
+			gen p`fl'`fc'`d'=trans`ls'`cs'_`d'/den`ls'_`d'
+		}
+	}
+}
+
+keep p*
+
+gen constant=1
+
+reshape long p11 p12 p13 p14 p15 p21 p22 p23 p24 p25 p31 p32 p33 p34 p35 p41 p42 p43 p44 p45 p51 p52 p53 p54 p55 , i(constant) j(age)
+
+foreach var of varlist _all{
+	replace `var'=0 if missing(`var')
+}
+
+* The life table does not have distribution across states at birth, just transition rates. So, the first transition is from not a mother (at time 0) to a mother (at time 1)
+* Thus, the duration variables are not age of oldest child, but age of oldest child - 1. We need the life table up to duration 17, which represents the year the oldest child 
+* transitions to age 18
+
+save "$SIPP08keep/transrates50.dta", $replace
+
+restore
+preserve
+
+keep if my_race==1
+
+*create numerators
+
+forvalues d=0/18{
+	forvalues cs=0/4{
+		forvalues ls=0/4{
+			egen trans`ls'`cs'_`d'=count(y) if durmom==`d' & uyearbw50==`cs' & uybw50L1==`ls'
+		}
+	}
+}
+
+* create denominators
+
+forvalues d=0/18{
+	forvalues ls=0/4{
+		egen den`ls'_`d'=count(y) if durmom==`d' & uybw50L1==`ls'
+	}
+}
+
+keep trans* den* 
+collapse _all
+
+* create rates
+
+forvalues d=0/18{
+	forvalues cs=0/4{
+		local fc=`cs'+1
+		forvalues ls=0/4{
+			local fl=`ls'+1
+			gen p`fl'`fc'`d'=trans`ls'`cs'_`d'/den`ls'_`d'
+		}
+	}
+}
+
+keep p*
+
+gen constant=1
+
+reshape long p11 p12 p13 p14 p15 p21 p22 p23 p24 p25 p31 p32 p33 p34 p35 p41 p42 p43 p44 p45 p51 p52 p53 p54 p55 , i(constant) j(age)
+
+foreach var of varlist _all{
+	replace `var'=0 if missing(`var')
+}
+
+* The life table does not have distribution across states at birth, just transition rates. So, the first transition is from not a mother (at time 0) to a mother (at time 1)
+* Thus, the duration variables are not age of oldest child, but age of oldest child - 1. We need the life table up to duration 17, which represents the year the oldest child 
+* transitions to age 18
+
+save "$SIPP08keep/transrates50w.dta", $replace
+
+restore
+preserve
+
+keep if my_race==2
+
+*create numerators
+
+forvalues d=0/18{
+	forvalues cs=0/4{
+		forvalues ls=0/4{
+			egen trans`ls'`cs'_`d'=count(y) if durmom==`d' & uyearbw50==`cs' & uybw50L1==`ls'
+		}
+	}
+}
+
+* create denominators
+
+forvalues d=0/18{
+	forvalues ls=0/4{
+		egen den`ls'_`d'=count(y) if durmom==`d' & uybw50L1==`ls'
+	}
+}
+
+keep trans* den* 
+collapse _all
+
+* create rates
+
+forvalues d=0/18{
+	forvalues cs=0/4{
+		local fc=`cs'+1
+		forvalues ls=0/4{
+			local fl=`ls'+1
+			gen p`fl'`fc'`d'=trans`ls'`cs'_`d'/den`ls'_`d'
+		}
+	}
+}
+
+keep p*
+
+gen constant=1
+
+reshape long p11 p12 p13 p14 p15 p21 p22 p23 p24 p25 p31 p32 p33 p34 p35 p41 p42 p43 p44 p45 p51 p52 p53 p54 p55 , i(constant) j(age)
+
+foreach var of varlist _all{
+	replace `var'=0 if missing(`var')
+}
+
+* The life table does not have distribution across states at birth, just transition rates. So, the first transition is from not a mother (at time 0) to a mother (at time 1)
+* Thus, the duration variables are not age of oldest child, but age of oldest child - 1. We need the life table up to duration 17, which represents the year the oldest child 
+* transitions to age 18
+
+save "$SIPP08keep/transrates50b.dta", $replace
+
+restore
+preserve
+
+keep if my_race==3
+
+*create numerators
+
+forvalues d=0/18{
+	forvalues cs=0/4{
+		forvalues ls=0/4{
+			egen trans`ls'`cs'_`d'=count(y) if durmom==`d' & uyearbw50==`cs' & uybw50L1==`ls'
+		}
+	}
+}
+
+* create denominators
+
+forvalues d=0/18{
+	forvalues ls=0/4{
+		egen den`ls'_`d'=count(y) if durmom==`d' & uybw50L1==`ls'
+	}
+}
+
+keep trans* den* 
+collapse _all
+
+* create rates
+
+forvalues d=0/18{
+	forvalues cs=0/4{
+		local fc=`cs'+1
+		forvalues ls=0/4{
+			local fl=`ls'+1
+			gen p`fl'`fc'`d'=trans`ls'`cs'_`d'/den`ls'_`d'
+		}
+	}
+}
+
+keep p*
+
+gen constant=1
+
+reshape long p11 p12 p13 p14 p15 p21 p22 p23 p24 p25 p31 p32 p33 p34 p35 p41 p42 p43 p44 p45 p51 p52 p53 p54 p55 , i(constant) j(age)
+
+foreach var of varlist _all{
+	replace `var'=0 if missing(`var')
+}
+
+* The life table does not have distribution across states at birth, just transition rates. So, the first transition is from not a mother (at time 0) to a mother (at time 1)
+* Thus, the duration variables are not age of oldest child, but age of oldest child - 1. We need the life table up to duration 17, which represents the year the oldest child 
+* transitions to age 18
+
+save "$SIPP08keep/transrates50h.dta", $replace
+
+restore
+preserve
+
+keep if hieduc==1
+
+*create numerators
+
+forvalues d=0/18{
+	forvalues cs=0/4{
+		forvalues ls=0/4{
+			egen trans`ls'`cs'_`d'=count(y) if durmom==`d' & uyearbw50==`cs' & uybw50L1==`ls'
+		}
+	}
+}
+
+* create denominators
+
+forvalues d=0/18{
+	forvalues ls=0/4{
+		egen den`ls'_`d'=count(y) if durmom==`d' & uybw50L1==`ls'
+	}
+}
+
+keep trans* den* 
+collapse _all
+
+* create rates
+
+forvalues d=0/18{
+	forvalues cs=0/4{
+		local fc=`cs'+1
+		forvalues ls=0/4{
+			local fl=`ls'+1
+			gen p`fl'`fc'`d'=trans`ls'`cs'_`d'/den`ls'_`d'
+		}
+	}
+}
+
+keep p*
+
+gen constant=1
+
+reshape long p11 p12 p13 p14 p15 p21 p22 p23 p24 p25 p31 p32 p33 p34 p35 p41 p42 p43 p44 p45 p51 p52 p53 p54 p55 , i(constant) j(age)
+
+foreach var of varlist _all{
+	replace `var'=0 if missing(`var')
+}
+
+* The life table does not have distribution across states at birth, just transition rates. So, the first transition is from not a mother (at time 0) to a mother (at time 1)
+* Thus, the duration variables are not age of oldest child, but age of oldest child - 1. We need the life table up to duration 17, which represents the year the oldest child 
+* transitions to age 18
+
+save "$SIPP08keep/transrates50e1.dta", $replace
+
+restore
+preserve
+
+keep if hieduc==2
+
+*create numerators
+
+forvalues d=0/18{
+	forvalues cs=0/4{
+		forvalues ls=0/4{
+			egen trans`ls'`cs'_`d'=count(y) if durmom==`d' & uyearbw50==`cs' & uybw50L1==`ls'
+		}
+	}
+}
+
+* create denominators
+
+forvalues d=0/18{
+	forvalues ls=0/4{
+		egen den`ls'_`d'=count(y) if durmom==`d' & uybw50L1==`ls'
+	}
+}
+
+keep trans* den* 
+collapse _all
+
+* create rates
+
+forvalues d=0/18{
+	forvalues cs=0/4{
+		local fc=`cs'+1
+		forvalues ls=0/4{
+			local fl=`ls'+1
+			gen p`fl'`fc'`d'=trans`ls'`cs'_`d'/den`ls'_`d'
+		}
+	}
+}
+
+keep p*
+
+gen constant=1
+
+reshape long p11 p12 p13 p14 p15 p21 p22 p23 p24 p25 p31 p32 p33 p34 p35 p41 p42 p43 p44 p45 p51 p52 p53 p54 p55 , i(constant) j(age)
+
+foreach var of varlist _all{
+	replace `var'=0 if missing(`var')
+}
+
+* The life table does not have distribution across states at birth, just transition rates. So, the first transition is from not a mother (at time 0) to a mother (at time 1)
+* Thus, the duration variables are not age of oldest child, but age of oldest child - 1. We need the life table up to duration 17, which represents the year the oldest child 
+* transitions to age 18
+
+save "$SIPP08keep/transrates50e2.dta", $replace
+
+restore
+preserve
+
+keep if hieduc==3
+
+*create numerators
+
+forvalues d=0/18{
+	forvalues cs=0/4{
+		forvalues ls=0/4{
+			egen trans`ls'`cs'_`d'=count(y) if durmom==`d' & uyearbw50==`cs' & uybw50L1==`ls'
+		}
+	}
+}
+
+* create denominators
+
+forvalues d=0/18{
+	forvalues ls=0/4{
+		egen den`ls'_`d'=count(y) if durmom==`d' & uybw50L1==`ls'
+	}
+}
+
+keep trans* den* 
+collapse _all
+
+* create rates
+
+forvalues d=0/18{
+	forvalues cs=0/4{
+		local fc=`cs'+1
+		forvalues ls=0/4{
+			local fl=`ls'+1
+			gen p`fl'`fc'`d'=trans`ls'`cs'_`d'/den`ls'_`d'
+		}
+	}
+}
+
+keep p*
+
+gen constant=1
+
+reshape long p11 p12 p13 p14 p15 p21 p22 p23 p24 p25 p31 p32 p33 p34 p35 p41 p42 p43 p44 p45 p51 p52 p53 p54 p55 , i(constant) j(age)
+
+foreach var of varlist _all{
+	replace `var'=0 if missing(`var')
+}
+
+* The life table does not have distribution across states at birth, just transition rates. So, the first transition is from not a mother (at time 0) to a mother (at time 1)
+* Thus, the duration variables are not age of oldest child, but age of oldest child - 1. We need the life table up to duration 17, which represents the year the oldest child 
+* transitions to age 18
+
+save "$SIPP08keep/transrates50e3.dta", $replace
+
+restore
+preserve
+
+keep if hieduc==4
+
+*create numerators
+
+forvalues d=0/18{
+	forvalues cs=0/4{
+		forvalues ls=0/4{
+			egen trans`ls'`cs'_`d'=count(y) if durmom==`d' & uyearbw50==`cs' & uybw50L1==`ls'
+		}
+	}
+}
+
+* create denominators
+
+forvalues d=0/18{
+	forvalues ls=0/4{
+		egen den`ls'_`d'=count(y) if durmom==`d' & uybw50L1==`ls'
+	}
+}
+
+keep trans* den* 
+collapse _all
+
+* create rates
+
+forvalues d=0/18{
+	forvalues cs=0/4{
+		local fc=`cs'+1
+		forvalues ls=0/4{
+			local fl=`ls'+1
+			gen p`fl'`fc'`d'=trans`ls'`cs'_`d'/den`ls'_`d'
+		}
+	}
+}
+
+keep p*
+
+gen constant=1
+
+reshape long p11 p12 p13 p14 p15 p21 p22 p23 p24 p25 p31 p32 p33 p34 p35 p41 p42 p43 p44 p45 p51 p52 p53 p54 p55 , i(constant) j(age)
+
+foreach var of varlist _all{
+	replace `var'=0 if missing(`var')
+}
+
+* The life table does not have distribution across states at birth, just transition rates. So, the first transition is from not a mother (at time 0) to a mother (at time 1)
+* Thus, the duration variables are not age of oldest child, but age of oldest child - 1. We need the life table up to duration 17, which represents the year the oldest child 
+* transitions to age 18
+
+save "$SIPP08keep/transrates50e4.dta", $replace
+
+
+
+
 
 
 
