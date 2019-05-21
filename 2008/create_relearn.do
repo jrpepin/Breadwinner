@@ -20,10 +20,10 @@ gen yrmar1=tlmyear if exmar==1
 replace yrmar1=tfmyear if exmar > 1
 replace yrmar1=999 if exmar < 1
 
+* A start to code to indicate births between marriages
 *gen yrmar1end=tlsyear if exmar==1 & tlsyear > 0
 *replace yrmar1end=tltyear if exmar==1 & tltyear < tlsyear & tltyear > 0
 *replace yrmar
-
 
 gen msbirth=-1 if tage >= 65
 replace msbirth=0 if ems==6 // never married
@@ -67,33 +67,40 @@ gen HHsize=1
 gen agechild=to_age if inlist(relationship,2,3,8,22,23)
 
 * spouse or partner
-gen spartner=1 if inlist(relationship,12,18)
+gen spouse=1 if relationship==12
+gen partner=1 if relationship==18
+gen spartner_pnum=to_EPPNUM if inlist(relationship,12,18)
 
 * collapse across all people in ego's (EPPPNUM's) household to create a person-level file
 * with information on that person's household composition in the wave.
-collapse (count) nmomto nmomtominor nbiomomto HHsize nHHkids spartner (max) agechild, by(SSUID EPPPNUM SWAVE)
+collapse (count) nmomto nmomtominor nbiomomto HHsize nHHkids spouse partner (max) agechild (min) spartner_pnum, by(SSUID EPPPNUM SHHADID SWAVE)
 
 rename agechild ageoldest
 
-* some have more than one person in the household coded as spouse or partner. 
-recode spartner (0=0)(1/20=1)
+* some (9) have more than one person in the household coded as partner. 
+recode partner (0=0)(1/20=1)
+
+* a small number (26) have both a spouse and a partner in the household. 
+gen spartner=0 if spouse==0 & partner==0
+replace spartner=1 if spouse==1 
+replace spartner=2 if spouse==0 & partner==1
 
 * add in self as a household member.
 replace HHsize=HHsize+1
 
-keep SSUID EPPPNUM SWAVE nmomto nmomtominor nbiomomto HHsize nHHkids spartner ageoldest
+keep SSUID EPPPNUM SHHADID SWAVE nmomto nmomtominor nbiomomto HHsize nHHkids spartner ageoldest spartner_pnum
 
 *******************************************************************************
 * Section: merging to children's households long demographic file, 
 * a person-level data file, to get basic demographic information about ego.
 *******************************************************************************
 merge 1:1 SSUID EPPPNUM SWAVE using "$childhh/demo_long_interviews.dta"
-
-keep if !missing(ERRP)
+* Note that _merge==2 are people living alone
 
 rename SSUID ssuid
 rename EPPPNUM epppnum
 rename SWAVE swave
+rename SHHADID shhadid
 
 * adding self to count of household kids if self is < 18
 replace nHHkids=nHHkids+1 if adj_age < 18
@@ -109,14 +116,56 @@ replace spartner=0 if missing(spartner)
 
 drop _merge
 
-sort ssuid epppnum swave
+sort ssuid epppnum shhadid swave
 
+save "$tempdir/withdem", $replace
+***********************************************************************************
 * merging in a person-level data file with personal earnings and household earnings.
+***********************************************************************************
+
+*first merge to spouse or partner's pnum
+
+drop if spartner==0
+
+rename epppnum real_epppnum
+rename spartner_pnum epppnum
+
+duplicates report ssuid epppnum shhadid swave
+
+* A small number of individuals (29) are partners to more than one person in the household unit
+duplicates drop ssuid epppnum shhadid swave, force 
+
+merge 1:1 ssuid epppnum shhadid swave using "$tempdir/altearn.dta", keepusing(tpearn anyallocate)
+
+keep if _merge==3
+
+rename tpearn spart_tpearn
+rename anyallocate spart_allo
+
+label variable spart_tpearn "partner earnings, including allocated data"
+label variable spart_allo "indicator for whether spart_tpearn includes allocated data"
+
+rename epppnum spartner_pnum
+rename real_epppnum epppnum
+
+keep ssuid epppnum swave spart_tpearn spart_allo
+
+merge 1:1 ssuid epppnum swave using "$tempdir/withdem"
+
+drop _merge
+
+* now merge to r's pnum
 merge 1:1 ssuid epppnum swave using "$tempdir/altearn.dta"
 
 assert _merge==3
 
 drop _merge
+
+gen couplearn=tpearn+spart_tpearn if !missing(tpearn) & !missing(spart_tpearn) 
+gen ucouplearn=couplearn if anyallocate==0 & spart_allo==0
+
+label variable couplearn "Couple earnings with allocated data"
+label variable ucouplearn "Couple earnings without allocated data"
 
 gen momtoany=0 if nmomto==0
 replace momtoany=1 if nmomto > 0 & !missing(nmomto)
