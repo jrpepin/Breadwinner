@@ -7,7 +7,7 @@
 ********************************************************************************
 * Create an extract with year of first birth and marital history
 ********************************************************************************
-use "$SIPP2008/sippp08putm2", clear
+use "$SIPP2008TM/sippp08putm2", clear
 
 keep ssuid epppnum tfmyear tfsyear tftyear tsmyear tssyear tstyear tlmyear tlsyear tltyear tfbrthyr exmar ewidiv1 ewidiv2 ems esex tmomchl tage
 

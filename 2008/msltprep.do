@@ -2,8 +2,7 @@
 
 use "$tempdir/relearn_year.dta", clear // a file produces by create_yearearn.do
 
-gen negpinc=1 if year_pearn < 0
-gen neghinc=1 if year_hearn < 0
+gen neghinc=1 if year_uhearn < 0
 
 * drop cases with negative household income
 drop if neghinc==1
@@ -31,11 +30,10 @@ gen durmom=year-tfbrthyr+1 if tfbrthyr > 1900
 replace durmom=year-yearbir1+1 if missing(durmom)
 
 drop if durmom < -1
+drop if durmom > 18
 
 gen ageb1=yearage-durmom
 recode ageb1 (0/17=1)(18/22=2)(23/29=3)(30/56=4), gen(agebir1)
-
-tab uybw50L1_ y, m
 
 ********************************************************************************
 * adjust variables for transitions analysis
@@ -50,34 +48,37 @@ rename nobsmomminorL1_ nobsmomminorL1
 
 local nowvars "uyearbw50 uyearbw60"
 
+* Note that uyearbw50 can be missing either because of missing data (most cases) or because
+* income data are not available. Missing does not mean zero income. Households with no income
+* are coded as 9 on breadwinning. Households with negative household income were dropped
+* at the top of this file.
+
 foreach var in `nowvars'{
-	replace `var'=0 if `var'==1 & year_upearn <= 0 // can't be breadwinner if earnings are 0
-	replace `var'=2 if !missing(`var') & `var'==1 & year_upearn==year_uhearn // sole breadwinner
-	replace `var'=3 if !missing(`var') & nobsmomminor==0 
-	replace `var'=3 if !missing(`var') & durmom < 0 
-	replace `var'=3 if durmom >=18
-	replace `var'=4 if missing(`var')
+	replace `var'=4 if !missing(`var') & nobsmomminor==0 
+	replace `var'=4 if !missing(`var') & durmom < 0 
+	replace `var'=4 if durmom >=18
+	replace `var'=5 if missing(`var')
 }
 
 local thenvars  "uybw50L1 uybw60L1"
 
 foreach var in `thenvars'{
-	replace `var'=0 if `var'==1 & year_upearn <= 0 // can't be breadwinner if earnings are 0
-	replace `var'=2 if !missing(`var') & `var'==1 & year_upearn==year_uhearn // sole breadwinner
-	replace `var'=3 if !missing(`var') & nobsmomminorL1==0
-	replace `var'=3 if !missing(`var') & durmom < 1 
-	replace `var'=3 if durmom >=19
-	replace `var'=4 if missing(`var')
+	replace `var'=4 if !missing(`var') & nobsmomminorL1==0
+	replace `var'=4 if !missing(`var') & durmom < 1 
+	replace `var'=4 if durmom >=19
+	replace `var'=5 if missing(`var')
 }
-keep if durmom <= 19 
+
+tab uybw50L1 uyearbw50
 
 #delimit ;
 
 label define bwstat 0 "non breadwinning mother"
 					1 "primary breadwinning mother"
 					2 "sole breadwinning mother"
-					3 "non-mother, oldest child > 18"
-					4 "missing";
+                                        3 "no household earnings (==0, not missing)"
+                                        4 "non-mother, oldest child > 18"
+                                        5 "missing";
 					
 # delimit cr
 
@@ -88,7 +89,9 @@ label values uybw60L1 bwstat
 
 * drop cases missing at either side of the interval
 * remove this to see how many years observations are missing (a lot)
-drop if uybw50L1==4 | uyearbw50==4
+* except that this doesn't work without adding a new layer of pXX variables
+
+drop if uybw50L1==5 | uyearbw50==5
 
 *******************************************************************************
 * generate data files with measures of transition rates

@@ -10,7 +10,7 @@ tab educ, m
 
 local i_variables " ssuid epppnum "
 local j_variables " swave "
-local other_variables "nmomto nbiomomto HHsize nHHkids spartner adj_age EBORNUS EMS EORIGIN ERRP thearn tfearn thothinc tpearn momtoany momtoanyminor nHHadults WPFINWGT altpearn altfearn althearn ualtpearn ualtfearn ualthearn anyallocate ageoldest educ"
+local other_variables "nmomto nbiomomto HHsize nHHkids spartner adj_age EBORNUS EMS EORIGIN ERRP thearn tfearn thtotinc tpearn momtoany momtoanyminor nHHadults WPFINWGT altpearn altfearn althearn ualtpearn ualtfearn ualthearn anyallocate ageoldest educ"
 
 keep `j_variables' `i_variables' `other_variables' my_race msbirth tfbrthyr
 
@@ -40,11 +40,13 @@ gen nmpearn`w'=0
 gen nmhearn`w'=0
 gen nmupearn`w'=0
 gen nmuhearn`w'=0
+gen anyhhinc`w'=0
 replace in`w'=1 if !missing(ERRP`w')
 replace nmpearn`w'=1 if !missing(altpearn`w')
 replace nmhearn`w'=1 if !missing(althearn`w')
 replace nmupearn`w'=1 if !missing(ualtpearn`w')
 replace nmuhearn`w'=1 if !missing(ualthearn`w')
+replace anyhhinc`w'=1 if thtotinc`w' > 0 & !missing(thtotinc`w')
 }
 
 * create indicators of number of observations in each year, where a year is a collection 
@@ -58,6 +60,7 @@ forvalues y=1/5 {
   gen nmhuyear`y'=0
   gen nobsmom`y'=0
   gen nobsmomminor`y'=0
+  gen yanyhhinc`y'=0
   forvalues o=1/3 {
     local w=(`y'-1)*3 + `o'
     replace inyear`y'=inyear`y'+1 if in`w'==1 
@@ -67,6 +70,7 @@ forvalues y=1/5 {
     replace nmhuyear`y'=nmhuyear`y'+1 if nmuhearn`w'==1
     replace nobsmom`y'=nobsmom`y'+1 if momtoany`w'==1
     replace nobsmomminor`y'=nobsmomminor`y'+1 if momtoanyminor`w'==1
+    replace yanyhhinc`y'=yanyhhinc`y'+1 if anyhhinc`w'==1
   }
  }
 
@@ -135,8 +139,14 @@ forvalues y=1/5 {
   gen uyearbw50`y'=0 if !missing(year_upearn`y') & !missing(year_uhearn`y')
   gen uyearbw60`y'=0 if !missing(year_upearn`y') & !missing(year_uhearn`y')
 
-  replace uyearbw50`y'=1 if year_upearn`y' >= 0.5*year_uhearn`y' & uyearbw50`y'==0
+  replace uyearbw50`y'=1 if year_upearn`y' >= 0.5*year_uhearn`y' & uyearbw50`y'==0 // Primary earning
   replace uyearbw60`y'=1 if year_upearn`y' >= 0.6*year_uhearn`y' & uyearbw60`y'==0
+
+  replace uyearbw50`y'=2 if year_upearn`y'==year_uhearn`y' & uyearbw50`y'==1 // Sole earning
+  replace uyearbw60`y'=2 if year_upearn`y'==year_uhearn`y' & uyearbw60`y'==1
+
+  replace uyearbw50`y'=3 if uyearbw50`y'==1 & year_uhearn`y'==0 // if household income is zero, then not breadwinning
+  replace uyearbw60`y'=3 if uyearbw60`y'==1 & year_uhearn`y'==0
   
   replace uyearbw50`y'=. if nmhuyear`y'==0
   replace uyearbw60`y'=. if nmhuyear`y'==0
@@ -146,28 +156,30 @@ forvalues y=1/5 {
 
 forvalues y=2/5 {
 	local x=`y'-1
-	gen uybw50L1_`y'=yearbw50`x'
-    gen uybw60L1_`y'=yearbw60`x'
+	gen uybw50L1_`y'=uyearbw50`x'
+        gen uybw60L1_`y'=uyearbw60`x'
 	gen nobsmomminorL1_`y'=nobsmomminor`x'
 }
 
 forvalues y=3/5 {
 	local x=`y'-2
-	gen uybw50L2_`y'=yearbw50`x'
-    gen uybw60L2_`y'=yearbw60`x'
+	gen uybw50L2_`y'=uyearbw50`x'
+        gen uybw60L2_`y'=uyearbw60`x'
 }
 
 forvalues y=4/5 {
 	local x=`y'-3
-	gen uybw50L3_`y'=yearbw50`x'
-    gen uybw60L3_`y'=yearbw60`x'
+	gen uybw50L3_`y'=uyearbw50`x'
+        gen uybw60L3_`y'=uyearbw60`x'
 }
 
-gen uybw50L4_5=yearbw501
-gen uybw60L4_5=yearbw601
+gen uybw50L4_5=uyearbw501
+gen uybw60L4_5=uyearbw601
 
-* Indicators of ever having breadwon (to censor at first breadwinning)
- 
+
+* Indicators of ever having breadwon (to censor at first breadwinning in single-decrement analysis)
+* The multistate lifetable does not use these measures
+
 gen everbw50=.
 gen everbw60=.
 gen ueverbw50=.
@@ -204,12 +216,9 @@ gen ueverbw60=.
    replace ueverbw60=1 if inlist(ubecbw60`y',1,2) // marking so that ineligble to become bw again
  }
 
-egen bw50profile = concat (yearbw501 yearbw502 yearbw503 yearbw504 yearbw505)
-
+ keep ssuid epppnum year_pearn* year_hearn* year_upearn* year_uhearn* yearbw50* yearbw60* uyearbw50* uyearbw60* inyear* nmpyear* nmhyear* yearage* becbw50* becbw60* ubecbw50* ubecbw60* nobsmom* yearspartner* my_race hieduc weight* ageoldest* msbirth tfbrthyr uybw50L* uybw60L* nobsmomminorL1_* firstbirth yanyhhinc*
  
- keep ssuid epppnum year_pearn* year_hearn* year_upearn* year_uhearn* yearbw50* yearbw60* uyearbw50* uyearbw60* inyear* nmpyear* nmhyear* yearage* becbw50* becbw60* ubecbw50* ubecbw60* nobsmom* yearspartner* my_race hieduc *profile weight* ageoldest* msbirth tfbrthyr uybw50L* uybw60L* nobsmomminorL1_* firstbirth
- 
- reshape long year_pearn year_hearn yearbw50 yearbw60 inyear nmpyear nmhyear yearage becbw50 becbw60 ubecbw50 ubecbw60 nobsmom nobsmomminor yearspartner weight year_upearn year_uhearn uyearbw50 uyearbw60 ageoldest uybw50L1_ uybw50L2_ uybw50L3_ uybw50L4_ uybw60L1_ uybw60L2_ uybw60L3_ uybw60L4_ nobsmomminorL1_, i(`i_variables') j(y)
+ reshape long year_pearn year_hearn yearbw50 yearbw60 inyear nmpyear nmhyear yearage becbw50 becbw60 ubecbw50 ubecbw60 nobsmom nobsmomminor yearspartner weight year_upearn year_uhearn uyearbw50 uyearbw60 ageoldest uybw50L1_ uybw50L2_ uybw50L3_ uybw50L4_ uybw60L1_ uybw60L2_ uybw60L3_ uybw60L4_ nobsmomminorL1_ yanyhhinc, i(`i_variables') j(y)
 
 * drops cases not observed in a year plus all the data organized by wave
 drop if missing(inyear)
@@ -234,7 +243,8 @@ gen catratio=int(ratio*10) if ratio >= 0 & ratio <= 1
 replace catratio=-1 if ratio < 0
 replace catratio=20 if ratio > 1
 
-tab firstbirth
+tab uybw50L1, m
+tab uybw50L1 uyearbw50, m
 
 save "$tempdir/relearn_year.dta", replace
 
