@@ -54,30 +54,32 @@ local nowvars "uyearbw50 uyearbw60"
 * at the top of this file.
 
 foreach var in `nowvars'{
-	replace `var'=4 if !missing(`var') & nobsmomminor==0 
-	replace `var'=4 if !missing(`var') & durmom < 0 
-	replace `var'=4 if durmom >=18
+        replace `var'=`var'+1 if !missing(`var')
+        replace `var'=5 if !missing(`var') & nobsmomminor==0 // ignore spells where mother isn't living with her children
+	replace `var'=0 if !missing(`var') & durmom < 0 
+	replace `var'=0 if durmom >=18
 	replace `var'=5 if missing(`var')
 }
 
 local thenvars  "uybw50L1 uybw60L1"
 
 foreach var in `thenvars'{
-	replace `var'=4 if !missing(`var') & nobsmomminorL1==0
-	replace `var'=4 if !missing(`var') & durmom < 1 
-	replace `var'=4 if durmom >=19
+        replace `var'=`var'+1 if !missing(`var')
+	replace `var'=5 if !missing(`var') & nobsmomminorL1==0
+	replace `var'=0 if !missing(`var') & durmom < 1 
+	replace `var'=0 if durmom >=19
 	replace `var'=5 if missing(`var')
 }
 
-tab uybw50L1 uyearbw50
 
 #delimit ;
 
 label define bwstat 0 "non breadwinning mother"
-					1 "primary breadwinning mother"
-					2 "sole breadwinning mother"
-                                        3 "no household earnings (==0, not missing)"
-                                        4 "non-mother, oldest child > 18"
+                                        0 " not living with children or first child > 18"
+                                        1 "non-breadwinning mother"
+                                        2 "primary breadwinning mother"
+					3 "sole breadwinning mother"
+                                        4 "no household earnings (==0, not missing)"
                                         5 "missing";
 					
 # delimit cr
