@@ -145,8 +145,8 @@ forvalues y=1/5 {
   replace uyearbw50`y'=2 if year_upearn`y'==year_uhearn`y' & uyearbw50`y'==1 // Sole earning
   replace uyearbw60`y'=2 if year_upearn`y'==year_uhearn`y' & uyearbw60`y'==1
 
-  replace uyearbw50`y'=3 if uyearbw50`y'==1 & year_uhearn`y'==0 // if household income is zero, then not breadwinning
-  replace uyearbw60`y'=3 if uyearbw60`y'==1 & year_uhearn`y'==0
+  replace uyearbw50`y'=0 if uyearbw50`y'==1 & year_uhearn`y'==0 // if household income is zero, then not breadwinning
+  replace uyearbw60`y'=0 if uyearbw60`y'==1 & year_uhearn`y'==0 
   
   replace uyearbw50`y'=. if nmhuyear`y'==0
   replace uyearbw60`y'=. if nmhuyear`y'==0
