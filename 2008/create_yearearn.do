@@ -243,8 +243,8 @@ gen catratio=int(ratio*10) if ratio >= 0 & ratio <= 1
 replace catratio=-1 if ratio < 0
 replace catratio=20 if ratio > 1
 
-tab uybw50L1, m
-tab uybw50L1 uyearbw50, m
+tab uybw50L1_, m
+tab uybw50L1_ uyearbw50, m
 
 save "$tempdir/relearn_year.dta", replace
 
