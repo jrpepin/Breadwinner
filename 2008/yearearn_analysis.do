@@ -5,8 +5,8 @@ use "$tempdir/relearn_year.dta", clear
 * select if started observation a mother or became a mother during observation window
 keep if nobsmomminor > 0 
 
-gen negpinc=1 if year_pearn < 0
-gen neghinc=1 if year_hearn < 0
+gen negpinc=1 if year_pearn < 0 // negative personal income
+gen neghinc=1 if year_hearn < 0 // negative household income
 
 * drop cases with negative household income
 drop if neghinc==1
