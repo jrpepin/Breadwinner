@@ -5,8 +5,8 @@ use "$tempdir/relearn_year.dta", clear
 * select if started observation a mother or became a mother during observation window
 keep if nobsmomminor > 0 
 
-gen negpinc=1 if year_pearn < 0 // negative personal income
-gen neghinc=1 if year_hearn < 0 // negative household income
+gen negpinc=1 if year_pearn < 0 
+gen neghinc=1 if year_hearn < 0 
 
 * drop cases with negative household income
 drop if neghinc==1
@@ -38,6 +38,9 @@ drop if durmom < 0
 gen ageb1=yearage-durmom
 recode ageb1 (0/17=1)(18/22=2)(23/29=3)(30/56=4), gen(agebir1)
 
+recode uyearbw50 (0=0)(1/2=1)
+recode uyearbw60 (0=0)(1/2=1)
+
 *******************************************************************************
 * Basic Descriptive Table 
 *******************************************************************************
@@ -58,7 +61,7 @@ putexcel B3=("`median_personal'")
 sum year_uhearn, detail
 local median_household: di %9.0fc = r(p50)
 putexcel B4=("`median_household'")
-sum ratio
+sum uratio
 local ratio: di %4.2f = r(mean)
 putexcel B5=("`ratio'")
 
@@ -77,7 +80,7 @@ putexcel C3=("`median_personal'")
 sum year_uhearn if yearspartner==1, detail
 local median_household: di %9.0fc = r(p50)
 putexcel C4=("`median_household'")
-sum ratio if yearspartner==1
+sum uratio if yearspartner==1
 local ratio: di %4.2f = r(mean)
 putexcel C5=("`ratio'")
 
@@ -96,7 +99,7 @@ putexcel D3=("`median_personal'")
 sum year_uhearn if yearspartner==0, detail
 local median_household: di %9.0fc = r(p50)
 putexcel D4=("`median_household'")
-sum ratio if yearspartner==0
+sum uratio if yearspartner==0
 local ratio: di %4.2f = r(mean)
 putexcel D5=("`ratio'")
 

@@ -37,6 +37,10 @@ drop if durmom < 0
 
 gen ageb1=yearage-durmom
 recode ageb1 (0/17=1)(18/22=2)(23/29=3)(30/56=4), gen(agebir1)
+
+recode uyearbw50 (0=0)(1/2=1)
+recode uyearbw60 (0=0)(1/2=1)
+
 *******************************************************************************
 * calculate cumulative risk of breadwinning 
 *******************************************************************************
