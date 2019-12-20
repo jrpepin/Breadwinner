@@ -120,7 +120,7 @@ sort ssuid epppnum shhadid swave
 
 save "$tempdir/withdem", $replace
 ***********************************************************************************
-* merging in a person-level data file with personal earnings and household earnings.
+* merging in a person-level data file with spouse/partner's personal earnings
 ***********************************************************************************
 
 *first merge to spouse or partner's pnum
@@ -137,7 +137,7 @@ duplicates drop ssuid epppnum shhadid swave, force
 
 merge 1:1 ssuid epppnum shhadid swave using "$tempdir/altearn.dta", keepusing(tpearn anyallocate)
 
-keep if _merge==3
+keep if _merge==3 // basically, keeping only those who are partnered.
 
 rename tpearn spart_tpearn
 rename anyallocate spart_allo
@@ -154,10 +154,12 @@ merge 1:1 ssuid epppnum swave using "$tempdir/withdem"
 
 drop _merge
 
-* now merge to r's pnum
+***********************************************************************************
+* merging in a person-level data file with own personal earnings and household
+***********************************************************************************
 merge 1:1 ssuid epppnum swave using "$tempdir/altearn.dta"
 
-assert _merge==3
+assert _merge==3 // back to everyone, even those who are not partnered
 
 drop _merge
 
@@ -177,6 +179,19 @@ gen nHHadults=HHsize-nHHkids
 
 sum nHHadults
 
+* describe sample
+	 sort ssuid epppnum
+	 egen tagid = tag(ssuid epppnum)
+	 replace tagid=. if tagid !=1 
+
+	 egen all_p1=count(tagid)
+
+	 local allindividuals1 = all_p1
+
+	 drop all_p1 tagid 
+
+display "We have `allindividuals1' individuals"
+
 keep if adj_age >= 15 & adj_age < 70
 keep if my_sex==2
 
@@ -186,6 +201,20 @@ drop if _merge ==2
 
 * Those without msbirth because not matched in famhis were generally not observed in wave 2
 rename _merge mergefam
+
+
+* describe sample
+	 sort ssuid epppnum
+	 egen tagid = tag(ssuid epppnum)
+	 replace tagid=. if tagid !=1 
+
+	 egen all_p2=count(tagid)
+
+	 local allindividuals2 = all_p2
+
+	 drop all_p2 tagid 
+
+display "We have `allindividuals2' women age 15-29"
 
 save "$tempdir/relearn.dta", replace
 
