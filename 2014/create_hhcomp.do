@@ -9,9 +9,11 @@ gen childage=to_age if biochildren==1
 gen spouse=1 if relationship==1
 gen partner=1 if relationship==2
 
+gen numtype2=1 if pairtype==2
+
 gen hhsize=1
 
-collapse (count) minorchildren minorbiochildren spouse partner hhsize (min) youngest_age=childage (max) oldest_age=childage, by(SSUID PNUM panelmonth)
+collapse (count) minorchildren minorbiochildren spouse partner hhsize numtype2 (min) youngest_age=childage (max) oldest_age=childage, by(SSUID PNUM panelmonth)
 
 save "$tempdir/hhcomp.dta", replace
 
