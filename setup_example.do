@@ -1,18 +1,21 @@
-* Tell stata where your box folder and data extracts are 
-global boxdir "$homedir/Box Sync"
-global SIPPextracts "$boxdir/Breadwinning moms/data extracts"
-
-* Where to find code, log files, temporary data files and analysis data files
-global projcode "t:\GitHub\breadwinner"
-global sipp2008_code "$projcode/2008"
-global sipp2008_logs "$homedir/logs/SIPP/2008"
-global logdir "$homedir/logs/SIPP/2008"
-
-* temporary data files
-global tempdir "$homedir/stata_data/stata_tmp"
-
-* Analysis data files
-global SIPP08keep "$homedir/stata_data/SIPP08_Processed"
-
 global replace "replace"
+
+global SIPP2008 "/data/sipp/2008_Core"
+global SIPP2008TM "/data/sipp/2008_TM/StataData/"
+global SIPP2014 "/data/sipp/2014"
+global SIPPextracts "$homedir/projects/breadwinner/data/keep"
+
+global logdir "$homedir/projects/breadwinner/logs"
+global tempdir "$homedir/projects/breadwinner/data/tmp"
+
+global projcode "$homedir/github/breadwinner/2014"
+global sipp2008_code "$projcode/2008"
+global sipp2008_logs "$homedir/breadwinner/logs"
+global SIPP08keep "$homedir/projects/breadwinner/data/keep"
+global SIPP14keep "$homedir/projects/breadwinner/data/keep"
+
+global childhh "$homedir/projects/childhh/data/keep/2008"
+
+global results "$homedir/projects/breadwinner/results"
+
 
