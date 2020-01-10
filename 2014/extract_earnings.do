@@ -1,6 +1,6 @@
 *-------------------------------------------------------------------------------
 * BREADWINNER PROJECT
-* extract_and_format.do
+* extract_earnings.do
 * Kelly Raley and Joanna Pepin
 *-------------------------------------------------------------------------------
 di "$S_DATE"
@@ -12,7 +12,6 @@ di "$S_DATE"
 
 * The data files used in this script are the compressed data files that we
 * created from the Census data files. 
-* These files lack variable labels, unfortnuately.
 *********************************************************************
 
 ********************************************************************************
@@ -97,7 +96,7 @@ clear
 	*?*?*? This seems like a different thing than first birth occuring within 
 	* the 25 years prior to each interview.
 
-// First, count the total number of respondents in the original sample.
+* First, count the total number of respondents in the original sample.
 	sort SSUID PNUM
 	egen 	tagid 	= tag(SSUID PNUM)
 	replace tagid	= . if tagid !=1 
@@ -110,7 +109,7 @@ clear
 * Then, keep only the respondents that meet sample criteria
 
 // Keep only women
-	tab 	esex 		if tagid==1
+	tab 	esex 		if tagid==1 /* *?*?* JP initial run included 42550 women. Now 42516. WTF */
 	replace tagid = . 	if esex ==1 // men
 	egen	women = count(tagid)
 	keep 				if esex==2
@@ -159,4 +158,4 @@ replace tagid = . if tagid !=1
 
 	 drop mothers tagid 
 
-save "$SIPP14keep/sipp14tpearn_all", $replace
+save "$SIPP14keep/sipp14tpearn_all", $replace /* *?*?* Consider saving this in $tempdir */
