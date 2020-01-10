@@ -1,27 +1,48 @@
-* merge together measures of earning and demographic characteristics with measures of household composition and then collapse to
-* create annual measures
+*-------------------------------------------------------------------------------
+* BREADWINNER PROJECT
+* annualize.do
+* Kelly Raley and Joanna Pepin
+*-------------------------------------------------------------------------------
+di "$S_DATE"
+
+********************************************************************************
+* DESCRIPTION
+********************************************************************************
+* Create annual measures of breadwinning.
+
+* The data files used in this script were produced by extract_earnings.do & create_hhcomp.do
+
+********************************************************************************
+* Merge  measures of earning, demographic characteristics and household composition
+********************************************************************************
 
 use "$SIPP14keep/sipp14tpearn_all", clear
 
 merge 1:1 SSUID PNUM panelmonth using "$tempdir/hhcomp.dta"
 
-keep if _merge==3
+keep if _merge==3 // *?*?* Who are the not matched people?
+drop 	_merge
 
-drop _merge
+********************************************************************************
+* Restrict sample to women who live with their own minor children
+********************************************************************************
+// 	Create a tempory person id variable
+	sort SSUID PNUM
+	egen tagid = tag(SSUID PNUM)
+	replace tagid=. if tagid !=1
 
-* we want to limit to measurement of earnings to observations where women live with minor own children
-keep if minorbiochildren >= 1
+// Keep mothers who reside with their biological children
+	fre minorbiochildren if tagid==1 /* *?*?* This equals 11379, not 10381 like in markdown. hmmmmm */
+	replace tagid = . if minorbiochildren < 1
+	egen mothers_cores_minor=count(tagid)
+	keep if minorbiochildren >= 1   /// How many cases are we dropping and why?? 
 
-* describe sample
-	 sort SSUID PNUM
-	 egen tagid = tag(SSUID PNUM)
-	 replace tagid=. if tagid !=1 
+// Creates a macro with the total number of residential mothers in the dataset.	 
+	global mothers_cores_minor = mothers_cores_minor
 
-	 egen mothers_cores_minor=count(tagid)
-
-	 global mothers_cores_minor = mothers_cores_minor
-
-	 drop mothers_cores_minor tagid
+	drop mothers_cores_minor tagid
+	
+	
 
 * Now I want to know what the first and last month of observation in this year is
    egen startmonth=min(monthcode), by(SSUID PNUM year)
@@ -55,6 +76,7 @@ keep if minorbiochildren >= 1
 gen one=1
 
 *************** collapsing to year *************************************
+*  and then collapse to create annual measures
 
 collapse (count) monthsobserved=one  nmos_bw50=mbw50 nmos_bw60=mbw60 (sum) tpearn thearn (mean) spouse partner numtype2 wpfinwgt (max) minorchildren minorbiochildren erace eeduc tceb oldest_age start_spartner last_spartner (min) dursinceb1_atint youngest_age,  by(SSUID PNUM year)
 
@@ -91,6 +113,3 @@ gen per_bw60_atbirth=100*`r(mean)'
 gen notbw60_atbirth=1-`r(mean)'
 
 save "$SIPP14keep/bwstatus.dta", replace
-
-
-

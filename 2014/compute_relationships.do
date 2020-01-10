@@ -43,16 +43,16 @@ drop if missing(to_num)
 save "$tempdir/type2_pairs.dta", $replace
 
 ********************************************************************************
-* Reshape Type 1 data
+* Reshape relationship data
 ********************************************************************************
 
-// Import data on type 1 people
+// Import relationship data
 use "$SIPP14keep/allmonths14.dta", clear
 
 // Select only necessary variables
 keep SSUID ERESIDENCEID PNUM RREL* RREL_PNUM* panelmonth
 
-// resahpe the data
+// Resahpe the data
 reshape long RREL_PNUM RREL,i(SSUID ERESIDENCEID PNUM panelmonth) j(lno) 
 
 // Don't keep relationship to self or empty lines
@@ -85,7 +85,8 @@ label define rel  1 " Opposite sex spouse"
 
 label values RREL  rel
 
-tab RREL, m
+// Peek at the labels and values
+fre RREL
 
 // Rename vars
 rename PNUM from_num
@@ -94,18 +95,19 @@ rename RREL_PNUM to_num
 save "$tempdir/rel_pairs_bymonth", $replace
 
 ********************************************************************************
-* Merge relationship data to allpairs data
+* Merge relationship data to Type 1 people's data
 ********************************************************************************
 * all in rel_pairs are matched in allpairs, but not vice versa.
 * This is because type 2 people don't have observations in allpairs
 
-// Combine datasets
+// Combine relationship data with Type 1 data
 merge 1:1 SSUID ERESIDENCEID panelmonth from_num to_num using "$tempdir/allpairs"
 
 keep if _merge==3
+drop 	_merge
 
-drop _merge
-gen pairtype=1
+// Create a variable identifying these individuals at Type 1
+gen pairtype =1
 
 save "$tempdir/t1.dta", $replace
 
@@ -118,30 +120,35 @@ use "$tempdir/rel_pairs_bymonth", clear
 // Combine datasets
 merge 1:1 SSUID ERESIDENCEID panelmonth from_num to_num using "$tempdir/type2_pairs"
 
-keep if _merge==3
+keep if _merge	==3
+drop 	_merge
 
-drop _merge
+// Create a variable identifying these individuals at Type 1
 gen pairtype=2
 
+// Merge type 2 people's data with type 1 people
 append using "$tempdir/t1.dta"
 
-label variable pairtype "Is the to person a type 1 or type 2 individual?"
+label variable pairtype "Is the person a type 1 or type 2 individual?"
 
 tab from_age pairtype
 
-// Recode relationship variable
+********************************************************************************
+* Recode relationship variable
+********************************************************************************
+
 recode RREL (1=1)(2=2)(3=1)(4=2)(5/19=.), gen(relationship) 
 replace relationship=RREL+2 if RREL >=9 & RREL <=13 		// bump rarer codes up to make room for common ones
-replace relationship=16 if RREL==14 | RREL==15 				// combine in-law categories
+replace relationship=16 	if RREL==14 | RREL==15 			// combine in-law categories
 replace relationship=RREL+1 if RREL >=16 & RREL <=19 		// bump rarer codes up to make room for common ones
-replace relationship=3  if RREL==5 & to_age > from_age 		// parents must be older than children
-replace relationship=4  if RREL==5 & to_age < from_age
-replace relationship=5  if RREL==6 & to_age > from_age 		// Step
-replace relationship=6  if RREL==6 & to_age < from_age 		// There are a small number of cases where ages are equal
-replace relationship=7  if RREL==7 & to_age > from_age 		// Adoptive
-replace relationship=8  if RREL==7 & to_age < from_age 		// There are a small number of cases where ages are equal
-replace relationship=9  if RREL==8 & to_age > from_age 		// Grand
-replace relationship=10 if RREL==8 & to_age < from_age
+replace relationship=3  	if RREL==5 & to_age > from_age 	// parents must be older than children
+replace relationship=4  	if RREL==5 & to_age < from_age	// bio child
+replace relationship=5  	if RREL==6 & to_age > from_age 	// Step
+replace relationship=6  	if RREL==6 & to_age < from_age 	// There are a small number of cases where ages are equal
+replace relationship=7  	if RREL==7 & to_age > from_age 	// Adoptive
+replace relationship=8  	if RREL==7 & to_age < from_age 	// There are a small number of cases where ages are equal
+replace relationship=9  	if RREL==8 & to_age > from_age 	// Grandparent
+replace relationship=10 	if RREL==8 & to_age < from_age	// Grandchild
 
 #delimit ;
 label define arel 1 "Spouse"
@@ -170,8 +177,8 @@ label define arel 1 "Spouse"
 
 label values relationship arel
 
-tab relationship, m
-tab relationship if to_num < 100
-
+// Peek at the labels and values
+fre relationship
+fre relationship if to_num < 100
 
 save "$tempdir/relationship_pairs_bymonth", $replace
