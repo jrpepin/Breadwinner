@@ -1,15 +1,34 @@
-***
-*
-* USE RREL and RRELPUM variables to describe each person's relationship to every other person in the household by month
-* 
-* The RREL variables RREL1-RREL20 are for type 1 persons and RREL21-RREL30 are for type 2 persons
+*-------------------------------------------------------------------------------
+* BREADWINNER PROJECT
+* compute_relationships.do
+* Kelly Raley and Joanna Pepin
+*-------------------------------------------------------------------------------
+di "$today"
 
+********************************************************************************
+* DESCRIPTION
+********************************************************************************
 * Create a file with demographic information on type 2 people because it isn't in allpairs
 
+* This script uses the RREL and RRELPUM variables to describe each person's relationship 
+* to every other person in the household by month
+
+* The RREL variables RREL1-RREL20 are for type 1 persons and RREL21-RREL30 are for type 2 persons
+* This script creates pairs only between two type 2 people. 
+
+* The data files used in this script were produced by merge_waves.do and allpairs.do
+
+********************************************************************************
+* Reshape Type 2 data
+********************************************************************************
+
+** Import data on type 2 people
 use "$SIPP14keep/allmonths14_type2.dta", clear
 
+** Select only necessary variables
 keep SSUID ERESIDENCEID panelmonth PNUM ET2_LNO* ET2_SEX* TT2_AGE* TAGE
 
+** resahpe the data
 reshape long ET2_LNO ET2_SEX TT2_AGE, i(SSUID ERESIDENCEID panelmonth PNUM) j(lno)
 
 rename PNUM from_num
@@ -18,18 +37,28 @@ rename ET2_LNO to_num
 rename ET2_SEX to_sex
 rename TT2_AGE to_age
 
+** delete variables no longer needed
 drop if missing(to_num)
 
 save "$tempdir/type2_pairs.dta", $replace
 
+********************************************************************************
+* Reshape Type 1 data
+********************************************************************************
+
+// Import data on type 1 people
 use "$SIPP14keep/allmonths14.dta", clear
 
+// Select only necessary variables
 keep SSUID ERESIDENCEID PNUM RREL* RREL_PNUM* panelmonth
 
+// resahpe the data
 reshape long RREL_PNUM RREL,i(SSUID ERESIDENCEID PNUM panelmonth) j(lno) 
 
-keep if RREL !=99 & !missing(RREL) // don't keep relationship to self or empty lines
+// Don't keep relationship to self or empty lines
+keep if RREL !=99 & !missing(RREL) 
 
+// Add value labels to relationship variables
 #delimit ;
 label define rel  1 " Opposite sex spouse"
                   2 " Opposite sex unmarried partner"
@@ -58,14 +87,20 @@ label values RREL  rel
 
 tab RREL, m
 
+// Rename vars
 rename PNUM from_num
 rename RREL_PNUM to_num
 
 save "$tempdir/rel_pairs_bymonth", $replace
 
-merge 1:1 SSUID ERESIDENCEID panelmonth from_num to_num using "$tempdir/allpairs"
+********************************************************************************
+* Merge relationship data to allpairs data
+********************************************************************************
 * all in rel_pairs are matched in allpairs, but not vice versa.
 * This is because type 2 people don't have observations in allpairs
+
+// Combine datasets
+merge 1:1 SSUID ERESIDENCEID panelmonth from_num to_num using "$tempdir/allpairs"
 
 keep if _merge==3
 
@@ -74,9 +109,13 @@ gen pairtype=1
 
 save "$tempdir/t1.dta", $replace
 
+********************************************************************************
+* Add type 2 people's demographic information
+********************************************************************************
+
 use "$tempdir/rel_pairs_bymonth", clear
 
-* We need to add type 2 people's demographic information
+// Combine datasets
 merge 1:1 SSUID ERESIDENCEID panelmonth from_num to_num using "$tempdir/type2_pairs"
 
 keep if _merge==3
@@ -90,17 +129,18 @@ label variable pairtype "Is the to person a type 1 or type 2 individual?"
 
 tab from_age pairtype
 
+// Recode relationship variable
 recode RREL (1=1)(2=2)(3=1)(4=2)(5/19=.), gen(relationship) 
-replace relationship=RREL+2 if RREL >=9 & RREL <=13 // bump rarer codes up to make room for common ones
-replace relationship=16 if RREL==14 | RREL==15 // combine in-law categories
-replace relationship=RREL+1 if RREL >=16 & RREL <=19 // bump rarer codes up to make room for common ones
-replace relationship=3 if RREL==5 & to_age > from_age // parents must be older than children
-replace relationship=4 if RREL==5 & to_age < from_age
-replace relationship=5 if RREL==6 & to_age > from_age // Step
-replace relationship=6 if RREL==6 & to_age < from_age // There are a small number of cases where ages are equal
-replace relationship=7 if RREL==7 & to_age > from_age // Adoptive
-replace relationship=8 if RREL==7 & to_age < from_age // There are a small number of cases where ages are equal
-replace relationship=9 if RREL==8 & to_age > from_age // Grand
+replace relationship=RREL+2 if RREL >=9 & RREL <=13 		// bump rarer codes up to make room for common ones
+replace relationship=16 if RREL==14 | RREL==15 				// combine in-law categories
+replace relationship=RREL+1 if RREL >=16 & RREL <=19 		// bump rarer codes up to make room for common ones
+replace relationship=3  if RREL==5 & to_age > from_age 		// parents must be older than children
+replace relationship=4  if RREL==5 & to_age < from_age
+replace relationship=5  if RREL==6 & to_age > from_age 		// Step
+replace relationship=6  if RREL==6 & to_age < from_age 		// There are a small number of cases where ages are equal
+replace relationship=7  if RREL==7 & to_age > from_age 		// Adoptive
+replace relationship=8  if RREL==7 & to_age < from_age 		// There are a small number of cases where ages are equal
+replace relationship=9  if RREL==8 & to_age > from_age 		// Grand
 replace relationship=10 if RREL==8 & to_age < from_age
 
 #delimit ;

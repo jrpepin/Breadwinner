@@ -1,12 +1,28 @@
-***
-*
-* USE RREL and RRELPUM variables to describe each person's relationship to every other person in the household by month
-* 
-* The RREL variables RREL1-RREL20 are for type 1 persons and RREL21-RREL30 are for type 2 persons
-* This file creates pairs only between two type 2 people. 
+*-------------------------------------------------------------------------------
+* BREADWINNER PROJECT
+* allpairs.do
+* Kelly Raley and Joanna Pepin
+*-------------------------------------------------------------------------------
+di "$today"
 
+********************************************************************************
+* DESCRIPTION
+********************************************************************************
+*?*?* THIS WAS THE DESCRIPTION, BUT THESE VARIABLES AREN'T USED......
+
+* This script will create a dataset that we will use to merge onto the rel_pairs_bymonth 
+* data created in the compute_relationships script.
+
+* The data files used in this script were produced by merge_waves.do
+
+********************************************************************************
+* Reshape data
+********************************************************************************
+
+// Import data 
 use "$SIPP14keep/allmonths14", clear
 
+// Select only necessary variables
 keep SSUID ERESIDENCEID PNUM panelmonth TAGE ESEX ERACE
 
 save "$tempdir/onehalf", $replace
@@ -16,7 +32,8 @@ rename TAGE from_age
 rename ESEX from_sex
 rename ERACE from_race
 
-joinby SSUID ERESIDENCEID panelmonth using "$tempdir/onehalf"
+// Reshape the data ?*?* I don't understand what this command is doing */
+joinby SSUID ERESIDENCEID panelmonth using "$tempdir/onehalf" 
 
 rename PNUM to_num
 rename TAGE to_age
@@ -25,8 +42,7 @@ rename ERACE to_race
 
 sort SSUID ERESIDENCEID panelmonth from_num to_num
 
+// delete variables no longer needed
 drop if from_num==to_num
 
 save "$tempdir/allpairs", $replace
-
-* want to merge this onto the relationship_pairs data to refine relationship variables
