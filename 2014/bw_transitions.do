@@ -1,3 +1,11 @@
+*-------------------------------------------------------------------------------
+* BREADWINNER PROJECT
+* bw_transitions.do
+* Kelly Raley
+*-------------------------------------------------------------------------------
+
+di "$S_DATE"
+
 * creates measures of transitions into breadwinning status
 
 use "$SIPP14keep/bwstatus.dta", clear
@@ -20,9 +28,14 @@ reshape wide `change_variables', i(`i_vars') j(`j_vars')
 
 gen trans_bw501=bw501
 gen trans_bw601=bw601
+gen bw50L1=.
+gen bw60L1=.
     forvalues w=2/4 {
        gen trans_bw50`w'=bw50`w'
        gen trans_bw60`w'=bw60`w'
+       local v=`w'-1
+       gen bw50L`w'=bw50`v' // for multi-state lifetable analysis it is helpful to have a lagged measure of breadwinning
+       gen bw60L`w'=bw60`v' 
        forvalues obs=1/`w' {
           replace trans_bw50`w'=2 if trans_bw50`obs'==1
           replace trans_bw60`w'=2 if trans_bw60`obs'==1
@@ -30,7 +43,7 @@ gen trans_bw601=bw601
     }
 
 
-reshape long `change_variables' trans_bw50 trans_bw60, i(`i_vars') j(`j_vars')
+reshape long `change_variables' trans_bw50 trans_bw60 bw50L bw60L , i(`i_vars') j(`j_vars')
 
 sum wpfinwgt
 
