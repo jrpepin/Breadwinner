@@ -1,49 +1,92 @@
-/*
-* First execute a series of scripts adapted from the childhh project
-* to develop measures of household composition
+*-------------------------------------------------------------------------------
+* BREADWINNER PROJECT
+* breadwinnner14.do
+* Kelly Raley and Joanna Pepin
+*-------------------------------------------------------------------------------
 
-     log using "$logdir/extract_and_format.log", replace
-     do "$projcode/extract_and_format.do"
-     log close
+********************************************************************************
+* ENVIRONMENT
+********************************************************************************
+* There are two scripts users need to run before importing the data. 
+* First, create a personal setup file using the setup_example.do script as a template
+* and save this file in the base project directory.
+* Second, run the setup_breadwinner_environment script to set the project filepaths and macros.
 
-     log using "$logdir/merge_waves.log", replace
-     do "$projcode/merge_waves.do"
-     log close
+// The current directory is assumed to be the base project directory.
+	cd "C:\Users\Joanna\Dropbox\Repositories\SIPP_Breadwinner"
 
-     log using "$logdir/allpairs.log", replace
-     do "$projcode/allpairs.do"
-     log close
+// Run the setup script
+	do "setup_breadwinner_environment"
 
-     log using "$logdir/compute_relationships.log", replace
-     do "$projcode/compute_relationships.do"
-     log close
+********************************************************************************
+* DATA
+********************************************************************************
+* This project uses Wave 1-4 of the 2014 SIPP data files. They can be downloaded here:
+* https://www.census.gov/programs-surveys/sipp/data/datasets.html
 
+	*?*?* How did the Stata data files get compressed *?*?*
+	** JP: I cheated a copied the compressed files from the PRC stats server onto my personal computer.
 
-     log using "$logdir/create_HHComp_asis.log", replace
-     do "$projcode/create_HHComp_asis.do"
-     log close
-*/
+// Extract the variables for this project
+    log using "$logdir/extract_and_format.log",	replace 
+    do "$SIPP2014_code/extract_and_format.do"
+    log close
+
+// Merge the waves of data to create two datafiles (type 1 and type 2 records)
+    log using "$logdir/merge_waves.log", replace
+    do "$SIPP2014_code/merge_waves.do"
+    log close
+
+********************************************************************************
+* HOUSEHOLD COMPOSITION
+********************************************************************************
+* Execute a series of scripts to develop measures of household composition
+* These scripts were adapted from the supplementary materials for the journal article 
+* [10.1007/s13524-019-00806-1]
+* (https://link.springer.com/article/10.1007/s13524-019-00806-1#SupplementaryMaterial).
+
+** *?*?* I don't know what this script is doing for us exactly.
+	*?*? Should we fold this script into computes_relationships?
+    log using "$logdir/allpairs.log", replace
+    do "$SIPP2014_code/allpairs.do"
+    log close
+
+// Create a file with demographic information on type 2 people
+    log using "$logdir/compute_relationships.log", replace
+    do "$SIPP2014_code/compute_relationships.do"
+    log close
+
+// Create a file with *?*?
+	log using "$logdir/create_HHComp_asis.log", replace
+    do "$SIPP2014_code/create_HHComp_asis.do"
+    log close
+
+********************************************************************************
+* BREADWINNER INDICATORS
+********************************************************************************
 *Execute breadwinner scripts
 
-* a monthly file with earnings and other information on individuals
-log using "$logdir/extract_earnings.log", replace
-do "$projcode/extract_earnings.do"
-log close
+// Create a monthly file with earnings and other information on individuals
+	log using "$logdir/extract_earnings.log", replace
+	do "$SIPP2014_code/extract_earnings.do"
+	log close
 
-* a monthly file with just household composition, including number of type2 people
-log using "$logdir/create_hhcomp.log", replace
-do "$projcode/create_hhcomp.do"
-log close
+// Create a monthly file with just household composition, including type2 people
+	log using "$logdir/create_hhcomp.log", replace
+	do "$SIPP2014_code/create_hhcomp.do"
+	log close
 
-* merge files together and collapse to annual measures of breadwinning,
-log using "$logdir/annualize.log", replace
-do "$projcode/annualize.do"
-log close
+// Create annual measures of breadwinning
+	log using "$logdir/annualize.log", replace
+	do "$SIPP2014_code/annualize.do"
+	log close
 
-* create indicators of transitions into and out of breadwinning
-log using "$logdir/bw_transitions.log", replace
-do "$projcode/bw_transitions.do"
-log close
+// create indicators of transitions into and out of breadwinning
+	log using "$logdir/bw_transitions.log", replace
+	do "$SIPP2014_code/bw_transitions.do"
+	log close
 
-* create a file describing sample and initial "lifetime" estimates of breadwinning.
-dyndoc "$projcode/bw_analysis.md", replace
+********************************************************************************
+* Create a file describing sample and initial "lifetime" estimates of breadwinning.
+********************************************************************************
+	dyndoc "$results/bw_analysis_2014.md", saving($results/bw_analysis_2014.html) replace
