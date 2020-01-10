@@ -21,7 +21,7 @@ di "$today"
 // Import first wave. 
 use "$SIPP14keep/wave1_extract", clear 
 
-/ Append the first wave with waves from the second to last
+// Append the first wave with waves from the second to last
 forvalues wave = 2/4 {
     append using "$SIPP14keep/wave`wave'_extract"
 }
