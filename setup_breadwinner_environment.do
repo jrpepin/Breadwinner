@@ -59,3 +59,16 @@ if ("$logdir" == "") {
     display as error "logdir macro not set."
     exit
 }
+
+********************************************************************************
+* Check for package dependencies 
+********************************************************************************
+* This check for packages that the user should install prior to running the project do files.
+
+// Fre: https://ideas.repec.org/c/boc/bocode/s456835.html
+capture : which fre
+if (_rc) {
+    display as result in smcl `"Please install package {it:fre} from SSC in order to run this do-file;"' _newline ///
+        `"you can do so by clicking this link: {stata "ssc install fre":auto-install fre}"'
+    exit 199
+}
