@@ -96,23 +96,30 @@ clear
 	*?*?*? This seems like a different thing than first birth occuring within 
 	* the 25 years prior to each interview.
 
-* First, count the total number of respondents in the original sample.
+* First, create an id variable per person
 	sort SSUID PNUM
-	egen 	tagid 	= tag(SSUID PNUM)
-	replace tagid	= . if tagid !=1 
+	egen id = concat (SSUID PNUM)
+	destring id, gen(idnum)
+	format idnum %20.0f
+	drop id
 
-	egen 	all		= count(tagid)
+* Then, count the total number of respondents in the original sample.
+	sort idnum panelmonth
+	egen tagid = tag(idnum)
+	replace tagid=. if tagid !=1
 
-// Create a macro with the total number of respondents in the dataset.
+	egen all = count(tagid)
+
+	// Create a macro with the total number of respondents in the dataset.
 	global allindividuals = all
 
-* Then, keep only the respondents that meet sample criteria
+* Next, keep only the respondents that meet sample criteria
 
 // Keep only women
-	tab 	esex 		if tagid==1 /* *?*?* JP initial run included 42550 women. Now 42516. WTF */
+	tab 	esex 		if tagid==1
 	replace tagid = . 	if esex ==1 // men
 	egen	women = count(tagid)
-	keep 				if esex==2
+	keep 				if esex ==2
 	
 	// Creates a macro with the total number of women in the dataset.
 	global women_n = women
