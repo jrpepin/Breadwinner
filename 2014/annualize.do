@@ -23,30 +23,51 @@ merge 1:1 SSUID PNUM panelmonth using "$tempdir/hhcomp.dta"
 keep if _merge==3 // *?*?* Who are the not matched people?
 drop 	_merge
 
+// 	Create a tempory person id variable
+	sort SSUID PNUM
+	egen id = concat (SSUID PNUM)
+	destring id, gen(idnum)
+	format idnum %20.0f
+	drop id
+
+	sort idnum panelmonth
+	egen tagid = tag(idnum)
+	replace tagid=. if tagid !=1
+	
+// *?*?*? Shouldn't count if tagid==1 equal $mothers0to25 (10,577 moms at end of extract_earnings)?
+	if ("$mothers0to25" == "count if tagid==1") {
+		display "Success! Sample sizes consistent."
+		}
+		else {
+		display as error "The sample size is different than extract_earnings."
+		}
+
 ********************************************************************************
 * Restrict sample to women who live with their own minor children
 ********************************************************************************
-// 	Create a tempory person id variable
-	sort SSUID PNUM
-	egen tagid = tag(SSUID PNUM)
-	replace tagid=. if tagid !=1
-
+		
 // Keep mothers who reside with their biological children
-	fre minorbiochildren if tagid==1 /* *?*?* This equals 11379, not 10381 like in markdown. hmmmmm */
-	replace tagid = . if minorbiochildren < 1
-	egen mothers_cores_minor=count(tagid)
-	keep if minorbiochildren >= 1   /// How many cases are we dropping and why?? 
+	fre minorbiochildren if tagid==1 
+	
+	cap drop notmom
+	gen notmom = 1 if minorbiochildren < 1
+	
+	replace tagid = . if minorbiochildren < 1 // No minor children in the household.
+	egen mothers_cores_minor = count(tagid)
+	keep if minorbiochildren >= 1   // *?*?* How many cases are we dropping and why?? 
 
 // Creates a macro with the total number of residential mothers in the dataset.	 
 	global mothers_cores_minor = mothers_cores_minor
 
-	drop mothers_cores_minor tagid
-	
-	
+	drop tagid idnum mothers_cores_minor 
+		
+********************************************************************************
+* Create descrptive statistics to prep for annualized variables
+********************************************************************************
 
-* Now I want to know what the first and last month of observation in this year is
+// Now I want to know what the first and last month of observation in this year is
    egen startmonth=min(monthcode), by(SSUID PNUM year)
-   egen lastmonth=max(monthcode), by(SSUID PNUM year)
+   egen lastmonth =max(monthcode), by(SSUID PNUM year)
 
 * preparing to count of the total number of months breadwinning for the year. (won't be our primary measure)
 
