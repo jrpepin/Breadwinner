@@ -149,28 +149,16 @@ clear
 	// Creates a macro with the total number of mothers left in the dataset.
 	global minus_oldmoms = notold
 
-// Clean up dataset
-	drop all women mothers notnew notold tagid
 ********************************************************************************
 * Describe the analytic sample
 ********************************************************************************
-* First, create an id variable per person
-	sort SSUID PNUM
-	egen id = concat (SSUID PNUM)
-	destring id, gen(idnum)
-	format idnum %20.0f
-	drop id
-
-* Then, count the total number of respondents in the new, analytic sample.
-	sort idnum panelmonth
-	egen tagid = tag(idnum)
-	replace tagid=. if tagid !=1
-
-	egen mothers=count(tagid)
+	egen sample=count(tagid)
 
 // create a global macro identifying mothers age 0 to 25
-	 global mothers0to25 = mothers
-
-	 drop mothers tagid 
+	global mothers0to25 = sample
+	di "$mothers0to25"
+	
+// Clean up dataset
+	drop tagid idnum all women mothers notnew notold  sample
 
 save "$SIPP14keep/sipp14tpearn_all", $replace /* *?*?* Consider saving this in $tempdir */
