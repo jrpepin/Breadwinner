@@ -1,6 +1,6 @@
 *-------------------------------------------------------------------------------
 * BREADWINNER PROJECT
-* extract_and_format.do
+* create_HHComp_asis.do
 * Kelly Raley and Joanna Pepin
 *-------------------------------------------------------------------------------
 di "$S_DATE"
@@ -9,7 +9,7 @@ di "$S_DATE"
 * DESCRIPTION
 ********************************************************************************
 * Create a data file with one record for each coresident pair in each wave
-* Merge onto the file the relationships data created by compute_relationships.
+* Merge onto the relationships data file created by compute_relationships.
 
 * The data files used in this script were produced by merge_waves & compute_relationships.do
 

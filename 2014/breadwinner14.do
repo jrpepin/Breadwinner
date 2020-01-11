@@ -46,21 +46,12 @@
 * [10.1007/s13524-019-00806-1]
 * (https://link.springer.com/article/10.1007/s13524-019-00806-1#SupplementaryMaterial).
 
-** *?*?* I don't know what this script is doing for us exactly.
-*?*? Should we fold this script into computes_relationships?
-
-    * we can do that. Honestly, I'm not sure it is necessary, but it was useful to check the data.
-    
-    log using "$logdir/allpairs.log", replace
-    do "$SIPP2014_code/allpairs.do"
-    log close
-
-// Create a file with demographic information on type 2 people
+// Create a file with demographic information and relationship types
     log using "$logdir/compute_relationships.log", replace
     do "$SIPP2014_code/compute_relationships.do"
     log close
 
-// Create a file with *?*?
+// Create a file with one record for each coresident pair per wave
 	log using "$logdir/create_HHComp_asis.log", replace
     do "$SIPP2014_code/create_HHComp_asis.do"
     log close
