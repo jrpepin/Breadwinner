@@ -159,6 +159,6 @@ clear
 	di "$mothers0to25"
 	
 // Clean up dataset
-	drop tagid idnum all women mothers notnew notold  sample
+	drop tagid idnum all women mothers afterref notold  sample
 
 save "$SIPP14keep/sipp14tpearn_all", $replace /* *?*?* Consider saving this in $tempdir */

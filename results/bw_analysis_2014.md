@@ -102,7 +102,7 @@ We use the birth history measures (year of each birth) to identify the sample el
 |Raw sample								| <<dd_di: %10.0fc "$allindividuals" >> |
 |Women									| <<dd_di: %10.0fc "$women_n" >> |
 |Mothers								| <<dd_di: %10.0fc "$mothers_n" >> |
-|First born > 1 yr old					| <<dd_di: %10.0fc "$minus_afterref" >> |
+|No earnings data during reference year	| <<dd_di: %10.0fc "$minus_afterref" >> |
 |Motherhood < 25 yrs from interview year| <<dd_di: %10.0fc "$minus_oldmoms" >> |
 |Coreside with minor (age < 18) children| <<dd_di: %6.0fc "$mothers_cores_minor">> |
 
