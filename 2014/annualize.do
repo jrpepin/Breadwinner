@@ -36,7 +36,7 @@ use "$SIPP14keep/sipp14tpearn_all", clear
 // Merge this data with household composition data.
 merge 1:1 SSUID PNUM panelmonth using "$tempdir/hhcomp.dta"
 
-* *?*?* Where are there 10,265 records that are not matched ??
+* *?*?* WHERE ARE THE 10,265 RECORDS THAT ARE NOT MATCHED ??
 
 // 	Create a tempory unique person id variable
 	sort SSUID PNUM
@@ -45,10 +45,10 @@ merge 1:1 SSUID PNUM panelmonth using "$tempdir/hhcomp.dta"
 	format idnum %20.0f
 	drop id
 	
-	unique 	idnum 	if _merge==1 // 864 mothers don't have a record in hhcomp?
+	unique 	idnum 	if _merge!=2 // 864 mothers don't have a record in hhcomp?
 
 * Now, let's make sure we have the same number of mothers as before.
-	egen sample=nvals(idnum) if _merge==3
+	egen sample=nvals(idnum) if _merge!=2
 	global samplesize = sample
 	di "$samplesize"
 
@@ -64,8 +64,8 @@ di "$samplesize"
 		exit
 		}
 		
-	keep if _merge==3 
-	drop 	_merge
+	keep if _merge!=2 
+*	drop 	_merge // Keeping this variable until we decide about the _merge == 1 people
 
 ********************************************************************************
 * Restrict sample to women who live with their own minor children
