@@ -15,32 +15,57 @@ di "$S_DATE"
 ********************************************************************************
 * Merge  measures of earning, demographic characteristics and household composition
 ********************************************************************************
-
 use "$SIPP14keep/sipp14tpearn_all", clear
 
-merge 1:1 SSUID PNUM panelmonth using "$tempdir/hhcomp.dta"
-
-keep if _merge==3 // *?*?* Who are the not matched people?
-drop 	_merge
-
-// 	Create a tempory person id variable
+// 	Create a tempory unique person id variable
 	sort SSUID PNUM
 	egen id = concat (SSUID PNUM)
 	destring id, gen(idnum)
 	format idnum %20.0f
 	drop id
-
-	sort idnum panelmonth
-	egen tagid = tag(idnum)
-	replace tagid=. if tagid !=1
 	
-// *?*?*? Shouldn't count if tagid==1 equal $mothers0to25 (10,577 moms at end of extract_earnings)?
-	if ("$mothers0to25" == "count if tagid==1") {
+	egen sample=nvals(idnum)
+	global samplesize = sample
+	di "$samplesize"
+
+// Make sure starting with consistent sample size.
+	assert "$mothers0to25" == "$samplesize"
+	
+	drop sample idnum // clear variables to recreate again after merge.
+
+// Merge this data with household composition data.
+merge 1:1 SSUID PNUM panelmonth using "$tempdir/hhcomp.dta"
+
+* *?*?* Where are the not 10,265 not matched records??
+
+// 	Create a tempory unique person id variable
+	sort SSUID PNUM
+	egen id = concat (SSUID PNUM)
+	destring id, gen(idnum)
+	format idnum %20.0f
+	drop id
+	
+	unique 	idnum 	if _merge==1 // 964 mothers don't have a record in hhcomp?
+
+* Now, let's make sure we have the same number of mothers as before.
+	egen sample=nvals(idnum) if _merge==3
+	global samplesize = sample
+	di "$samplesize"
+
+// Make sure starting sample size is consistent.
+di "$mothers0to25"
+di "$samplesize"
+
+	if ("$mothers0to25" == "$samplesize") {
 		display "Success! Sample sizes consistent."
 		}
 		else {
 		display as error "The sample size is different than extract_earnings."
+		exit
 		}
+		
+	keep if _merge==3 
+	drop 	_merge
 
 ********************************************************************************
 * Restrict sample to women who live with their own minor children

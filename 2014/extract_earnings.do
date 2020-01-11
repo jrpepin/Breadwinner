@@ -38,7 +38,7 @@ clear
 ********************************************************************************
 
 // Import first wave. 
-   use "$tempdir/sipp14tpearn1"
+   use "$tempdir/sipp14tpearn1", clear
 
 // Append the remaining waves
    forvalues w=2/4{
@@ -98,53 +98,61 @@ clear
 	format idnum %20.0f
 	drop id
 
-* Then, count the total number of respondents in the original sample.
-	sort idnum panelmonth
-	egen tagid = tag(idnum)
-	replace tagid=. if tagid !=1
-
-	egen all = count(tagid)
-
-	// Create a macro with the total number of respondents in the dataset.
+// Create a macro with the total number of respondents in the dataset.
+	egen all = nvals(idnum)
 	global allindividuals = all
+	di "$allindividuals"
 
 * Next, keep only the respondents that meet sample criteria
 
 // Keep only women
-	tab 	esex 		if tagid==1
-	replace tagid = . 	if esex ==1 // men
-	egen	women = count(tagid)
-	keep 				if esex ==2
+	tab 	esex				// Shows all cases
+	unique idnum, 	by(esex)	// Number of individuals
+	keep 			if esex ==2 // Keep women
 	
 	// Creates a macro with the total number of women in the dataset.
-	global women_n = women
+	egen	women 	= nvals(idnum)
+	global 	women_n = women
+	di "$women_n"
 
 // Only keep mothers
-	tab 	durmom 	if tagid==1, m
-	replace tagid = .  			if durmom ==. // not mothers
-	egen	mothers = count(tagid)
-	keep 						if durmom !=.
+	tab 	durmom, m
+	unique 	idnum 	if durmom ==.  // Not mothers
+	keep 		 	if durmom !=.  // Keep only mothers
 	
 	// Creates a macro with the total number of mothers in the dataset.
+	egen	mothers = nvals(idnum)
 	global mothers_n = mothers
+	di "$mothers_n"
 
 * Keep only if first birth occurred during or before the reference period
 
-// Drop births that happened after the reference period (in the year of the interview). 
-	replace tagid = . 			if durmom ==-1	 // We don't have earnings data for the year of the interview and so it's not useful to have those births in the data (yet)
-	egen	afterref = count(tagid)
-	drop 						if durmom ==0
+// Drop births that happened after the reference period (in the year of the interview).
+// We don't have earnings data for the year of the interview and so it's not useful to have those births in the data (yet)
+ 	tab 	durmom, m
+	unique 	idnum 	if durmom <  0  // Mom after reference period	
+	keep			if durmom >= 0
+	
+			/* *?*?* SHOULD WE BE DROPPING DURMOM <= 0, ==-1 ONLY , OR ==0 ONLY?
+			// What the old code looked like
+			replace tagid = . 			if durmom ==-1	 
+			drop 						if durmom ==0
+			*/
 
 	// Creates a macro with the total number of mothers left in the dataset.
+	egen	afterref = nvals(idnum)
 	global minus_afterref = afterref
+	di "$minus_afterref"
 	
 // Keep only if first birth occurred less than 25 years prior to reference period
-	replace tagid = . 			if durmom >25	 // old mothers
-	egen	notold = count(tagid)
-	drop 						if durmom >25
+ 	tab 	durmom , m
+	unique 	idnum 	if durmom >25	// Mom after reference period	
+	drop 			if durmom >25	// Drop old mothers
 
 	// Creates a macro with the total number of mothers left in the dataset.
+	egen	notold = nvals(idnum)
 	global minus_oldmoms = notold
+	di "$minus_oldmoms"
 
 // Consider dropping respondents who have an error in birthyear
 * (year of first birth is > respondents year of birth+9)
@@ -152,13 +160,13 @@ clear
 ********************************************************************************
 * Describe the analytic sample
 ********************************************************************************
-	egen sample=count(tagid)
+	egen sample=nvals(idnum)
 
 // create a global macro identifying mothers age 0 to 25
 	global mothers0to25 = sample
 	di "$mothers0to25"
 	
 // Clean up dataset
-	drop tagid idnum all women mothers afterref notold  sample
+	drop idnum all women mothers afterref notold  sample
 
 save "$SIPP14keep/sipp14tpearn_all", $replace /* *?*?* Consider saving this in $tempdir */
