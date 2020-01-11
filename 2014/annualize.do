@@ -99,7 +99,7 @@ gen one=1
 *************** collapsing to year *************************************
 *  and then collapse to create annual measures
 
-collapse (count) monthsobserved=one  nmos_bw50=mbw50 nmos_bw60=mbw60 (sum) tpearn thearn (mean) spouse partner numtype2 wpfinwgt (max) minorchildren minorbiochildren erace eeduc tceb oldest_age start_spartner last_spartner (min) dursinceb1_atint youngest_age,  by(SSUID PNUM year)
+collapse (count) monthsobserved=one  nmos_bw50=mbw50 nmos_bw60=mbw60 (sum) tpearn thearn (mean) spouse partner numtype2 wpfinwgt (max) minorchildren minorbiochildren erace eeduc tceb oldest_age start_spartner last_spartner (min) durmom youngest_age,  by(SSUID PNUM year)
 
 gen anytype2= (numtype2 > 0)
 
@@ -123,7 +123,7 @@ gen partial_year= (monthsobserved < 12)
 
 * the key number is the percent breadwinning in the first year. (~25%)
 
-sum bw50 if dursinceb1_atint==1 
+sum bw50 if durmom==1 
 
 gen per_bw50_atbirth=100*`r(mean)'
 gen notbw50_atbirth=1-`r(mean)'

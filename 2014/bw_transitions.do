@@ -14,7 +14,7 @@ use "$SIPP14keep/bwstatus.dta", clear
 
 gen wave=year-2012
 
-local change_variables "year monthsobserved nmos_bw50 nmos_bw60 tpearn thearn spouse partner wpfinwgt minorchildren minorbiochildren tceb oldest_age start_spartner last_spartner dursinceb1_atint youngest_age anytype2 hh_noearnings bw50 bw60 gain_partner lost_partner partial_year erace eeduc"
+local change_variables "year monthsobserved nmos_bw50 nmos_bw60 tpearn thearn spouse partner wpfinwgt minorchildren minorbiochildren tceb oldest_age start_spartner last_spartner durmom youngest_age anytype2 hh_noearnings bw50 bw60 gain_partner lost_partner partial_year erace eeduc"
 
 * these should be constants: per_bw50_atbirth notbw50_atbirth pper_bw60_atbirth notbw50_atbirth
 

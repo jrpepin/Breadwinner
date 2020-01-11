@@ -13,7 +13,8 @@
 * Second, run the setup_breadwinner_environment script to set the project filepaths and macros.
 
 // The current directory is assumed to be the base project directory.
-	cd "C:\Users\Joanna\Dropbox\Repositories\SIPP_Breadwinner"
+*	cd "C:\Users\Joanna\Dropbox\Repositories\SIPP_Breadwinner" // change to the directory before running
+*       breadwinner14.do
 
 // Run the setup script
 	do "setup_breadwinner_environment"
@@ -46,7 +47,10 @@
 * (https://link.springer.com/article/10.1007/s13524-019-00806-1#SupplementaryMaterial).
 
 ** *?*?* I don't know what this script is doing for us exactly.
-	*?*? Should we fold this script into computes_relationships?
+*?*? Should we fold this script into computes_relationships?
+
+    * we can do that. Honestly, I'm not sure it is necessary, but it was useful to check the data.
+    
     log using "$logdir/allpairs.log", replace
     do "$SIPP2014_code/allpairs.do"
     log close

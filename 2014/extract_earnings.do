@@ -73,10 +73,7 @@ clear
 	}
 
 // Create an indicator of how many years have elapsed since individual transitioned to parenthood
-	* Note that we add 1 to year to reflect year of interview rather than calendar year 
-	* of the reference month because year of birth measures are as of interview. 
-	* This is why we add _atint (i.e. "at interview") to the variable.
-   gen dursinceb1_atint=year+1-yrfirstbirth if !missing(yrfirstbirth)
+   gen durmom=year-yrfirstbirth if !missing(yrfirstbirth)
 	
 // check that year of first birth is > respondents year of birth+9
 
@@ -87,7 +84,9 @@ clear
       *?*?*?*?*?*?*?* Do we do anything with this besides generating it?
 	  /*
 	  Shouldn't we drop these peeps?
-	  drop if birthyear_error == 1 
+	  drop if birthyear_error == 1
+
+ Perhaps they should be dropped, but probably not here because it would mess up the description of the sample selection. Usually you start by defining the population of interest and then after making those sample restrictions you might delete cases with incomplete or inconsistent data. More and more, however, I'm in the practice of flagging and not deleting in case I want to do some imputation later on. But I get the point that it is not very helpful to create a variable so far in advance of when we might use it. 
 	  */
 ********************************************************************************
 * Create the analytic sample
@@ -95,6 +94,8 @@ clear
 * Keep observations of women in first 18 years since first birth. 
 	*?*?*? This seems like a different thing than first birth occuring within 
 	* the 25 years prior to each interview.
+
+        * because 25 is different from 18? 
 
 * First, create an id variable per person
 	sort SSUID PNUM
@@ -125,26 +126,26 @@ clear
 	global women_n = women
 
 // Only keep mothers
-	tab 	dursinceb1_atint 	if tagid==1, m
-	replace tagid = .  			if dursinceb1_atint ==. // not mothers
+	tab 	durmom 	if tagid==1, m
+	replace tagid = .  			if durmom ==. // not mothers
 	egen	mothers = count(tagid)
-	keep 						if dursinceb1_atint !=.
+	keep 						if durmom !=.
 	
 	// Creates a macro with the total number of mothers in the dataset.
 	global mothers_n = mothers
 
-// Keep only if first birth occurred at least 1 year prior to reference period
-	replace tagid = . 			if dursinceb1_atint ==0	 // new mothers
+// Keep only if first birth occurred during or before the reference period
+	replace tagid = . 			if durmom ==-1	 // new mothers
 	egen	notnew = count(tagid)
-	drop 						if dursinceb1_atint ==0
+	drop 						if durmom ==0
 
 	// Creates a macro with the total number of mothers left in the dataset.
 	global minus_newmoms = notnew
 	
 // Keep only if first birth occurred less than 25 years prior to reference period
-	replace tagid = . 			if dursinceb1_atint >25	 // old mothers
+	replace tagid = . 			if durmom >25	 // old mothers
 	egen	notold = count(tagid)
-	drop 						if dursinceb1_atint >25
+	drop 						if durmom >25
 
 	// Creates a macro with the total number of mothers left in the dataset.
 	global minus_oldmoms = notold
