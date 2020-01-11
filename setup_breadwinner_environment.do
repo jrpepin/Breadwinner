@@ -63,7 +63,7 @@ if ("$logdir" == "") {
 ********************************************************************************
 * Check for package dependencies 
 ********************************************************************************
-* This check for packages that the user should install prior to running the project do files.
+* This checks for packages that the user should install prior to running the project do files.
 
 // Fre: https://ideas.repec.org/c/boc/bocode/s456835.html
 capture : which fre
