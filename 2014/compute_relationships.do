@@ -19,31 +19,7 @@ di "$S_DATE"
 * The data files used in this script were produced by merge_waves.do and allpairs.do
 
 ********************************************************************************
-* Reshape Type 2 data
-********************************************************************************
-
-** Import data on type 2 people
-use "$SIPP14keep/allmonths14_type2.dta", clear
-
-** Select only necessary variables
-keep SSUID ERESIDENCEID panelmonth PNUM ET2_LNO* ET2_SEX* TT2_AGE* TAGE
-
-** resahpe the data
-reshape long ET2_LNO ET2_SEX TT2_AGE, i(SSUID ERESIDENCEID panelmonth PNUM) j(lno)
-
-rename PNUM from_num
-rename TAGE from_age
-rename ET2_LNO to_num
-rename ET2_SEX to_sex
-rename TT2_AGE to_age
-
-** delete variables no longer needed
-drop if missing(to_num)
-
-save "$tempdir/type2_pairs.dta", $replace
-
-********************************************************************************
-* Reshape relationship data
+* Reshape relationship data using reshape
 ********************************************************************************
 
 // Import relationship data
@@ -92,33 +68,95 @@ fre RREL
 rename PNUM from_num
 rename RREL_PNUM to_num
 
-save "$tempdir/rel_pairs_bymonth", $replace
+save "$tempdir/rel_pairs_bymonth.dta", $replace
 
 ********************************************************************************
-* Merge relationship data to Type 1 people's data
+* Reshape data using joinby
 ********************************************************************************
-* all in rel_pairs are matched in allpairs, but not vice versa.
+
+// Import relationship data 
+use "$SIPP14keep/allmonths14.dta", clear
+
+// Select only necessary variables
+keep SSUID ERESIDENCEID PNUM panelmonth TAGE ESEX ERACE
+
+save "$tempdir/onehalf.dta", $replace
+
+rename PNUM from_num
+rename TAGE from_age
+rename ESEX from_sex
+rename ERACE from_race
+
+// Reshape the data
+joinby SSUID ERESIDENCEID panelmonth using "$tempdir/onehalf.dta" 
+
+rename PNUM to_num
+rename TAGE to_age
+rename ESEX to_sex
+rename ERACE to_race
+
+// Organize the data to make it easier to see the merged results
+sort SSUID ERESIDENCEID panelmonth from_num to_num
+order  SSUID ERESIDENCEID panelmonth from_num to_num from_age to_age from_sex to_sex from_race to_race 
+
+* browse // look at the results
+
+// delete variables no longer needed
+drop if from_num==to_num // We'll add these back when we merge with rel_pairs_bymonth
+
+save "$tempdir/allpairs.dta", $replace
+
+********************************************************************************
+* Identify Type 1 people
+********************************************************************************
+* all in rel_pairs_bymonth are matched in allpairs, but not vice versa.
 * This is because type 2 people don't have observations in allpairs
 
+use "$tempdir/rel_pairs_bymonth.dta", clear
+
 // Combine relationship data with Type 1 data
-merge 1:1 SSUID ERESIDENCEID panelmonth from_num to_num using "$tempdir/allpairs"
+merge 1:1 SSUID ERESIDENCEID panelmonth from_num to_num using "$tempdir/allpairs.dta"
 
 keep if _merge==3
 drop 	_merge
 
-// Create a variable identifying these individuals at Type 1
+// Create a variable identifying these individuals as Type 1
 gen pairtype =1
 
 save "$tempdir/t1.dta", $replace
 
 ********************************************************************************
+* Reshape Type 2 data
+********************************************************************************
+
+** Import data on type 2 people
+use "$SIPP14keep/allmonths14_type2.dta", clear
+
+** Select only necessary variables
+keep SSUID ERESIDENCEID panelmonth PNUM ET2_LNO* ET2_SEX* TT2_AGE* TAGE
+
+** resahpe the data
+reshape long ET2_LNO ET2_SEX TT2_AGE, i(SSUID ERESIDENCEID panelmonth PNUM) j(lno)
+
+rename PNUM from_num
+rename TAGE from_age
+rename ET2_LNO to_num
+rename ET2_SEX to_sex
+rename TT2_AGE to_age
+
+** delete variables no longer needed
+drop if missing(to_num)
+
+save "$tempdir/type2_pairs.dta", $replace
+
+********************************************************************************
 * Add type 2 people's demographic information
 ********************************************************************************
 
-use "$tempdir/rel_pairs_bymonth", clear
+use "$tempdir/rel_pairs_bymonth.dta", clear
 
 // Combine datasets
-merge 1:1 SSUID ERESIDENCEID panelmonth from_num to_num using "$tempdir/type2_pairs"
+merge 1:1 SSUID ERESIDENCEID panelmonth from_num to_num using "$tempdir/type2_pairs.dta"
 
 keep if _merge	==3
 drop 	_merge
@@ -133,10 +171,7 @@ label variable pairtype "Is the person a type 1 or type 2 individual?"
 
 tab from_age pairtype
 
-********************************************************************************
-* Recode relationship variable
-********************************************************************************
-
+// Recode relationship variable
 recode RREL (1=1)(2=2)(3=1)(4=2)(5/19=.), gen(relationship) 
 replace relationship=RREL+2 if RREL >=9 & RREL <=13 		// bump rarer codes up to make room for common ones
 replace relationship=16 	if RREL==14 | RREL==15 			// combine in-law categories
@@ -181,4 +216,4 @@ label values relationship arel
 fre relationship
 fre relationship if to_num < 100
 
-save "$tempdir/relationship_pairs_bymonth", $replace
+save "$tempdir/relationship_pairs_bymonth.dta", $replace
