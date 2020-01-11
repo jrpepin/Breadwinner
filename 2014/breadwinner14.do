@@ -66,7 +66,7 @@
 	do "$SIPP2014_code/extract_earnings.do"
 	log close
 
-// Create a monthly file with just household composition, including type2 people
+// Create a monthly file with just household composition, includes type2 people
 	log using "$logdir/create_hhcomp.log", replace
 	do "$SIPP2014_code/create_hhcomp.do"
 	log close
