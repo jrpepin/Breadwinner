@@ -75,19 +75,11 @@ clear
 // Create an indicator of how many years have elapsed since individual transitioned to parenthood
    gen durmom=year-yrfirstbirth if !missing(yrfirstbirth)
 	
-// check that year of first birth is > respondents year of birth+9
-
+// Create a flag if year of first birth is > respondents year of birth+9
    gen 		mybirthyear		= year-tage
    gen 		birthyear_error	= 1 			if mybirthyear+9  > yrfirstbirth & !missing(yrfirstbirth)  // too young
    replace 	birthyear_error	= 1 			if mybirthyear+50 < yrfirstbirth & !missing(yrfirstbirth)  // too old
    
-      *?*?*?*?*?*?*?* Do we do anything with this besides generating it?
-	  /*
-	  Shouldn't we drop these peeps?
-	  drop if birthyear_error == 1
-
- Perhaps they should be dropped, but probably not here because it would mess up the description of the sample selection. Usually you start by defining the population of interest and then after making those sample restrictions you might delete cases with incomplete or inconsistent data. More and more, however, I'm in the practice of flagging and not deleting in case I want to do some imputation later on. But I get the point that it is not very helpful to create a variable so far in advance of when we might use it. 
-	  */
 ********************************************************************************
 * Create the analytic sample
 ********************************************************************************
@@ -95,7 +87,9 @@ clear
 	*?*?*? This seems like a different thing than first birth occuring within 
 	* the 25 years prior to each interview.
 
-        * because 25 is different from 18? 
+        * KR: because 25 is different from 18? 
+			** JP Wouldn't it be 22? 18 years + 4 to capture all 4 waves? 
+				** Or create a duration of motherhood variable
 
 * First, create an id variable per person
 	sort SSUID PNUM
@@ -134,13 +128,15 @@ clear
 	// Creates a macro with the total number of mothers in the dataset.
 	global mothers_n = mothers
 
-// Keep only if first birth occurred during or before the reference period
-	replace tagid = . 			if durmom ==-1	 // new mothers
-	egen	notnew = count(tagid)
+* Keep only if first birth occurred during or before the reference period
+
+// Drop births that happened after the reference period (in the year of the interview). 
+	replace tagid = . 			if durmom ==-1	 // We don't have earnings data for the year of the interview and so it's not useful to have those births in the data (yet)
+	egen	afterref = count(tagid)
 	drop 						if durmom ==0
 
 	// Creates a macro with the total number of mothers left in the dataset.
-	global minus_newmoms = notnew
+	global minus_afterref = afterref
 	
 // Keep only if first birth occurred less than 25 years prior to reference period
 	replace tagid = . 			if durmom >25	 // old mothers
@@ -150,6 +146,9 @@ clear
 	// Creates a macro with the total number of mothers left in the dataset.
 	global minus_oldmoms = notold
 
+// Consider dropping respondents who have an error in birthyear
+* (year of first birth is > respondents year of birth+9)
+	*  drop if birthyear_error == 1
 ********************************************************************************
 * Describe the analytic sample
 ********************************************************************************
