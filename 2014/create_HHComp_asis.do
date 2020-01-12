@@ -13,6 +13,9 @@ di "$S_DATE"
 
 * The data files used in this script were produced by merge_waves & compute_relationships.do
 
+* The only value in this file is that it adds ERELRP to the relationship pairs data so that we
+* could fill in the small number of missing relationships. 
+
 ********************************************************************************
 * Create database with all pairs of coresident individuals in each wave
 ********************************************************************************
@@ -22,7 +25,7 @@ keep SSUID ERESIDENCEID PNUM panelmonth ERELRP TAGE ESEX
 
 sort SSUID ERESIDENCEID panelmonth
 
-// Create a variable with the number the people in the household at each wave.
+// Create a variable with the number the people in the household at each month.
 by SSUID ERESIDENCEID panelmonth:  gen HHmembers = _N  
 
 rename PNUM to_num
@@ -39,7 +42,7 @@ keep SSUID ERESIDENCEID PNUM panelmonth ERELRP TAGE ESEX
 rename PNUM from_num
 rename ERELRP ERRPfrom
 
-// Reshape data
+// Reshape data, creating a record for each pair of type 1 people
 joinby SSUID ERESIDENCEID panelmonth using "$tempdir/to"  
 
 // drop pairs of ego to self

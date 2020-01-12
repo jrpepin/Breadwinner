@@ -8,18 +8,17 @@ di "$S_DATE"
 ********************************************************************************
 * DESCRIPTION
 ********************************************************************************
-* Create a file with demographic information on type 2 people because it isn't in allpairs
-
 * This script uses the RREL and RRELPUM variables to describe each person's relationship 
 * to every other person in the household by month
 
 * The RREL variables RREL1-RREL20 are for type 1 persons and RREL21-RREL30 are for type 2 persons
-* This script creates pairs only between two type 2 people. 
 
-* The data files used in this script were produced by merge_waves.do and allpairs.do
+* The data file used in this script was produced by merge_waves.do
 
 ********************************************************************************
-* Reshape relationship data using reshape
+* Reshape relationship data from a file with one record for each (type 1) person
+* to a file with one record for each person a type 1 individual lives with
+* (including type 2 people).
 ********************************************************************************
 
 // Import relationship data
@@ -71,10 +70,12 @@ rename RREL_PNUM to_num
 save "$tempdir/rel_pairs_bymonth.dta", $replace
 
 ********************************************************************************
-* Reshape data using joinby
+* Reshape data on type 1 individuals,
+* creating two records for each pair of coresident
+* type 1 people using joinby
 ********************************************************************************
 
-// Import relationship data 
+// Import relationship data, a file with one record per type 1 individual 
 use "$SIPP14keep/allmonths14.dta", clear
 
 // Select only necessary variables
@@ -101,21 +102,21 @@ order  SSUID ERESIDENCEID panelmonth from_num to_num from_age to_age from_sex to
 
 * browse // look at the results
 
-// delete variables no longer needed
-drop if from_num==to_num // We'll add these back when we merge with rel_pairs_bymonth
+// delete record of individual living with herself
+drop if from_num==to_num 
 
-save "$tempdir/allpairs.dta", $replace
+save "$tempdir/allt1pairs.dta", $replace
 
 ********************************************************************************
 * Identify Type 1 people
 ********************************************************************************
-* all in rel_pairs_bymonth are matched in allpairs, but not vice versa.
-* This is because type 2 people don't have observations in allpairs
+* all in rel_pairs_bymonth are matched in allt1pairs, but not vice versa.
+* This is because type 2 people don't have observations in allt1pairs
 
 use "$tempdir/rel_pairs_bymonth.dta", clear
 
 // Combine relationship data with Type 1 data
-merge 1:1 SSUID ERESIDENCEID panelmonth from_num to_num using "$tempdir/allpairs.dta"
+merge 1:1 SSUID ERESIDENCEID panelmonth from_num to_num using "$tempdir/allt1pairs.dta"
 
 keep if _merge==3
 drop 	_merge
@@ -135,7 +136,7 @@ use "$SIPP14keep/allmonths14_type2.dta", clear
 ** Select only necessary variables
 keep SSUID ERESIDENCEID panelmonth PNUM ET2_LNO* ET2_SEX* TT2_AGE* TAGE
 
-** resahpe the data
+** reshape the data to have one record for each type 2 person living in a type 1 person's household
 reshape long ET2_LNO ET2_SEX TT2_AGE, i(SSUID ERESIDENCEID panelmonth PNUM) j(lno)
 
 rename PNUM from_num

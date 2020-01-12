@@ -16,9 +16,12 @@ di "$S_DATE"
 * Create database with household composition information.
 ********************************************************************************
 * Generating variables that indicate 1 if match person type and missing otherwise.
+* This sets up to count the number of people of relationship type that are in ego's household.
 
 // Load the data
-use "$SIPP14keep/HHComp_asis.dta", clear
+use "$tempdir/relationship_pairs_bymonth.dta", clear
+
+rename from_num PNUM
 
 // Identify relationship codes
 fre relationship
@@ -46,6 +49,9 @@ gen numtype2		=1 		if pairtype==2
 gen hhsize			=1
 
 collapse (count) minorchildren minorbiochildren spouse partner hhsize numtype2 (min) youngest_age=childage (max) oldest_age=childage, by(SSUID PNUM panelmonth)
+
+* this file has one record per person living with PNUM. Need to add add one to hhsize for PNUM
+replace hhsize=hhsize+1
 
 save "$tempdir/hhcomp.dta", replace
 

@@ -51,11 +51,6 @@
     do "$SIPP2014_code/compute_relationships.do"
     log close
 
-// Create a file with one record for each coresident pair per wave
-	log using "$logdir/create_HHComp_asis.log", replace
-    do "$SIPP2014_code/create_HHComp_asis.do"
-    log close
-
 ********************************************************************************
 * BREADWINNER INDICATORS
 ********************************************************************************

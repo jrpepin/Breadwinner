@@ -37,6 +37,19 @@ use "$SIPP14keep/sipp14tpearn_all", clear
 merge 1:1 SSUID PNUM panelmonth using "$tempdir/hhcomp.dta"
 
 * *?*?* WHERE ARE THE 10,265 RECORDS THAT ARE NOT MATCHED ??
+*  A: It's individuals living alone. relationship_pairs_bymonth has one record
+*     per person living with PNUM. We deleted records where to_num = from_num.
+*     So, individuals living alone are not in the data.
+
+// fix variables for unmatched individuals who must live alone
+
+local hhcompvars "minorchildren minorbiochildren spouse partner numtype2"
+
+foreach var of local hhcompvars{
+    replace `var'=0 if _merge==1 & missing(`var') 
+}
+
+replace hhsize==1
 
 // 	Create a tempory unique person id variable
 	sort SSUID PNUM
