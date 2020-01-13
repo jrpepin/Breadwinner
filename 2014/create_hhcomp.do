@@ -10,7 +10,7 @@ di "$S_DATE"
 ********************************************************************************
 * Create a monthly file with just household composition, including type2 people
 
-* The data file used in this script was produced by create_HHComp_asis.do
+* The data file used in this script was produced by compute_relationships.do
 
 ********************************************************************************
 * Create database with household composition information.

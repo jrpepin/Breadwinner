@@ -102,7 +102,7 @@ order  SSUID ERESIDENCEID panelmonth from_num to_num from_age to_age from_sex to
 
 * browse // look at the results
 
-// delete record of individual living with herself
+// Delete record of individual living with herself
 drop if from_num==to_num 
 
 save "$tempdir/allt1pairs.dta", $replace

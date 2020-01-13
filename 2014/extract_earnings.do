@@ -130,7 +130,7 @@ clear
 // Drop births that happened after the reference period (in the year of the interview).
 // We don't have earnings data for the year of the interview and so it's not useful to have those births in the data (yet)
  	tab 	durmom, m
-	unique 	idnum 	if durmom <  0  // Mom after reference period	
+	unique 	idnum 	if durmom <  0  // Mom during year of the interview.
 	keep			if durmom >= 0
 	
 			/* *?*?* SHOULD WE BE DROPPING DURMOM <= 0, ==-1 ONLY , OR ==0 ONLY?

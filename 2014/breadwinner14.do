@@ -5,7 +5,7 @@
 *-------------------------------------------------------------------------------
 
 ********************************************************************************
-* ENVIRONMENT
+* A1. ENVIRONMENT
 ********************************************************************************
 * There are two scripts users need to run before importing the data. 
 * First, create a personal setup file using the setup_example.do script as a template
@@ -20,7 +20,7 @@
 	do "setup_breadwinner_environment"
 
 ********************************************************************************
-* DATA
+* A2. DATA
 ********************************************************************************
 * This project uses Wave 1-4 of the 2014 SIPP data files. They can be downloaded here:
 * https://www.census.gov/programs-surveys/sipp/data/datasets.html
@@ -39,10 +39,10 @@
     log close
 
 ********************************************************************************
-* HOUSEHOLD COMPOSITION
+* B1. HOUSEHOLD COMPOSITION
 ********************************************************************************
 * Execute a series of scripts to develop measures of household composition
-* These scripts were adapted from the supplementary materials for the journal article 
+* This script was adapted from the supplementary materials for the journal article 
 * [10.1007/s13524-019-00806-1]
 * (https://link.springer.com/article/10.1007/s13524-019-00806-1#SupplementaryMaterial).
 
@@ -51,8 +51,13 @@
     do "$SIPP2014_code/compute_relationships.do"
     log close
 
+// Create a monthly file with just household composition, includes type2 people
+	log using "$logdir/create_hhcomp.log", replace
+	do "$SIPP2014_code/create_hhcomp.do"
+	log close
+	
 ********************************************************************************
-* BREADWINNER INDICATORS
+* B2. BREADWINNER INDICATORS
 ********************************************************************************
 *Execute breadwinner scripts
 
@@ -61,17 +66,12 @@
 	do "$SIPP2014_code/extract_earnings.do"
 	log close
 
-// Create a monthly file with just household composition, includes type2 people
-	log using "$logdir/create_hhcomp.log", replace
-	do "$SIPP2014_code/create_hhcomp.do"
-	log close
-
 // Create annual measures of breadwinning
 	log using "$logdir/annualize.log", replace
 	do "$SIPP2014_code/annualize.do"
 	log close
 
-// create indicators of transitions into and out of breadwinning
+// Create indicators of transitions into and out of breadwinning
 	log using "$logdir/bw_transitions.log", replace
 	do "$SIPP2014_code/bw_transitions.do"
 	log close
