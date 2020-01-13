@@ -36,20 +36,20 @@ use "$SIPP14keep/sipp14tpearn_all", clear
 // Merge this data with household composition data.
 merge 1:1 SSUID PNUM panelmonth using "$tempdir/hhcomp.dta"
 
-* *?*?* WHERE ARE THE 10,265 RECORDS THAT ARE NOT MATCHED ??
-*  A: It's individuals living alone. relationship_pairs_bymonth has one record
-*     per person living with PNUM. We deleted records where to_num = from_num.
-*     So, individuals living alone are not in the data.
+// Fix variables for unmatched individuals who live alone (_merge==1)
+* Relationship_pairs_bymonth has one record per person living with PNUM. 
+* We deleted records where "from_num==to_num." (compute_relationships.do)
+* So, individuals living alone are not in the data.
 
-// fix variables for unmatched individuals who must live alone
+	// Make relationship variables equal to zero
+	local hhcompvars "minorchildren minorbiochildren spouse partner numtype2"
 
-local hhcompvars "minorchildren minorbiochildren spouse partner numtype2"
-
-foreach var of local hhcompvars{
-    replace `var'=0 if _merge==1 & missing(`var') 
-}
-
-replace hhsize==1
+	foreach var of local hhcompvars{
+		replace `var'=0 if _merge==1 & missing(`var') 
+	}
+	
+	// Make household size = 1
+	replace hhsize = 1 if _merge==1
 
 // 	Create a tempory unique person id variable
 	sort SSUID PNUM
@@ -58,18 +58,18 @@ replace hhsize==1
 	format idnum %20.0f
 	drop id
 	
-	unique 	idnum 	if _merge!=2 // 864 mothers don't have a record in hhcomp?
+	unique 	idnum 	if _merge!=2
 
 * Now, let's make sure we have the same number of mothers as before.
-	egen sample=nvals(idnum) if _merge!=2
-	global samplesize = sample
-	di "$samplesize"
+	egen newsample=nvals(idnum) if _merge!=2
+	global newsamplesize = newsample
+	di "$newsamplesize"
 
 // Make sure starting sample size is consistent.
 di "$mothers0to25"
-di "$samplesize"
+di "$newsamplesize"
 
-	if ("$mothers0to25" == "$samplesize") {
+	if ("$mothers0to25" == "$newsamplesize") {
 		display "Success! Sample sizes consistent."
 		}
 		else {
@@ -78,26 +78,26 @@ di "$samplesize"
 		}
 		
 	keep if _merge!=2 
-*	drop 	_merge // Keeping this variable until we decide about the _merge == 1 people
+	drop 	_merge
 
 ********************************************************************************
 * Restrict sample to women who live with their own minor children
 ********************************************************************************
-		
+*!*!*! JP START HERE -- RECODE USING SYNTAX EXAMPLE FROM EXTRACT_EARNINGS
 // Keep mothers who reside with their biological children
-	fre minorbiochildren if tagid==1 
+	fre minorbiochildren // if tagid==1 (CHANGE TO NEW WAY TO SEE UNIQUE RECORDS)
 	
 	cap drop notmom
 	gen notmom = 1 if minorbiochildren < 1
 	
-	replace tagid = . if minorbiochildren < 1 // No minor children in the household.
-	egen mothers_cores_minor = count(tagid)
+*	replace tagid = . if minorbiochildren < 1 // No minor children in the household.
+*	egen mothers_cores_minor = count(tagid)
 	keep if minorbiochildren >= 1   // *?*?* How many cases are we dropping and why?? 
 
 // Creates a macro with the total number of residential mothers in the dataset.	 
-	global mothers_cores_minor = mothers_cores_minor
+*	global mothers_cores_minor = mothers_cores_minor
 
-	drop tagid idnum mothers_cores_minor 
+	drop idnum mothers_cores_minor 
 		
 ********************************************************************************
 * Create descrptive statistics to prep for annualized variables
