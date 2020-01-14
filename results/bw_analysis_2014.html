@@ -1,0 +1,96 @@
+<h1><a href="#breadwinner-estimates-sipp-2014" id="breadwinner-estimates-sipp-2014">Breadwinner Estimates (SIPP 2014)</a></h1>
+<pre><code></code></pre>
+<h2><a href="#data" id="data">Data</a></h2>
+<p>This analysis uses data from the <a href="https://www.census.gov/programs-surveys/sipp/data/datasets.html">2014 Survey of Income and Program Participation</a>. We use all 4 waves of the survey data, which spans January 2013 to December 2016. The total sample consists of 82464 individuals.</p>
+<pre><code></code></pre>
+<p>The description of the variables can be found in the <a href="https://www2.census.gov/programs-surveys/sipp/data/datasets/2014/w4/2014SIPP_W4_Metadata_AllSections.pdf">SIPP 2014 Wave 4 Metadata report</a>. We use the following variables for this analysis.</p>
+<table>
+<thead>
+<tr><th align="left">Variable		</th><th align="left"> Description 													</th></tr>
+</thead>
+<tbody>
+<tr><td align="left"><em>TECHNICAL</em>	</td><td align="left"> 																</td></tr>
+<tr><td align="left">swave  		</td><td align="left"> Wave number of interview </td></tr>
+<tr><td align="left">einttype  		</td><td align="left"> Type of interview </td></tr>
+<tr><td align="left">monthcode  	</td><td align="left"> Value of reference month </td></tr>
+<tr><td align="left">wpfinwgt  		</td><td align="left"> Final person weight </td></tr>
+<tr><td align="left">ssuid  		</td><td align="left"> Sample unit identifier.  </td></tr>
+<tr><td align="left">pnum 			</td><td align="left"> Person number </td></tr>
+<tr><td align="left">epnpar1  		</td><td align="left"> Person number of parent 1 </td></tr>
+<tr><td align="left">epnpar2  		</td><td align="left"> Person number of parent 2 </td></tr>
+<tr><td align="left">epnspouse 		</td><td align="left"> Person number of spouse </td></tr>
+<tr><td align="left">rfamrefwt2  	</td><td align="left"> Person number of the family reference person (with Type 2 persons) </td></tr>
+<tr><td align="left">et2_lno*		</td><td align="left"> Person number of the first Type 2 person </td></tr>
+<tr><td align="left">eresidenceid 	</td><td align="left"> This field stores a unique six-digit identifier for residence addresses </td></tr>
+<tr><td align="left">shhadid  		</td><td align="left"> Household address ID. Differentiates households spawned from an original sample household </td></tr>
+<tr><td align="left"><em>HOUSEHOLD</em>	</td><td align="left"> 																</td></tr>
+<tr><td align="left">erelrp  		</td><td align="left"> Household relationship (old values) </td></tr>
+<tr><td align="left">epar1typ  		</td><td align="left"> Type of relationship to parent 1 </td></tr>
+<tr><td align="left">epar2typ   	</td><td align="left"> Type of relationship to parent 2 </td></tr>
+<tr><td align="left">rhnumper  		</td><td align="left"> Number of persons in household this month </td></tr>
+<tr><td align="left">rhnumperwt2 	</td><td align="left"> Number of persons in household this month (with Type 2 persons) </td></tr>
+<tr><td align="left">rhnumu18  		</td><td align="left"> Number of persons in household under 18 years this month </td></tr>
+<tr><td align="left">rhnumu18wt2  	</td><td align="left"> Number of persons in household under 18 years this month (with Type 2 persons) </td></tr>
+<tr><td align="left">rhnum65over  	</td><td align="left"> Number of persons in household 65 years and over this month </td></tr>
+<tr><td align="left">rhnum65ovrt2 	</td><td align="left"> Number of persons in household 65 years and over this month (with Type 2 persons) </td></tr>
+<tr><td align="left">et2_mth*		</td><td align="left"> Did &hellip; live with the first Type 2 person during month *? </td></tr>
+<tr><td align="left">rrel*  		</td><td align="left"> Monthly household relationship to person </td></tr>
+<tr><td align="left">rrel_pnum* 	</td><td align="left"> Person number for monthly relationship </td></tr>
+<tr><td align="left">aroutingsrop	</td><td align="left"> Status Flag: Number of times the other parent takes child 0-5 on outings. </td></tr>
+<tr><td align="left"><em>FINANCIAL</em>	</td><td align="left"> 																</td></tr>
+<tr><td align="left">tftotinc 		</td><td align="left"> Sum of the reported monthly earning and income received by all individuals in a family </td></tr>
+<tr><td align="left">thtotinc  		</td><td align="left"> Sum of all earnings and income received by a household </td></tr>
+<tr><td align="left">tpearn			</td><td align="left"> Sum of earnings and profits/losses from all jobs </td></tr>
+<tr><td align="left">apearn			</td><td align="left"> Status Flag: tpearn </td></tr>
+<tr><td align="left">tjb?_msum		</td><td align="left"> Monthly earnings from job * </td></tr>
+<tr><td align="left">ajb?_msum		</td><td align="left"> Status Flag: tjb?_msum </td></tr>
+<tr><td align="left"><em>DEMOGRAPHIC</em>	</td><td align="left"> 																</td></tr>
+<tr><td align="left">ems  			</td><td align="left"> Is &hellip; currently married, widowed, divorced, separated, or never married? </td></tr>
+<tr><td align="left">tceb			</td><td align="left"> Children ever born/fathered </td></tr>
+<tr><td align="left">tcbyr_* 		</td><td align="left"> Birth year of child </td></tr>
+<tr><td align="left">eorigin  		</td><td align="left"> Is &hellip; Spanish, Hispanic, or Latino? </td></tr>
+<tr><td align="left">erace  		</td><td align="left"> What race(s) does &hellip; consider herself/himself to be? </td></tr>
+<tr><td align="left">esex  			</td><td align="left"> Sex of this person </td></tr>
+<tr><td align="left">et2_sex*		</td><td align="left"> What is the * Type 2 person&rsquo;s sex? </td></tr>
+<tr><td align="left">tage   		</td><td align="left"> Age as of last birthday </td></tr>
+<tr><td align="left">tt2_age		</td><td align="left"> What is the * Type 2 person&rsquo;s age? </td></tr>
+<tr><td align="left">eeduc  		</td><td align="left"> What is the highest level of school &hellip; completed or the highest degree received&hellip;. </td></tr>
+<tr><td align="left">rged 			</td><td align="left"> Did respondent complete high school by diploma or GED? </td></tr>
+<tr><td align="left">renroll  		</td><td align="left"> Recode for monthly enrollment status </td></tr>
+<tr><td align="left">eedgrade  		</td><td align="left"> Grade level of spell of enrollment </td></tr>
+<tr><td align="left">eedgrep  		</td><td align="left"> Repeated a grade </td></tr>
+<tr><td align="left">rfoodr  		</td><td align="left"> Recode for the raw food security score that is a count of affirmative responses </td></tr>
+<tr><td align="left">rfoods  		</td><td align="left"> Recode variable for food security status </td></tr>
+<tr><td align="left">rhpov 			</td><td align="left"> Household poverty threshold in this month, excluding Type 2 individuals </td></tr>
+<tr><td align="left">rhpovt2 		</td><td align="left"> Household poverty threshold in this month, including Type 2 individuals </td></tr>
+<tr><td align="left">thincpov  		</td><td align="left"> Household income-to-poverty ratio in this month, excluding Type 2 individuals </td></tr>
+<tr><td align="left">thincpovt2  	</td><td align="left"> Household income-to-poverty ratio in this month, including Type 2 individuals </td></tr>
+<tr><td align="left">tst_intv  		</td><td align="left"> State of residence for the interview address </td></tr>
+</tbody>
+</table>
+<h2><a href="#sample" id="sample">Sample</a></h2>
+<p>We restricted the sample to 8462 women who first became mothers within the 25 years prior to each interview and currently coreside with minor (age &lt; 18) children.<br />
+We use the birth history measures (year of each birth) to identify the sample eligble to be included in our analysis.</p>
+<h2><a href="#sample-construction" id="sample-construction">Sample Construction</a></h2>
+<pre><code></code></pre>
+<table>
+<thead>
+<tr><th align="left"><strong>Restiction</strong>  						</th><th align="left"> <strong>Cases left</strong> </th></tr>
+</thead>
+<tbody>
+<tr><td align="left">Raw sample								</td><td align="left"> 82464 </td></tr>
+<tr><td align="left">Women									</td><td align="left"> 42529 </td></tr>
+<tr><td align="left">Mothers								</td><td align="left"> 23500 </td></tr>
+<tr><td align="left">First born &gt; 1 yr old					</td><td align="left"> 23381 </td></tr>
+<tr><td align="left">Motherhood &lt; 25 yrs from interview year</td><td align="left"> 10577 </td></tr>
+<tr><td align="left">Coreside with minor (age &lt; 18) children</td><td align="left"> 8462 </td></tr>
+</tbody>
+</table>
+<h2><a href="#measures" id="measures">Measures</a></h2>
+<p>We created a measure of household earnings by aggregating the earnings across all type 1 individuals in the household in each month and then aggregating earnings across all months in each year to get an annual measure of household earnings.</p>
+<p>To create indicators of breadwinning we compare each mothers&rsquo; annual earnings to the annual household earnings measures. We consider mothers who earn more than 50% (or 60%) of the household earnings breadwinners.</p>
+<pre><code></code></pre>
+<h2><a href="#results" id="results">Results</a></h2>
+<p>We observe 24.1% breadwining, or earning more than 50% of the household income in the year of their first birth. This estimate is lower (16.7 percent) using a 60% threshold.</p>
+<p>The percentage never breadwinning by the time their first child reaches age 18 is  7.7, or 15.7 using the 60% threshold.</p>
+<p>The percentage breadwinning by the time their first child reaches age 18 is 92.3% or 84.3% using the 60% threshold.</p>

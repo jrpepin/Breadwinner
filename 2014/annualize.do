@@ -1,31 +1,111 @@
-* merge together measures of earning and demographic characteristics with measures of household composition and then collapse to
-* create annual measures
+*-------------------------------------------------------------------------------
+* BREADWINNER PROJECT
+* annualize.do
+* Kelly Raley and Joanna Pepin
+*-------------------------------------------------------------------------------
+di "$S_DATE"
 
+********************************************************************************
+* DESCRIPTION
+********************************************************************************
+* Create annual measures of breadwinning.
+
+* The data files used in this script were produced by extract_earnings.do & create_hhcomp.do
+
+********************************************************************************
+* Merge  measures of earning, demographic characteristics and household composition
+********************************************************************************
 use "$SIPP14keep/sipp14tpearn_all", clear
 
+// 	Create a tempory unique person id variable
+	sort SSUID PNUM
+	egen id = concat (SSUID PNUM)
+	destring id, gen(idnum)
+	format idnum %20.0f
+	drop id
+	
+	egen sample=nvals(idnum)
+	global samplesize = sample
+	di "$samplesize"
+
+// Make sure starting with consistent sample size.
+	assert "$mothers0to25" == "$samplesize"
+	
+	drop sample idnum // clear variables to recreate again after merge.
+
+// Merge this data with household composition data.
 merge 1:1 SSUID PNUM panelmonth using "$tempdir/hhcomp.dta"
 
-keep if _merge==3
+// Fix variables for unmatched individuals who live alone (_merge==1)
+* Relationship_pairs_bymonth has one record per person living with PNUM. 
+* We deleted records where "from_num==to_num." (compute_relationships.do)
+* So, individuals living alone are not in the data.
 
-drop _merge
+	// Make relationship variables equal to zero
+	local hhcompvars "minorchildren minorbiochildren spouse partner numtype2"
 
-* we want to limit to measurement of earnings to observations where women live with minor own children
-keep if minorbiochildren >= 1
+	foreach var of local hhcompvars{
+		replace `var'=0 if _merge==1 & missing(`var') 
+	}
+	
+	// Make household size = 1
+	replace hhsize = 1 if _merge==1
 
-* describe sample
-	 sort SSUID PNUM
-	 egen tagid = tag(SSUID PNUM)
-	 replace tagid=. if tagid !=1 
+// 	Create a tempory unique person id variable
+	sort SSUID PNUM
+	egen id = concat (SSUID PNUM)
+	destring id, gen(idnum)
+	format idnum %20.0f
+	drop id
+	
+	unique 	idnum 	if _merge!=2
 
-	 egen mothers_cores_minor=count(tagid)
+* Now, let's make sure we have the same number of mothers as before.
+	egen newsample=nvals(idnum) if _merge!=2
+	global newsamplesize = newsample
+	di "$newsamplesize"
 
-	 global mothers_cores_minor = mothers_cores_minor
+// Make sure starting sample size is consistent.
+di "$mothers0to25"
+di "$newsamplesize"
 
-	 drop mothers_cores_minor tagid
+	if ("$mothers0to25" == "$newsamplesize") {
+		display "Success! Sample sizes consistent."
+		}
+		else {
+		display as error "The sample size is different than extract_earnings."
+		exit
+		}
+		
+	keep if _merge!=2 
+	drop 	_merge
 
-* Now I want to know what the first and last month of observation in this year is
+********************************************************************************
+* Restrict sample to women who live with their own minor children
+********************************************************************************
+*!*!*! JP START HERE -- RECODE USING SYNTAX EXAMPLE FROM EXTRACT_EARNINGS
+// Keep mothers who reside with their biological children
+	fre minorbiochildren // if tagid==1 (CHANGE TO NEW WAY TO SEE UNIQUE RECORDS)
+	
+	cap drop notmom
+	gen notmom = 1 if minorbiochildren < 1
+	
+*	replace tagid = . if minorbiochildren < 1 // No minor children in the household.
+*	egen mothers_cores_minor = count(tagid)
+	keep if minorbiochildren >= 1   // *?*?* How many cases are we dropping and why?? 
+
+// Creates a macro with the total number of residential mothers in the dataset.	 
+*	global mothers_cores_minor = mothers_cores_minor
+
+	drop idnum mothers_cores_minor 
+		
+********************************************************************************
+* Create descrptive statistics to prep for annualized variables
+********************************************************************************
+
+// Now I want to know what the first and last month of observation in this year is
    egen startmonth=min(monthcode), by(SSUID PNUM year)
-   egen lastmonth=max(monthcode), by(SSUID PNUM year)
+   egen lastmonth =max(monthcode), by(SSUID PNUM year)
 
 * preparing to count of the total number of months breadwinning for the year. (won't be our primary measure)
 
@@ -55,8 +135,9 @@ keep if minorbiochildren >= 1
 gen one=1
 
 *************** collapsing to year *************************************
+*  and then collapse to create annual measures
 
-collapse (count) monthsobserved=one  nmos_bw50=mbw50 nmos_bw60=mbw60 (sum) tpearn thearn (mean) spouse partner numtype2 wpfinwgt (max) minorchildren minorbiochildren erace eeduc tceb oldest_age start_spartner last_spartner (min) dursinceb1_atint youngest_age,  by(SSUID PNUM year)
+collapse (count) monthsobserved=one  nmos_bw50=mbw50 nmos_bw60=mbw60 (sum) tpearn thearn (mean) spouse partner numtype2 wpfinwgt (max) minorchildren minorbiochildren erace eeduc tceb oldest_age start_spartner last_spartner (min) durmom youngest_age,  by(SSUID PNUM year)
 
 gen anytype2= (numtype2 > 0)
 
@@ -80,7 +161,7 @@ gen partial_year= (monthsobserved < 12)
 
 * the key number is the percent breadwinning in the first year. (~25%)
 
-sum bw50 if dursinceb1_atint==1 
+sum bw50 if durmom==1 
 
 gen per_bw50_atbirth=100*`r(mean)'
 gen notbw50_atbirth=1-`r(mean)'
@@ -91,6 +172,3 @@ gen per_bw60_atbirth=100*`r(mean)'
 gen notbw60_atbirth=1-`r(mean)'
 
 save "$SIPP14keep/bwstatus.dta", replace
-
-
-
