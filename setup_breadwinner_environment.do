@@ -80,3 +80,11 @@ if (_rc) {
         `"you can do so by clicking this link: {stata "ssc install unique":auto-install unique}"'
     exit 199
 }
+
+// egenmore: https://ideas.repec.org/c/boc/bocode/s458420.html
+capture : which egenmore
+if (_rc) {
+    display as result in smcl `"Please install package {it:egenmore} from SSC in order to run these do-files;"' _newline ///
+        `"you can do so by clicking this link: {stata "ssc install egenmore":auto-install egenmore}"'
+    exit 199
+}
