@@ -108,9 +108,18 @@ clear
 // Keep only women
 	tab 	esex				// Shows all cases
 	unique idnum, 	by(esex)	// Number of individuals
-	keep 			if esex ==2 // Keep women
 	
 	// Creates a macro with the total number of women in the dataset.
+	egen	allwomen 	= nvals(idnum) if esex == 2
+	global 	allwomen_n 	= allwomen
+	di "$allwomen_n"
+
+	egen everman = min(esex) , by(idnum) // Identify if ever reported as a man (inconsistency).
+	unique idnum, by(everman)
+
+	keep if everman !=1 		// Keep women consistently identified
+	
+	// Creates a macro with the ADJUSTED total number of women in the dataset.
 	egen	women 	= nvals(idnum)
 	global 	women_n = women
 	di "$women_n"
