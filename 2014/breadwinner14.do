@@ -39,7 +39,7 @@
     log close
 
 ********************************************************************************
-* B1. HOUSEHOLD COMPOSITION
+* B1. DEMOGRAPHICS AND ANALYTIC SAMPLE
 ********************************************************************************
 * Execute a series of scripts to develop measures of household composition
 * This script was adapted from the supplementary materials for the journal article 
@@ -56,15 +56,15 @@
 	do "$SIPP2014_code/create_hhcomp.do"
 	log close
 	
+// Create a monthly file with earnings & demographic measures. Create sample.
+	log using "$logdir/measures_and_sample.log", replace
+	do "$SIPP2014_code/measures_and_sample.do"
+	log close
+	
 ********************************************************************************
 * B2. BREADWINNER INDICATORS
 ********************************************************************************
 *Execute breadwinner scripts
-
-// Create a monthly file with earnings and other information on individuals
-	log using "$logdir/extract_earnings.log", replace
-	do "$SIPP2014_code/extract_earnings.do"
-	log close
 
 // Create annual measures of breadwinning
 	log using "$logdir/annualize.log", replace
