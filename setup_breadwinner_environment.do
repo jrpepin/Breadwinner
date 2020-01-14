@@ -4,6 +4,9 @@
 * Kelly Raley and Joanna Pepin
 *-------------------------------------------------------------------------------
 
+* NOTE: This assumes that you have egenmore installed. If you do not have
+* egenmore installed ssc install the program.
+
 * The current directory is assumed to be the base project directory.
 **  cd "C:\Users\Joanna\Dropbox\Repositories\SIPP_Breadwinner"
 
@@ -43,7 +46,6 @@ else {
 
 
 // Checks that the setup file exists and runs it.
-quietly{
 capture confirm file "setup_`c(username)'.do"
 if _rc==0 {
     do setup_`c(username)'
@@ -58,7 +60,7 @@ if ("$logdir" == "") {
     display as error "logdir macro not set."
     exit
 }
-}
+
 ********************************************************************************
 * Check for package dependencies 
 ********************************************************************************
@@ -79,14 +81,6 @@ if (_rc) {
         `"you can do so by clicking this link: {stata "ssc install unique":auto-install unique}"'
     exit 199
 }
-
-// egenmore: https://ideas.repec.org/c/boc/bocode/s386401.html
-capture : which egenmore
-if (_rc) {
-    display as error in smcl `"Please install package {it:egenmore} from SSC in order to run these do-files;"' _newline ///
-        `"you can do so by clicking this link: {stata "ssc install egenmore":auto-install egenmore}"'
-	exit 199
-		}
 
 // ereplace: https://ideas.repec.org/c/boc/bocode/s458420.html
 capture : which ereplace
