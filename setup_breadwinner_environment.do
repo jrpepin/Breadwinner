@@ -81,10 +81,18 @@ if (_rc) {
     exit 199
 }
 
+
 // egenmore: https://ideas.repec.org/c/boc/bocode/s386401.html
 capture : which egenmore
 if (_rc) {
     display as error in smcl `"Please install package {it:egenmore} from SSC in order to run these do-files;"' _newline ///
         `"you can do so by clicking this link: {stata "ssc install egenmore":auto-install egenmore}"'
+
+// ereplace: https://ideas.repec.org/c/boc/bocode/s458420.html
+capture : which ereplace
+if (_rc) {
+    display as result in smcl `"Please install package {it:ereplace} from SSC in order to run these do-files;"' _newline ///
+        `"you can do so by clicking this link: {stata "ssc install ereplace":auto-install ereplace}"'
+
     exit 199
 }
