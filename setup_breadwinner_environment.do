@@ -12,8 +12,6 @@
 ********************************************************************************
 global bw_base_code "`c(pwd)'" 	/// Creating macro of project working directory
 
-global today `c(current_date)'	/// Creating a macro of today's date.
-
 * Project default is that we don't write over existing files.
 * Change this in your project setup file if you really want,
 * but for archiving replace is (generally) not allowed.
@@ -91,7 +89,7 @@ if (_rc) {
 // ereplace: https://ideas.repec.org/c/boc/bocode/s458420.html
 capture : which ereplace
 if (_rc) {
-    display as result in smcl `"Please install package {it:ereplace} from SSC in order to run these do-files;"' _newline ///
+    display as error in smcl `"Please install package {it:ereplace} from SSC in order to run these do-files;"' _newline ///
         `"you can do so by clicking this link: {stata "ssc install ereplace":auto-install ereplace}"'
 
     exit 199
