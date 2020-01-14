@@ -84,7 +84,7 @@ We use the following variables for this analysis.
 
 Sample
 --------------------------------------------------------------------------------
-We restricted the sample to <<dd_di: %6.0fc "$mothers_cores_minor">> women who first became mothers within the 25 years prior 
+We restricted the sample to <<dd_di: %6.0fc "$hhmoms_n">> women who first became mothers within the 25 years prior 
 to each interview and currently coreside with minor (age < 18) children.  
 We use the birth history measures (year of each birth) to identify the sample eligble to be included in our analysis.
 
@@ -104,7 +104,7 @@ We use the birth history measures (year of each birth) to identify the sample el
 |Mothers								| <<dd_di: %10.0fc "$mothers_n" >> |
 |No earnings data during reference year	| <<dd_di: %10.0fc "$minus_afterref" >> |
 |Motherhood < 25 yrs from interview year| <<dd_di: %10.0fc "$minus_oldmoms" >> |
-|Coreside with minor (age < 18) children| <<dd_di: %6.0fc "$mothers_cores_minor">> |
+|Coreside with minor (age < 18) children| <<dd_di: %6.0fc  "$hhmoms_n">> |
 
 Measures
 --------------------------------------------------------------------------------
