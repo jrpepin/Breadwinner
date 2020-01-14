@@ -1,15 +1,16 @@
 
 setup_kraley.do
-setup_kraley.do
-setup_kraley.do
+setup_joanna.do
 2008/gen_mslt_results.html
 2008/yearearn_describe_data.html
 gen_mslt_results.html
-gen_mslt_results.html
-gen_mslt_results.html
-setup_kraley.do
-gen_mslt_results.html
-setup_kraley.do
-gen_mslt_results.html
-setup_kraley.do
-setup_kraley.do
+
+*.dta
+*.dat
+*.gz
+*.Rhistory
+.Rproj.user
+*.Rproj
+DemographySupplement/
+
+>>>>>>> b437f5966d2a6e363ff66e5a6e2b15a036f500cf
