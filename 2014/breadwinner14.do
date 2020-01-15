@@ -56,7 +56,7 @@
 	do "$SIPP2014_code/create_hhcomp.do"
 	log close
 	
-// Create a monthly file with earnings & demographic measures. Create sample.
+// Create a monthly file with earnings & demographic measures. Create analytic sample.
 	log using "$logdir/measures_and_sample.log", replace
 	do "$SIPP2014_code/measures_and_sample.do"
 	log close
