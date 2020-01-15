@@ -92,7 +92,7 @@ sum bw50 if durmom==1
 gen per_bw50_atbirth	=100*`r(mean)'
 gen notbw50_atbirth		=1-`r(mean)'
 
-sum bw60 if dursinceb1_atint==1 
+sum bw60 if durmom==0
 
 gen per_bw60_atbirth=100*`r(mean)'
 gen notbw60_atbirth=1-`r(mean)'
