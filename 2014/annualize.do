@@ -61,13 +61,13 @@ use "$SIPP14keep/sipp14tpearn_all", clear
 ********************************************************************************
 // Collapse the data by year to create annual measures
 collapse 	(count) monthsobserved=one  nmos_bw50=mbw50 nmos_bw60=mbw60 		///
-			(sum) 	tpearn thearn 												///
-			(mean) 	spouse partner numtype2 wpfinwgt 							///
+			(sum) 	tpearn thearn 						///
+			(mean) 	spouse partner numtype2 wpfinwgt 			///
 			(max) 	minorchildren minorbiochildren erace eeduc tceb oldest_age 	///
-					start_spartner last_spartner 								///
-			(min) 	durmom youngest_age,  										///
+					start_spartner last_spartner 			///
+			(min) 	durmom youngest_age,  					///
 			by(SSUID PNUM year)
-
+			
 // Fix Type 2 people identifier
 	gen 	anytype2 = (numtype2 > 0)
 	drop 	numtype2

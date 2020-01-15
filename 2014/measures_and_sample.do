@@ -83,12 +83,11 @@ clear
 * Create the analytic sample
 ********************************************************************************
 * Keep observations of women in first 18 years since first birth. 
-	*?*?*? This seems like a different thing than first birth occuring within 
-	* the 25 years prior to each interview.
+* Durmom is wave specific. So a mother who was durmom=19 in wave 3 is still in the sample 
+* in waves 1 and 2.
 
-        * KR: because 25 is different from 18? 
-			** JP Wouldn't it be 22? 18 years + 4 to capture all 4 waves? 
-				** Or create a duration of motherhood variable
+* Note that we don't restrict the sample to mothers coresident with minor 
+* children (below) anymore. At least not for now, to allow robustness checks.
 
 * First, create an id variable per person
 	sort SSUID PNUM
@@ -138,24 +137,18 @@ clear
 // Drop births that happened after the reference period (in the year of the interview).
 // We don't have earnings data for the year of the interview and so it's not useful to have those births in the data (yet)
  	tab 	durmom, m
-	unique 	idnum 	if durmom <  0  // Mom during year of the interview.
+	unique 	idnum 	if durmom <  0  // became mom during year of the interview.
 	keep			if durmom >= 0
 	
-			/* *?*?* SHOULD WE BE DROPPING DURMOM <= 0, ==-1 ONLY , OR ==0 ONLY?
-			// What the old code looked like
-			replace tagid = . 			if durmom ==-1	 
-			drop 						if durmom ==0
-			*/
-
 	// Creates a macro with the total number of mothers left in the dataset.
 	egen	afterref = nvals(idnum)
 	global minus_afterref = afterref
 	di "$minus_afterref"
 	
-// Keep only if first birth occurred less than 25 years prior to reference period
+// Keep only if first birth occurred less than 19 years prior to reference period
  	tab 	durmom , m
-	unique 	idnum 	if durmom >25	// Mom after reference period	
-	drop 			if durmom >25	// Drop old mothers
+	unique 	idnum 	if durmom > 19	
+	drop 			if durmom > 19	// Drop "old" mothers
 
 	// Creates a macro with the total number of mothers left in the dataset.
 	egen	notold = nvals(idnum)
@@ -165,17 +158,21 @@ clear
 // Consider dropping respondents who have an error in birthyear
 * (year of first birth is > respondents year of birth+9)
 	*  drop if birthyear_error == 1
-	
+tab birthyear_error	
 // Clean up dataset
 	drop idnum all allwomen women mothers afterref notold
 	
 ********************************************************************************
 * Merge  measures of earning, demographic characteristics and household composition
 ********************************************************************************
-// Merge this data with household composition data.
+// Merge this data with household composition data. hhcomp.dta has one record for
+   * every SSUID PNUM panelmonth combination except for PNUMs living alone (_merge==1). 
+   * those not in the target sample are _merge==2
 	merge 1:1 SSUID PNUM panelmonth using "$tempdir/hhcomp.dta"
 
-// Fix variables for unmatched individuals who live alone (_merge==1)
+drop if _merge==2
+
+// Fix household compposition variables for unmatched individuals who live alone (_merge==1)
 * Relationship_pairs_bymonth has one record per person living with PNUM. 
 * We deleted records where "from_num==to_num." (compute_relationships.do)
 * So, individuals living alone are not in the data.
@@ -187,7 +184,7 @@ clear
 		replace `var'=0 if _merge==1 & missing(`var') 
 	}
 	
-	// Make household size = 1
+	// Make household size = 1 for those living alone
 	replace hhsize = 1 if _merge==1
 
 // 	Create a tempory unique person id variable
@@ -197,10 +194,10 @@ clear
 	format idnum %20.0f
 	drop id
 	
-	unique 	idnum 	if _merge!=2
+	unique 	idnum 
 
 * Now, let's make sure we have the same number of mothers as before merge.
-	egen newsample=nvals(idnum) if _merge!=2
+	egen newsample = nvals(idnum) 
 	global newsamplesize = newsample
 	di "$newsamplesize"
 
@@ -216,9 +213,8 @@ clear
 		exit
 		}
 		
-	keep if _merge!=2 
 	drop 	_merge
-
+/*
 ********************************************************************************
 * Restrict sample to women who live with their own minor children
 ********************************************************************************
@@ -233,5 +229,5 @@ clear
 	di "$hhmoms_n"
 	
 	drop idnum hhmoms
-
+*/
 save "$SIPP14keep/sipp14tpearn_all", replace

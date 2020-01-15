@@ -79,4 +79,8 @@
 ********************************************************************************
 * Create a file describing sample and initial "lifetime" estimates of breadwinning.
 ********************************************************************************
+
+    * NOTE: I don't think it is a great idea to put the results in the repository. The markdown file, yes,
+    * but maybe not the results. It becomes hard to tell if I'm replicating or copying.
+
 	dyndoc "$results/bw_analysis_2014.md", saving($results/bw_analysis_2014.html) replace
