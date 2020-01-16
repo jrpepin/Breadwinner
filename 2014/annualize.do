@@ -100,13 +100,13 @@ collapse 	(count) monthsobserved=one  nmos_bw50=mbw50 nmos_bw60=mbw60 		///
 * Describe percent breadwinning in the first year
 ********************************************************************************
 // The percent breadwinning (50% threhold) in the first year. (~25%)
-	sum bw50 if durmom==1 /**?*?* Should this be 0 OR 1 ? */
+	sum bw50 if durmom==0 /**?*?* Should this be 0 OR 1 ?. It should be 0 */
 
 	gen per_bw50_atbirth	=100*`r(mean)'
 	gen notbw50_atbirth		=1-`r(mean)'
 
 // The percent breadwinning (60% threhold) in the first year. (~17%)
-	sum bw60 if durmom==0 /**?*?* Should this be 0 OR 1 ? */
+	sum bw60 if durmom==0 /**?*?* Should this be 0 OR 1 ?. 0 only. Breadwinning in the year of the birth */
 
 	gen per_bw60_atbirth=100*`r(mean)'
 	gen notbw60_atbirth=1-`r(mean)'
