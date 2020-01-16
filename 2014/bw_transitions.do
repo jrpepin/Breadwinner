@@ -23,27 +23,39 @@ local j_vars "wave"
 
 reshape wide `change_variables', i(`i_vars') j(`j_vars')
 
-* create an indicator for whether individual is observed breadwinning for the first time (1) or
+// create a lagged measure of breadwinning
+gen bw50L1=.
+gen bw60L1=.
+    forvalues w=2/4 {
+       local v=`w'-1
+       gen bw50L`w'=bw50`v' 
+       gen bw60L`w'=bw60`v' 
+    }
+
+// create an indicator for whether individual is observed breadwinning for the first time (1) or
 * has been observed breadwinning in the past (2)
 
 gen trans_bw501=bw501
 gen trans_bw601=bw601
-gen bw50L1=.
-gen bw60L1=.
-    forvalues w=2/4 {
-       gen trans_bw50`w'=bw50`w'
-       gen trans_bw60`w'=bw60`w'
-       local v=`w'-1
-       gen bw50L`w'=bw50`v' // for multi-state lifetable analysis it is helpful to have a lagged measure of breadwinning
-       gen bw60L`w'=bw60`v' 
-       forvalues obs=1/`w' {
-          replace trans_bw50`w'=2 if trans_bw50`obs'==1
-          replace trans_bw60`w'=2 if trans_bw60`obs'==1
-       }
-    }
 
+forvalues w=2/4{
+   local v=`w'-1
+   gen trans_bw50`w'=0 if bw50`w'==0 & trans_bw50`v'==0
+   gen trans_bw60`w'=0 if bw60`w'==0 & trans_bw60`v'==0
+   replace trans_bw50`w'=1 if bw50`v'==0 & bw50`w'==1
+   replace trans_bw60`w'=1 if bw60`v'==0 & bw60`w'==1
 
+   // code those who previously transitioned into breadwinning
+
+   replace trans_bw50`w'=2 if inlist(trans_bw50`v', 1, 2)
+   replace trans_bw60`w'=2 if inlist(trans_bw60`v', 1, 2)
+}
+	
 reshape long `change_variables' trans_bw50 trans_bw60 bw50L bw60L , i(`i_vars') j(`j_vars')
+
+// keep only real observations 
+
+keep if !missing(monthsobserved)
 
 sum wpfinwgt
 
