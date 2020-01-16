@@ -84,8 +84,8 @@ We use the following variables for this analysis.
 
 Sample
 --------------------------------------------------------------------------------
-We restricted the sample to <<dd_di: %6.0fc "$hhmoms_n">> women who first became mothers within the 25 years prior 
-to each interview and currently coreside with minor (age < 18) children.  
+We restricted the sample to <<dd_di: %6.0fc "$minus_oldmoms">> women who first became mothers less than 19 years prior 
+to each interview.  
 We use the birth history measures (year of each birth) to identify the sample eligble to be included in our analysis.
 
 ## Sample Construction
@@ -103,8 +103,8 @@ We use the birth history measures (year of each birth) to identify the sample el
 |Women									| <<dd_di: %10.0fc "$women_n" >> |
 |Mothers								| <<dd_di: %10.0fc "$mothers_n" >> |
 |No earnings data during reference year	| <<dd_di: %10.0fc "$minus_afterref" >> |
-|Motherhood < 25 yrs from interview year| <<dd_di: %10.0fc "$minus_oldmoms" >> |
-|Coreside with minor (age < 18) children| <<dd_di: %6.0fc  "$hhmoms_n">> |
+|Motherhood < 19 yrs from interview year| <<dd_di: %10.0fc "$minus_oldmoms" >> |
+
 
 Measures
 --------------------------------------------------------------------------------
@@ -115,30 +115,72 @@ To create indicators of breadwinning we compare each mothers' annual earnings to
 measures. We consider mothers who earn more than 50% (or 60%) of the household earnings breadwinners.
 
 ~~~~
-<<dd_do: quietly>>
+<<dd_do>>
 use "$SIPP14keep/bw_transitions.dta", clear
 
-tab dursinceb1_atint trans_bw50, matcell(bw50uw)
+// calculate breadwinning status in the year of birth
 
-tab dursinceb1_atint trans_bw50 [aweight=wpfinwgt] if trans_bw50 !=2 , matcell(bw50w) nofreq row
+sum bw50 if durmom==0
+gen notbw50_ab=1-`r(mean)'
 
-* ugh, stata won't put percent in the matrix. Ok, here's calculating the proportions not
-* (not!) transitioning into breadwining by hand.
+sum bw60 if durmom==0 
+gen notbw60_ab=1-`r(mean)'
+
+* quick check -- numbers aren't the same. I've not figured out why yet.
+tab notbw50_ab notbw50_atbirth, m
+
+// calculate transitions into breadwinning status among those not previously observed breadwinning
+// must first drop wave 1 because we only know status, not transitions into breadwinning
+
+drop if wave==1
+
+// need to adjust durmom. Currently the transition variables describe transition
+// into breadwinning between the previous year and this one. For example:
+// 
+//  durmom   trans_bw
+//    4         0             
+//    5         0          <- this case transitions to breadwinning between year
+//    6         1              5 and year 6
+//
+// Lifetables usually would describe the risk of transition between this year and the next.
+// For example
+//  durmom   trans_bw
+//    4         0             
+//    5         1          <- this case transitions to breadwinning between year
+//    6         2              5 and year 6
+//
+// to make the file as expected subtract 1 from durmom
+
+replace durmom=durmom-1
+
+// drop the observation at birth because it is covered by the status at birth
+// above. the record durmom = 0 is the risk of transitioning between year 0 and 1
+
+drop if durmom < 0
+
+tab durmom trans_bw50, matcell(bw50uw)
+
+tab durmom trans_bw50 [aweight=wpfinwgt] if trans_bw50 !=2 , matcell(bw50w) nofreq row
+
+// Now, calculating the proportions not (not!) transitioning into breadwining by hand.
 
 forvalues d=1/17 {
    gen nbbw50_rate`d'=bw50w[`d',1]/(bw50w[`d',1]+bw50w[`d',2])
 }
 
-tab dursinceb1_atint trans_bw60, matcell(bw60uw)
+tab durmom trans_bw60, matcell(bw60uw)
 
-tab dursinceb1_atint trans_bw60 [aweight=wpfinwgt] if trans_bw60 !=2 , matcell(bw60w) nofreq row
+tab durmom trans_bw60 [aweight=wpfinwgt] if trans_bw60 !=2 , matcell(bw60w) nofreq row
 
 forvalues d=1/17 {
    gen nbbw60_rate`d'=bw60w[`d',1]/(bw60w[`d',1]+bw60w[`d',2])
 }
 
-sum notbw50_atbirth
+// calculating a cumulative risk of breadwinning by age 18 by multiplying rates
+* of entry at each duration of breadwinning
 
+
+* initializing cumulative measure at birth
 gen notbw50 = notbw50_atbirth
 gen notbw60 = notbw60_atbirth
 
@@ -153,13 +195,14 @@ forvalues d=1/17 {
 tab notbw50
 tab notbw60
 
+* make into nice percents
 local notbw50 = 100*notbw50
 local notbw60 = 100*notbw60
 
 local per_bw50_atbirth=per_bw50_atbirth
 local per_bw60_atbirth=per_bw60_atbirth
 
-* Take the inferse of the proportion not breadwinning to get the proportion breadwinning.
+* Take the inverse of the proportion not breadwinning to get the proportion breadwinning.
 * Multiply by 100 to get a percent.
 local bw50_bydur18=100*(1-notbw50)
 local bw60_bydur18=100*(1-notbw60)
