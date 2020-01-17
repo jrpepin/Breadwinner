@@ -10,13 +10,20 @@ di "$S_DATE"
 
 use "$SIPP14keep/bwstatus.dta", clear
 
-* start by making the file wide
+// set up to make the file wide
 
 gen wave=year-2012
 
+tab monthsobserved wave
+
+sort first_wave
+by first_wave: tab monthsobserved wave
+
+table durmom wave, contents(mean bw50) format(%3.2g)
+
 local change_variables "year monthsobserved nmos_bw50 nmos_bw60 tpearn thearn spouse partner wpfinwgt minorchildren minorbiochildren tceb oldest_age start_spartner last_spartner durmom youngest_age anytype2 hh_noearnings bw50 bw60 gain_partner lost_partner partial_year erace eeduc"
 
-* these should be constants: per_bw50_atbirth notbw50_atbirth pper_bw60_atbirth notbw50_atbirth
+* these should be constants: per_bw50_atbirth notbw50_atbirth pper_bw60_atbirth notbw50_atbirth first_wave
 
 local i_vars "SSUID PNUM"
 local j_vars "wave"
@@ -53,6 +60,8 @@ forvalues w=2/4{
 }
 	
 reshape long `change_variables' trans_bw50 trans_bw60 bw50L bw60L monthsobservedL, i(`i_vars') j(`j_vars')
+
+tab durmom bw50L
 
 // keep only observations with data in the current waves
 keep if !missing(monthsobserved)

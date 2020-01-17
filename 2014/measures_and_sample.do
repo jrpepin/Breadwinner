@@ -62,6 +62,10 @@ clear
 // Count number of earners in hh per month
     egen numearner = count(tpearn),	by(SSUID ERESIDENCEID swave monthcode)
 
+// Create an indicator of first wave of observation for this individual
+
+    egen first_wave = min(swave), by(SSUID PNUM)	
+	
 // Create an indictor of the birth year of the first child 
     gen yrfirstbirth = tcbyr_1 
 
