@@ -24,19 +24,20 @@ local j_vars "wave"
 reshape wide `change_variables', i(`i_vars') j(`j_vars')
 
 // create a lagged measure of breadwinning
-gen bw50L1=.
-gen bw60L1=.
+gen bw50L1=. // in wave 1 we have no measure of breadwinning in previous wave
+gen bw60L1=. 
     forvalues w=2/4 {
        local v=`w'-1
        gen bw50L`w'=bw50`v' 
        gen bw60L`w'=bw60`v' 
+	   gen monthsobservedL`w'=monthsobserved`v'
     }
 
 // create an indicator for whether individual is observed breadwinning for the first time (1) or
 * has been observed breadwinning in the past (2)
 
-gen trans_bw501=bw501
-gen trans_bw601=bw601
+gen trans_bw501=0 if bw601==0 // not really measuring transition here 
+gen trans_bw601=0 if bw601==0 // but calling it trans to make the loop below to work
 
 forvalues w=2/4{
    local v=`w'-1
@@ -51,15 +52,13 @@ forvalues w=2/4{
    replace trans_bw60`w'=2 if inlist(trans_bw60`v', 1, 2)
 }
 	
-reshape long `change_variables' trans_bw50 trans_bw60 bw50L bw60L , i(`i_vars') j(`j_vars')
+reshape long `change_variables' trans_bw50 trans_bw60 bw50L bw60L monthsobservedL, i(`i_vars') j(`j_vars')
 
-// keep only real observations 
-
+// keep only observations with data in the current waves
 keep if !missing(monthsobserved)
 
-sum wpfinwgt
-
-gen weighted=wpfinwgt/`r(mean)'
+// and the previous wave, the only cases where we know about a *transition*
+keep if !missing(monthsobservedL)
 
 save "$SIPP14keep/bw_transitions.dta", replace
 
