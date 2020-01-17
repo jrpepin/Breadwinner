@@ -28,18 +28,6 @@ use "$SIPP14keep/sipp14tpearn_all", clear
 * NOTE: This isn't our primary measure.
    gen mbw50=1 if tpearn > .5*thearn & !missing(tpearn) & !missing(thearn)	// 50% threshold
    gen mbw60=1 if tpearn > .6*thearn & !missing(tpearn) & !missing(thearn)	// 60% threshold
-
-/*
-	// Create indicators of whether the household experienced an increase or decrease in number of earners
-	* These variables indicate whether an earner move out or moved in OR whether there was a change 
-	* in the earnings status of anyone in the household.
-   
-		gen start_earners	=numearner 	if monthcode==startmonth
-		gen last_earners 	=numearner 	if monthcode==lastmonth
-	
-	* Mismeasurement of timing of changes in household composition may distort our measurement of breadwinning. 
-	* So, instead, let's use partnership transitions
-*/
    
 // Create indicators of transitions into marriage/cohabitation or out of marriage/cohabitation
 	replace spouse	=1 	if spouse 	> 1 // one case has 2 spouses
@@ -91,6 +79,8 @@ collapse 	(count) monthsobserved=one  nmos_bw50=mbw50 nmos_bw60=mbw60 		///
 	gen 	bw50= (tpearn > .5*thearn) 	if !missing(tpearn) 		& hh_noearnings !=1
 	replace bw50=0 						if missing(tpearn) 			& !missing(thearn)
 		/* *?*?* WE DON'T HAVE ANY MISSING TPEARN | THEARN. IS THAT EXPECTED? */
+		/* yes. We are now using allocated data. The SIPP 2014 doesn't have codes */
+		/* for whether the summary measure includes allocated data */
 
 	// 60% breadwinning threshold
 	gen 	bw60= (tpearn > .6*thearn) 	if !missing(tpearn) 		& hh_noearnings !=1
