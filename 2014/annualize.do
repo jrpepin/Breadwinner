@@ -53,7 +53,7 @@ collapse 	(count) monthsobserved=one  nmos_bw50=mbw50 nmos_bw60=mbw60 		///
 			(mean) 	spouse partner numtype2 wpfinwgt 			///
 			(max) 	minorchildren minorbiochildren erace eeduc tceb oldest_age 	///
 					start_spartner last_spartner 			///
-			(min) 	durmom youngest_age,  					///
+			(min) 	durmom youngest_age first_wave,		///
 			by(SSUID PNUM year)
 			
 // Fix Type 2 people identifier
@@ -100,5 +100,5 @@ collapse 	(count) monthsobserved=one  nmos_bw50=mbw50 nmos_bw60=mbw60 		///
 
 	gen per_bw60_atbirth=100*`r(mean)'
 	gen notbw60_atbirth=1-`r(mean)'
-
+	
 save "$SIPP14keep/bwstatus.dta", replace

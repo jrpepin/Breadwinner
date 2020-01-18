@@ -14,10 +14,7 @@ use "$SIPP14keep/bwstatus.dta", clear
 
 gen wave=year-2012
 
-tab monthsobserved wave
-
-sort first_wave
-by first_wave: tab monthsobserved wave
+tab first_wave wave 
 
 table durmom wave, contents(mean bw50) format(%3.2g)
 
@@ -43,31 +40,39 @@ gen bw60L1=.
 // create an indicator for whether individual is observed breadwinning for the first time (1) or
 * has been observed breadwinning in the past (2)
 
-gen trans_bw501=0 if bw601==0 // not really measuring transition here 
-gen trans_bw601=0 if bw601==0 // but calling it trans to make the loop below to work
-
+gen nprevbw50=0
+gen nprevbw60=0
 forvalues w=2/4{
    local v=`w'-1
-   gen trans_bw50`w'=0 if bw50`w'==0 & trans_bw50`v'==0
-   gen trans_bw60`w'=0 if bw60`w'==0 & trans_bw60`v'==0
-   replace trans_bw50`w'=1 if bw50`v'==0 & bw50`w'==1
-   replace trans_bw60`w'=1 if bw60`v'==0 & bw60`w'==1
+   replace nprevbw50=nprevbw50+1 if bw50`v'==1 
+   replace nprevbw60=nprevbw60+1 if bw60`v'==1  
+ 
+   gen trans_bw50`w'=0 if bw50`w'==0 & nprevbw50==0
+   gen trans_bw60`w'=0 if bw60`w'==0 & nprevbw60==0
+   replace trans_bw50`w'=1 if bw50`w'==1 & nprevbw50==0
+   replace trans_bw60`w'=1 if bw60`w'==1 & nprevbw60==0
 
    // code those who previously transitioned into breadwinning
 
-   replace trans_bw50`w'=2 if inlist(trans_bw50`v', 1, 2)
-   replace trans_bw60`w'=2 if inlist(trans_bw60`v', 1, 2)
+   replace trans_bw50`w'=2 if nprevbw50 > 0
+   replace trans_bw60`w'=2 if nprevbw60 > 0
 }
+
+drop nprevbw50 nprevbw60
 	
 reshape long `change_variables' trans_bw50 trans_bw60 bw50L bw60L monthsobservedL, i(`i_vars') j(`j_vars')
 
-tab durmom bw50L
+gen transeligible`w'=1 if !missing(monthsobserved) & !missing(monthsobservedL) // for troubleshooting, delete 
+
+tab trans_bw50 transeligible, m
 
 // keep only observations with data in the current waves
 keep if !missing(monthsobserved)
 
 // and the previous wave, the only cases where we know about a *transition*
 keep if !missing(monthsobservedL)
+
+tab trans_bw50 transeligible, m
 
 save "$SIPP14keep/bw_transitions.dta", replace
 
