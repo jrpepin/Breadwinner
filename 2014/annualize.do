@@ -76,15 +76,17 @@ collapse 	(count) monthsobserved=one  nmos_bw50=mbw50 nmos_bw60=mbw60 		///
 	gen hh_noearnings= (thearn <= 0)
 
 	// 50% breadwinning threshold
+	* Note that this measure was missing for no (or negative) earnings households, but that is now changed
 	gen 	bw50= (tpearn > .5*thearn) 	if !missing(tpearn) 		& hh_noearnings !=1
-	replace bw50=0 						if missing(tpearn) 			& !missing(thearn)
+	replace bw50=0 				if hh_noearnings==1
 		/* *?*?* WE DON'T HAVE ANY MISSING TPEARN | THEARN. IS THAT EXPECTED? */
 		/* yes. We are now using allocated data. The SIPP 2014 doesn't have codes */
 		/* for whether the summary measure includes allocated data */
 
+
 	// 60% breadwinning threshold
 	gen 	bw60= (tpearn > .6*thearn) 	if !missing(tpearn) 		& hh_noearnings !=1
-	replace bw60=0 						if missing(tpearn) 			& !missing(thearn)
+	replace bw60=0 				if hh_noearnings==1
 
 ********************************************************************************
 * Describe percent breadwinning in the first year

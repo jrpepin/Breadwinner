@@ -228,23 +228,11 @@ breadwinning in earlier waves.
 ~~~~
 <<dd_do: quietly>>
 
-use "$SIPP14keep/bw_transitions.dta", clear
-
 drop if wave < 3
 
 // need to adjust durmom (see above for full explanation)
 
-replace durmom=durmom-1
-
-// drop the observation at birth because it is covered by the status at birth
-// above. After the above adjustment, the record durmom = 0 is the risk of 
-// transitioning between year 0 and 1
-
-drop if durmom < 0
-
-tab durmom trans_bw50, matcell(bw50uw) // checking n's
-
-tab durmom trans_bw60, matcell(bw60uw) // checking n's 
+drop if durmom < 1 // the estimate at durmom=0 above is unbiased
 
 <</dd_do>>
 ~~~~
@@ -257,18 +245,26 @@ observed breadwinning.
 
 tab durmom trans_bw50, matcell(bw50uw) // checking n's
 
-tab durmom trans_bw60, matcell(bw60uw) // checking n's 
-
 tab durmom trans_bw50 [aweight=wpfinwgt] if trans_bw50 !=2 , matcell(bw50w) nofreq row
 tab durmom trans_bw60 [aweight=wpfinwgt] if trans_bw60 !=2 , matcell(bw60w) nofreq row
 
 <</dd_do>>
 ~~~~
 
-Note, transition rate from 0-1 is based on a very small size and would include 
-only mothers of first children born in wave 1 or 2. (I think). I'm not sure why 
-these cases have such high rates of breadwinning. Duration 1-2 is 
-also skewed upward. There's some structural bias here that I need to understand
-better.
+We see that on average the transition rates are a slight bit lower when we restrict to 
+transitions from wave 2-3 and 3-4. Does it shrink further if we restrict to just
+transitions from wave 3-4?
+
+~~~~
+<<dd_do>>
+
+drop if wave < 4
+
+tab durmom trans_bw50, matcell(bw50uw) // checking n's
+
+tab durmom trans_bw50 [aweight=wpfinwgt] if trans_bw50 !=2 , matcell(bw50w) nofreq row
+tab durmom trans_bw60 [aweight=wpfinwgt] if trans_bw60 !=2 , matcell(bw60w) nofreq row
 
 
+<</dd_do>>
+~~~~
