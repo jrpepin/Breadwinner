@@ -12,13 +12,11 @@ use "$SIPP14keep/bwstatus.dta", clear
 
 // set up to make the file wide
 
-gen wave=year-2012
-
 tab first_wave wave 
 
 table durmom wave, contents(mean bw50) format(%3.2g)
 
-local change_variables "year monthsobserved nmos_bw50 nmos_bw60 tpearn thearn spouse partner wpfinwgt minorchildren minorbiochildren tceb oldest_age start_spartner last_spartner durmom youngest_age anytype2 hh_noearnings bw50 bw60 gain_partner lost_partner partial_year erace eeduc"
+local change_variables "year monthsobserved nmos_bw50 nmos_bw60 tpearn thearn spouse partner wpfinwgt minorchildren minorbiochildren tceb oldest_age start_spartner last_spartner durmom youngest_age anytype2 hh_noearnings bw50 bw60 gain_partner lost_partner partial_year raceth educ"
 
 * these should be constants: per_bw50_atbirth notbw50_atbirth pper_bw60_atbirth notbw50_atbirth first_wave
 
@@ -35,6 +33,7 @@ gen bw60L1=.
        gen bw50L`w'=bw50`v' 
        gen bw60L`w'=bw60`v' 
 	   gen monthsobservedL`w'=monthsobserved`v'
+	   gen minorbiochildrenL`w'=minorbiochildren`v'
     }
 
 // create an indicator for whether individual is observed breadwinning for the first time (1) or
@@ -60,7 +59,7 @@ forvalues w=2/4{
 
 drop nprevbw50 nprevbw60
 	
-reshape long `change_variables' trans_bw50 trans_bw60 bw50L bw60L monthsobservedL, i(`i_vars') j(`j_vars')
+reshape long `change_variables' trans_bw50 trans_bw60 bw50L bw60L monthsobservedL minorbiochildrenL, i(`i_vars') j(`j_vars')
 
 gen transeligible`w'=1 if !missing(monthsobserved) & !missing(monthsobservedL) // for troubleshooting, delete 
 

@@ -5,6 +5,7 @@
 *-------------------------------------------------------------------------------
 di "$S_DATE"
 
+
 ********************************************************************************
 * DESCRIPTION
 ********************************************************************************
@@ -51,7 +52,7 @@ use "$SIPP14keep/sipp14tpearn_all", clear
 collapse 	(count) monthsobserved=one  nmos_bw50=mbw50 nmos_bw60=mbw60 		///
 			(sum) 	tpearn thearn 						///
 			(mean) 	spouse partner numtype2 wpfinwgt 			///
-			(max) 	minorchildren minorbiochildren erace eeduc tceb oldest_age 	///
+			(max) 	minorchildren minorbiochildren raceth educ tceb oldest_age 	///
 					start_spartner last_spartner 			///
 			(min) 	durmom youngest_age first_wave,		///
 			by(SSUID PNUM year)
@@ -102,5 +103,7 @@ collapse 	(count) monthsobserved=one  nmos_bw50=mbw50 nmos_bw60=mbw60 		///
 
 	gen per_bw60_atbirth=100*`r(mean)'
 	gen notbw60_atbirth=1-`r(mean)'
+	
+gen wave=year-2012
 	
 save "$SIPP14keep/bwstatus.dta", replace
