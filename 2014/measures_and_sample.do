@@ -24,8 +24,9 @@ set maxvar 5300
       keep 	swave 		monthcode		ssuid 		pnum 						/// /* TECHNICAL   */	
 			shhadid 	eresidenceid 	wpfinwgt								///
 			tpearn 		apearn 			tjb?_msum 	ajb?_msum 					/// /* FINANCIAL   */
-			erace 		esex 			tage 		eeduc 		tceb 	tcbyr_* 	/* DEMOGRAPHIC */
-      
+			erace 		esex 			tage 		eeduc 		tceb 	tcbyr_* ///	/* DEMOGRAPHIC */
+            eorigin
+			
 	  gen year = 2012+`w'
       save "$tempdir/sipp14tpearn`w'", replace
    }
@@ -82,7 +83,24 @@ clear
    gen 		mybirthyear		= year-tage
    gen 		birthyear_error	= 1 			if mybirthyear+9  > yrfirstbirth & !missing(yrfirstbirth)  // too young
    replace 	birthyear_error	= 1 			if mybirthyear+50 < yrfirstbirth & !missing(yrfirstbirth)  // too old
-   
+
+// Create a race/ethnicity variable and a recoded education variable
+
+gen raceth=erace
+replace raceth=5 if eorigin==1
+
+#delimit ;
+
+label define raceth    1 "non-Hispaanic White"
+                       2 "non-Hispanic Black"
+                       3 "non-Hispanic Asian"
+                       4 "non-Hispanic Other"
+                       5 "Hispanic";
+		
+# delimit cr
+
+recode eeduc (31/38=1)(39=2)(40/42=3)(43/46=4), gen(educ)
+
 ********************************************************************************
 * Create the analytic sample
 ********************************************************************************
