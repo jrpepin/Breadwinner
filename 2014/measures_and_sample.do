@@ -101,6 +101,18 @@ label define raceth    1 "non-Hispaanic White"
 
 recode eeduc (31/38=1)(39=2)(40/42=3)(43/46=4), gen(educ)
 
+#delimit ;
+
+label define ed    1 "less than hs"
+                       2 "high school"
+                       3 "some college"
+                       4 "college grad";
+		
+# delimit cr
+
+label values raceth raceth
+label values educ ed
+
 ********************************************************************************
 * Create the analytic sample
 ********************************************************************************
