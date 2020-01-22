@@ -84,3 +84,23 @@
     * but maybe not the results. It becomes hard to tell if I'm replicating or copying.
 
 	dyndoc "$results/bw_analysis_2014.md", saving($results/bw_analysis_2014.html) replace
+
+********************************************************************************
+* Multistate lifetable analysis
+********************************************************************************
+
+    // file needs to be set up a little differently for lxpct2
+	log using "$logdir/msltprep.log", replace
+	do "$SIPP2014_code/msltprep.do"
+	log close
+
+	// create small data files with transition rates pXX 
+	log using "$logdir/create_mstransitions14.log", replace
+	do "$SIPP2014_code/create_mstransitions14.do"
+	log close
+
+	// generate a matrix with estimates of expected number of years
+	// in each state from "birth"
+	log using "$logdir/.log", replace
+	do "$results/gen_mslt_results.do"
+	log close	
