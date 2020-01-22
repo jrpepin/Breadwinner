@@ -4,6 +4,8 @@
 
 use "$SIPP14keep/bwstatus.dta", clear
 
+drop if durmom > 18 
+
 // set up to make the file wide
 
 local change_variables "year monthsobserved nmos_bw50 nmos_bw60 tpearn thearn spouse partner wpfinwgt minorchildren minorbiochildren tceb oldest_age start_spartner last_spartner durmom youngest_age anytype2 hh_noearnings bw50 bw60 gain_partner lost_partner partial_year raceth educ"
@@ -31,11 +33,13 @@ reshape long `change_variables' trans_bw50 trans_bw60 bw50L bw60L monthsobserved
 //* delete observations created by reshape
 keep if !missing(monthsobserved)
 
-* add 1 to make the "p" variables start with "p11" not "p00"
-gen mbw50=bw50+1
-gen mbw60=bw60+1
-gen mbw50L=bw50L+1
-gen mbw60L=bw60L+1
+* add 2 . First add 1 to make the "p" variables start with "p11" not "p00"
+* then add another 1 to make the non-mother state the first one because the lifetable
+* program appears to assume that everyone starts in state 1.
+gen mbw50=bw50+2
+gen mbw60=bw60+2
+gen mbw50L=bw50L+2
+gen mbw60L=bw60L+2
 
 tab bw50L, m
 
@@ -44,34 +48,39 @@ tab mbw50L, m
 local nowvars "mbw50 mbw60"
 
 foreach var in `nowvars'{
-    replace `var'=4 if missing(`var') 
-	replace `var'=3 if minorbiochildren==0 // out of scope
-	replace `var'=3 if durmom >= 18                          // out of scope 
+	replace `var'=1 if minorbiochildren==0 // not mom
 }
 
 local thenvars  "mbw50L mbw60L"
 
 foreach var in `thenvars'{
-    replace `var'=4 if missing(`var') 
-	replace `var'=3 if minorbiochildrenL==0 // out of scope
-	replace `var'=3 if durmom==0 // out of scope
-    replace `var'=3 if durmom >= 19  
+	replace `var'=1 if minorbiochildrenL==0 // not mom
+	replace `var'=1 if durmom==0 & year > 2013 // forcing not mom in year prior to first birth
 }
 
 #delimit ;
 
 label define bwstat 0 "non breadwinning mother"
-                                        1 "non-breadwinning mother"
-                                        2 "breadwinning mother"
-                                        3 "not living with children or first child > 18"
-                                        4 "missing";
-		
+                                        1 "not living with children or first child > 18"
+                                        2 "non-breadwinning mother"
+                                        3 "breadwinning mother" ; 		
 # delimit cr
 
 label values mbw50 bwstat
 label values mbw60 bwstat
 label values mbw50L bwstat
 label values mbw60L bwstat
+
+// we could have missing as a state in the lifetable if we had cases
+// missing on mbw50, but if we don't then it doesn't help to include
+// observations missing on the lagged variable. Mising is all due to non
+// interview. Little obvious to be gained by including.
+drop if missing(mbw50L)
+
+* scale the weight to have an average of 1
+sum wpfinwgt
+gen weight=wpfinwgt/`r(mean)'
+sum weight
 
 save "$tempdir/msltprep14.dta", $replace
 
