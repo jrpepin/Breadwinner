@@ -104,7 +104,7 @@ We use the birth history measures (year of each birth) to identify the sample el
 |Mothers								| <<dd_di: %10.0fc "$mothers_n" >> |
 |No earnings data during reference year	| <<dd_di: %10.0fc "$minus_afterref" >> |
 |Motherhood < 19 yrs from interview year| <<dd_di: %10.0fc "$minus_oldmoms" >> |
-
+* JP -- still need to update this with all of the sample restrictions.
 
 Measures
 --------------------------------------------------------------------------------

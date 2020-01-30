@@ -84,6 +84,11 @@
     * but maybe not the results. It becomes hard to tell if I'm replicating or copying.
 	
 	* JP: How do you feel about it if we save the file with the date/time?
+		* Problem with this approach, I don't know how to automatically delete the earlier outputs.
+	
+// Remove old output
+ *tmp*.dta
+	shell erase $results/bw_analysis_2014*.html
 
 // generate local macros for the current date and time
 	local c_date = c(current_date)
