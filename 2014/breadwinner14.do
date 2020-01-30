@@ -83,7 +83,9 @@
     * NOTE: I don't think it is a great idea to put the results in the repository. The markdown file, yes,
     * but maybe not the results. It becomes hard to tell if I'm replicating or copying.
 	
-	* JP: How do you feel about it if we save the file with the date/time?
+	* JP: Where do you want to save the file? Reason not saving in main repository folder is GitHub will
+		* interpret this repository as an html repo instead of Stata.
+		* How do you feel about it if we save the file with the date/time?
 		* Problem with this approach, I don't know how to automatically delete the earlier outputs.
 	
 // Remove old output
@@ -104,7 +106,7 @@
 * Multistate lifetable analysis
 ********************************************************************************
 
-// file needs to be set up a little differently for lxpct2 (JP: What is lxpct2?)
+// Set up data for lxpct2 (JP: What is lxpct2?)
 	log using "$logdir/msltprep.log", replace
 	do "$SIPP2014_code/msltprep.do"
 	log close
