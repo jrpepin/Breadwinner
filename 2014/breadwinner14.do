@@ -104,7 +104,7 @@
 * Multistate lifetable analysis
 ********************************************************************************
 
-    // file needs to be set up a little differently for lxpct2
+// file needs to be set up a little differently for lxpct2 (JP: What is lxpct2?)
 	log using "$logdir/msltprep.log", replace
 	do "$SIPP2014_code/msltprep.do"
 	log close
