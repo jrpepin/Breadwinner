@@ -82,8 +82,18 @@
 
     * NOTE: I don't think it is a great idea to put the results in the repository. The markdown file, yes,
     * but maybe not the results. It becomes hard to tell if I'm replicating or copying.
+	
+	* JP: How do you feel about it if we save the file with the date/time?
 
-	dyndoc "$results/bw_analysis_2014.md", saving($results/bw_analysis_2014.html) replace
+// generate local macros for the current date and time
+	local c_date = c(current_date)
+	local c_time = c(current_time)
+	local c_time_date = "`c_date'"+"_" +"`c_time'" 				// concatenate the two string variables
+	local time_string = subinstr("`c_time_date'", ":", "_", .) 	// clean up our string
+	local time_string = subinstr("`time_string'", " ", "_", .) 	// clean up our string
+	di "`time_string'"
+	
+	dyndoc "$results/bw_analysis_2014.md", saving($results/bw_analysis_2014__`time_string'.html) replace
 
 ********************************************************************************
 * Multistate lifetable analysis

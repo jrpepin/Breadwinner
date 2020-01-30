@@ -190,7 +190,7 @@ label values educ ed
 	di "$minus_oldmoms"
 
 // Consider dropping respondents who have an error in birthyear
-* (year of first birth is > respondents year of birth+9)
+	* (year of first birth is > respondents year of birth+9)
 	*  drop if birthyear_error == 1
 tab birthyear_error	
 // Clean up dataset
@@ -200,16 +200,16 @@ tab birthyear_error
 * Merge  measures of earning, demographic characteristics and household composition
 ********************************************************************************
 // Merge this data with household composition data. hhcomp.dta has one record for
-   * every SSUID PNUM panelmonth combination except for PNUMs living alone (_merge==1). 
-   * those not in the target sample are _merge==2
+	* every SSUID PNUM panelmonth combination except for PNUMs living alone (_merge==1). 
+	* those not in the target sample are _merge==2
 	merge 1:1 SSUID PNUM panelmonth using "$tempdir/hhcomp.dta"
 
 drop if _merge==2
 
 // Fix household compposition variables for unmatched individuals who live alone (_merge==1)
-* Relationship_pairs_bymonth has one record per person living with PNUM. 
-* We deleted records where "from_num==to_num." (compute_relationships.do)
-* So, individuals living alone are not in the data.
+	* Relationship_pairs_bymonth has one record per person living with PNUM. 
+	* We deleted records where "from_num==to_num." (compute_relationships.do)
+	* So, individuals living alone are not in the data.
 
 	// Make relationship variables equal to zero
 	local hhcompvars "minorchildren minorbiochildren spouse partner numtype2"
@@ -248,20 +248,22 @@ drop if _merge==2
 		}
 		
 	drop 	_merge
-/*
+
 ********************************************************************************
 * Restrict sample to women who live with their own minor children
 ********************************************************************************
+*?*?* This section was commented out. Did I (JP) do that or did you (KR) do that?
+
 // Keep mothers who reside with their biological children
-	fre minorbiochildren // if tagid==1 (CHANGE TO NEW WAY TO SEE UNIQUE RECORDS)
+	fre minorbiochildren
 	unique 	idnum 	if minorbiochildren >= 1  	// 1 or more minor children in household
 	keep 			if minorbiochildren >= 1	// Keep only moms with kids in household
 	
 	// Creates a macro with the total number of mothers in the dataset.
-	egen	hhmoms = nvals(idnum)
-	global hhmoms_n = hhmoms
+	egen	hhmoms 		= nvals(idnum)
+	global 	hhmoms_n 	= hhmoms
 	di "$hhmoms_n"
 	
 	drop idnum hhmoms
-*/
+
 save "$SIPP14keep/sipp14tpearn_all", replace

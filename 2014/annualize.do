@@ -50,11 +50,11 @@ use "$SIPP14keep/sipp14tpearn_all", clear
 ********************************************************************************
 // Collapse the data by year to create annual measures
 collapse 	(count) monthsobserved=one  nmos_bw50=mbw50 nmos_bw60=mbw60 		///
-			(sum) 	tpearn thearn 						///
-			(mean) 	spouse partner numtype2 wpfinwgt 			///
+			(sum) 	tpearn thearn 												///
+			(mean) 	spouse partner numtype2 wpfinwgt 							///
 			(max) 	minorchildren minorbiochildren raceth educ tceb oldest_age 	///
-					start_spartner last_spartner 			///
-			(min) 	durmom youngest_age first_wave,		///
+					start_spartner last_spartner 								///
+			(min) 	durmom youngest_age first_wave,								///
 			by(SSUID PNUM year)
 			
 // Fix Type 2 people identifier
@@ -78,31 +78,31 @@ collapse 	(count) monthsobserved=one  nmos_bw50=mbw50 nmos_bw60=mbw60 		///
 
 	// 50% breadwinning threshold
 	* Note that this measure was missing for no (or negative) earnings households, but that is now changed
-	gen 	bw50= (tpearn > .5*thearn) 	if !missing(tpearn) 		& hh_noearnings !=1
-	replace bw50=0 				if hh_noearnings==1
+	gen 	bw50= (tpearn > .5*thearn) 	if hh_noearnings !=1 & !missing(tpearn) 
+	replace bw50= 0 					if hh_noearnings==1
 		/* *?*?* WE DON'T HAVE ANY MISSING TPEARN | THEARN. IS THAT EXPECTED? */
 		/* yes. We are now using allocated data. The SIPP 2014 doesn't have codes */
 		/* for whether the summary measure includes allocated data */
 
 
 	// 60% breadwinning threshold
-	gen 	bw60= (tpearn > .6*thearn) 	if !missing(tpearn) 		& hh_noearnings !=1
-	replace bw60=0 				if hh_noearnings==1
+	gen 	bw60= (tpearn > .6*thearn) 	if hh_noearnings !=1 & !missing(tpearn)
+	replace bw60= 0 					if hh_noearnings==1
 
 ********************************************************************************
 * Describe percent breadwinning in the first year
 ********************************************************************************
 // The percent breadwinning (50% threhold) in the first year. (~25%)
-	sum bw50 if durmom==0 /**?*?* Should this be 0 OR 1 ?. It should be 0 */
+	sum bw50 if durmom		==0 // Breadwinning in the year of the birth
 
 	gen per_bw50_atbirth	=100*`r(mean)'
 	gen notbw50_atbirth		=1-`r(mean)'
 
 // The percent breadwinning (60% threhold) in the first year. (~17%)
-	sum bw60 if durmom==0 /**?*?* Should this be 0 OR 1 ?. 0 only. Breadwinning in the year of the birth */
+	sum bw60 if durmom		==0 // Breadwinning in the year of the birth
 
-	gen per_bw60_atbirth=100*`r(mean)'
-	gen notbw60_atbirth=1-`r(mean)'
+	gen per_bw60_atbirth	=100*`r(mean)'
+	gen notbw60_atbirth		=1-`r(mean)'
 	
 gen wave=year-2012
 	
