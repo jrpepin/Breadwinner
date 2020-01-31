@@ -88,10 +88,6 @@
 		* How do you feel about it if we save the file with the date/time?
 		* Problem with this approach, I don't know how to automatically delete the earlier outputs.
 	
-// Remove old output
- *tmp*.dta
-	shell erase $results/bw_analysis_2014*.html
-
 // generate local macros for the current date and time
 	local c_date = c(current_date)
 	local c_time = c(current_time)
@@ -111,13 +107,13 @@
 	do "$SIPP2014_code/msltprep.do"
 	log close
 
-	// create small data files with transition rates pXX 
+// Create small data files with transition rates pXX 
 	log using "$logdir/create_mstransitions14.log", replace
 	do "$SIPP2014_code/create_mstransitions14.do"
 	log close
 
-	// generate a matrix with estimates of expected number of years
-	// in each state from "birth"
+// Generate a matrix with estimates of expected number of years
+// in each state from "birth"
 	log using "$logdir/.log", replace
 	do "$results/gen_mslt_results.do"
 	log close	

@@ -90,3 +90,13 @@ if (_rc) {
 
     exit 199
 }
+
+
+// lxpct_2: https://ideas.repec.org/c/boc/bocode/s453001.html
+capture : which lxpct_2
+if (_rc) {
+    display as error in smcl `"Please install package {it:lxpct_2} from SSC in order to run these do-files;"' _newline ///
+        `"you can do so by clicking this link: {stata "ssc install lxpct_2":auto-install lxpct_2}"'
+
+    exit 199
+}
