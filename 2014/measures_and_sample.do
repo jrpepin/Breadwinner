@@ -257,10 +257,10 @@ drop if _merge==2
 // Keep mothers who reside with their biological children
 	fre minorbiochildren
 	unique 	idnum 	if minorbiochildren >= 1  	// 1 or more minor children in household
-	keep 			if minorbiochildren >= 1	// Keep only moms with kids in household
+*	keep 			if minorbiochildren >= 1	// Keep only moms with kids in household
 	
 	// Creates a macro with the total number of mothers in the dataset.
-	egen	hhmoms 		= nvals(idnum)
+	egen	hhmoms 		= nvals(idnum) if minorbiochildren >= 1
 	global 	hhmoms_n 	= hhmoms
 	di "$hhmoms_n"
 	

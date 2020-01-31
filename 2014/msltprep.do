@@ -82,12 +82,12 @@ tab mbw50L, m
 // Set state indicators to 0 if not a mom
 local nowvars "mbw50 mbw60"
 foreach var in `nowvars'{
-	replace `var'=1 if minorbiochildren==0 		// not mom -- JP: Shouldn't be any changes; already dropped in measures_and_sample.do
+	replace `var'=1 if minorbiochildren==0 		// not residential mom -- different than in measures_and_sample.do
 }
 
 local thenvars  "mbw50L mbw60L"
 foreach var in `thenvars'{
-	replace `var'=1 if minorbiochildrenL==0 	// not mom -- JP: Shouldn't be any changes; already dropped in measures_and_sample.do
+	replace `var'=1 if minorbiochildrenL==0 	// not residential mom -- different than in measures_and_sample.do
 	replace `var'=1 if durmom==0 & year > 2013 	// forcing not mom in year prior to first birth
 }
 
