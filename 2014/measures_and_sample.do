@@ -252,11 +252,12 @@ drop if _merge==2
 ********************************************************************************
 * Restrict sample to women who live with their own minor children
 ********************************************************************************
-*?*?* This section was commented out. Did I (JP) do that or did you (KR) do that?
 
-// Keep mothers who reside with their biological children
+// Identify mothers who reside with their biological children
 	fre minorbiochildren
 	unique 	idnum 	if minorbiochildren >= 1  	// 1 or more minor children in household
+*NOTE: Keeping all mothers, even those not living with bio children for this part of the analysis.
+*Create macro just to get the n for later purposes (see msltprep.do).
 *	keep 			if minorbiochildren >= 1	// Keep only moms with kids in household
 	
 	// Creates a macro with the total number of mothers in the dataset.
