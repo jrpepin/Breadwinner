@@ -1,5 +1,20 @@
+*-------------------------------------------------------------------------------
+* BREADWINNER PROJECT
+* gen_mslt_results.do
+* Kelly Raley and Joanna Pepin
+*-------------------------------------------------------------------------------
+di "$S_DATE"
 
-// run the lifetable analysis for each group at each cutoff
+********************************************************************************
+* DESCRIPTION
+********************************************************************************
+* This script runs the lifetable analysis for each group at each cutoff
+
+* The data file used in this script was produced by create_mstransitions14.do
+
+********************************************************************************
+* Run the lifetable analysis using lxpct_2
+********************************************************************************
 
 local cutoffs "50 60"
 local groups "t w b h e1 e2 e3 e4"

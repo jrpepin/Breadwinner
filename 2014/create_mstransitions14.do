@@ -1,6 +1,6 @@
 *-------------------------------------------------------------------------------
 * BREADWINNER PROJECT
-* bw_transitions.do
+* create_mstransitions14.do
 * Kelly Raley and Joanna Pepin
 *-------------------------------------------------------------------------------
 di "$S_DATE"
