@@ -114,6 +114,6 @@
 
 // Generate a matrix with estimates of expected number of years
 // in each state from "birth"
-	log using "$logdir/.log", replace
+	log using "$logdir/gen_mslt_results.log", replace
 	do "$results/gen_mslt_results.do"
 	log close	
