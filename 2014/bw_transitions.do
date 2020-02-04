@@ -107,10 +107,10 @@ reshape long `change_variables' trans_bw50 trans_bw60 bw50L bw60L monthsobserved
 	global newsamplesize2 = newsample2
 	di "$newsamplesize2"
 
-	di "$hhmoms_n"
+	di "$newsamplesize"
 	di "$newsamplesize2"
 
-	if ("$hhmoms_n" == "$newsamplesize2") {
+	if ("$newsamplesize" == "$newsamplesize2") {
 		display "Success! Sample sizes consistent."
 		}
 		else {
