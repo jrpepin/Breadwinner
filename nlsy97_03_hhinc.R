@@ -97,11 +97,11 @@ data_inc$totinc_t8[is.nan(data_inc$totinc_t8)]   <- NA
 data_inc$totinc_t9[is.nan(data_inc$totinc_t9)]   <- NA
 data_inc$totinc_t10[is.nan(data_inc$totinc_t10)] <- NA
 
-totinc$totinc_m1[is.nan(totinc$totinc_m1)] <- NA
-totinc$totinc_m2[is.nan(totinc$totinc_m2)] <- NA
-totinc$totinc_m3[is.nan(totinc$totinc_m3)] <- NA
-totinc$totinc_m4[is.nan(totinc$totinc_m4)] <- NA
-totinc$totinc_m5[is.nan(totinc$totinc_m5)] <- NA
+data_inc$totinc_m1[is.nan(data_inc$totinc_m1)] <- NA
+data_inc$totinc_m2[is.nan(data_inc$totinc_m2)] <- NA
+data_inc$totinc_m3[is.nan(data_inc$totinc_m3)] <- NA
+data_inc$totinc_m4[is.nan(data_inc$totinc_m4)] <- NA
+data_inc$totinc_m5[is.nan(data_inc$totinc_m5)] <- NA
 
 
 # BREADWINNER 50%
@@ -307,90 +307,98 @@ data_inc <- data_inc %>%
 data_inc$everbw[is.na(data_inc$everbw)] <- 0
 
 table(data_inc$everbw)
+################################################################
+# Add variables to dataset
+nlsy97 <- data_inc # Create a newly named dataset
 
+nlsy97$birth_year <- new_data$birth_year[match(nlsy97$PUBID_1997, new_data$PUBID_1997)] # Add birth year
+nlsy97$mar_t0     <- new_data$mar_t0[match(nlsy97$PUBID_1997, new_data$PUBID_1997)]     # Add marst at t0
+nlsy97$age_birth  <- new_data$age_birth[match(nlsy97$PUBID_1997, new_data$PUBID_1997)]  # Add age at first birth
+
+###############################################################
 # Descriptives
-table(data_inc$birth_year, data_inc$mar_t0, exclude = NULL)
-table(data_inc$birth_year, data_inc$age_birth)
+table(nlsy97$birth_year, nlsy97$mar_t0, exclude = NULL)
+table(nlsy97$birth_year, nlsy97$age_birth)
 
-table(data_inc$birth_year, data_inc$bw_t0)
-table(data_inc$birth_year, data_inc$bw_t1)
-table(data_inc$birth_year, data_inc$bw_t2)
-table(data_inc$birth_year, data_inc$bw_t3)
-table(data_inc$birth_year, data_inc$bw_t4)
-table(data_inc$birth_year, data_inc$bw_t5)
-table(data_inc$birth_year, data_inc$bw_t6)
-table(data_inc$birth_year, data_inc$bw_m1)
+table(nlsy97$birth_year, nlsy97$bw5_t0)
+table(nlsy97$birth_year, nlsy97$bw5_t1)
+table(nlsy97$birth_year, nlsy97$bw5_t2)
+table(nlsy97$birth_year, nlsy97$bw5_t3)
+table(nlsy97$birth_year, nlsy97$bw5_t4)
+table(nlsy97$birth_year, nlsy97$bw5_t5)
+table(nlsy97$birth_year, nlsy97$bw5_t6)
+table(nlsy97$birth_year, nlsy97$bw5_m1)
 
-table(data_inc$bw5_t0)
-table(data_inc$bw5_t1)
-table(data_inc$bw5_t2)
-table(data_inc$bw5_t3)
-table(data_inc$bw5_t4)
-table(data_inc$bw5_t5)
-table(data_inc$bw5_t6)
-table(data_inc$bw5_t7)
-table(data_inc$bw5_t8)
-table(data_inc$bw5_t9)
-table(data_inc$bw5_t10)
+table(nlsy97$bw5_t0)
+table(nlsy97$bw5_t1)
+table(nlsy97$bw5_t2)
+table(nlsy97$bw5_t3)
+table(nlsy97$bw5_t4)
+table(nlsy97$bw5_t5)
+table(nlsy97$bw5_t6)
+table(nlsy97$bw5_t7)
+table(nlsy97$bw5_t8)
+table(nlsy97$bw5_t9)
+table(nlsy97$bw5_t10)
 
-table(data_inc$bw6_t0)
-table(data_inc$bw6_t1)
-table(data_inc$bw6_t2)
-table(data_inc$bw6_t3)
-table(data_inc$bw6_t4)
-table(data_inc$bw6_t5)
-table(data_inc$bw6_t6)
-table(data_inc$bw6_t7)
-table(data_inc$bw6_t8)
-table(data_inc$bw6_t9)
-table(data_inc$bw6_t10)
+table(nlsy97$bw6_t0)
+table(nlsy97$bw6_t1)
+table(nlsy97$bw6_t2)
+table(nlsy97$bw6_t3)
+table(nlsy97$bw6_t4)
+table(nlsy97$bw6_t5)
+table(nlsy97$bw6_t6)
+table(nlsy97$bw6_t7)
+table(nlsy97$bw6_t8)
+table(nlsy97$bw6_t9)
+table(nlsy97$bw6_t10)
 
 
-table(data_inc$bw5_t0, exclude = NULL)
-table(data_inc$bw5_t1, exclude = NULL)
-table(data_inc$bw5_t2, exclude = NULL)
-table(data_inc$bw5_t3, exclude = NULL)
-table(data_inc$bw5_t4, exclude = NULL)
-table(data_inc$bw5_t5, exclude = NULL)
+table(nlsy97$bw5_t0, exclude = NULL)
+table(nlsy97$bw5_t1, exclude = NULL)
+table(nlsy97$bw5_t2, exclude = NULL)
+table(nlsy97$bw5_t3, exclude = NULL)
+table(nlsy97$bw5_t4, exclude = NULL)
+table(nlsy97$bw5_t5, exclude = NULL)
 
 ## How many cases do we have 3 years of breadwinning in a row?
-data_inc <- data_inc %>%
-  mutate(t0 = case_when(  (bw_t0 == "Breadwinner" | bw_t0 == "Not a breadwinner") &
-                          (bw_t1 == "Breadwinner" | bw_t1 == "Not a breadwinner") &
-                          (bw_t2 == "Breadwinner" | bw_t2 == "Not a breadwinner") ~ 1),
-         t1 = case_when(  (bw_t1 == "Breadwinner" | bw_t1 == "Not a breadwinner") &
-                          (bw_t2 == "Breadwinner" | bw_t2 == "Not a breadwinner") &
-                          (bw_t3 == "Breadwinner" | bw_t3 == "Not a breadwinner") ~ 1),
-         t2 = case_when(  (bw_t2 == "Breadwinner" | bw_t2 == "Not a breadwinner") &
-                          (bw_t3 == "Breadwinner" | bw_t3 == "Not a breadwinner") &
-                          (bw_t4 == "Breadwinner" | bw_t4 == "Not a breadwinner") ~ 1))
+nlsy97 <- nlsy97 %>%
+  mutate(t0 = case_when(  (bw5_t0 == "Breadwinner" | bw5_t0 == "Not a breadwinner") &
+                          (bw5_t1 == "Breadwinner" | bw5_t1 == "Not a breadwinner") &
+                          (bw5_t2 == "Breadwinner" | bw5_t2 == "Not a breadwinner") ~ 1),
+         t1 = case_when(  (bw5_t1 == "Breadwinner" | bw5_t1 == "Not a breadwinner") &
+                          (bw5_t2 == "Breadwinner" | bw5_t2 == "Not a breadwinner") &
+                          (bw5_t3 == "Breadwinner" | bw5_t3 == "Not a breadwinner") ~ 1),
+         t2 = case_when(  (bw5_t2 == "Breadwinner" | bw5_t2 == "Not a breadwinner") &
+                          (bw5_t3 == "Breadwinner" | bw5_t3 == "Not a breadwinner") &
+                          (bw5_t4 == "Breadwinner" | bw5_t4 == "Not a breadwinner") ~ 1))
 
-data_inc$t0[is.na(data_inc$t0)] <- 0
-data_inc$t1[is.na(data_inc$t1)] <- 0
-data_inc$t2[is.na(data_inc$t2)] <- 0
+nlsy97$t0[is.na(nlsy97$t0)] <- 0
+nlsy97$t1[is.na(nlsy97$t1)] <- 0
+nlsy97$t2[is.na(nlsy97$t2)] <- 0
 
-summary(data_inc$t0)
-summary(data_inc$t1)
-summary(data_inc$t2)
+summary(nlsy97$t0)
+summary(nlsy97$t1)
+summary(nlsy97$t2)
 
-data_inc <- data_inc %>%
-  mutate(bw3a = case_when(  bw_t0 == "Breadwinner" & bw_t1 == "Breadwinner" &
-                            bw_t2 == "Breadwinner" ~ 1),
-         bw3b = case_when(  bw_t1 == "Breadwinner" & bw_t2 == "Breadwinner" &
-                            bw_t3 == "Breadwinner" ~ 1),  
-         bw3c = case_when(  bw_t2 == "Breadwinner" & bw_t3 == "Breadwinner" &
-                            bw_t4 == "Breadwinner" ~ 1))
+nlsy97 <- nlsy97 %>%
+  mutate(bw3a = case_when(  bw5_t0 == "Breadwinner" & bw5_t1 == "Breadwinner" &
+                            bw5_t2 == "Breadwinner" ~ 1),
+         bw3b = case_when(  bw5_t1 == "Breadwinner" & bw5_t2 == "Breadwinner" &
+                            bw5_t3 == "Breadwinner" ~ 1),  
+         bw3c = case_when(  bw5_t2 == "Breadwinner" & bw5_t3 == "Breadwinner" &
+                            bw5_t4 == "Breadwinner" ~ 1))
 
-data_inc$bw3a[is.na(data_inc$bw3a)] <- 0
-data_inc$bw3b[is.na(data_inc$bw3b)] <- 0
-data_inc$bw3c[is.na(data_inc$bw3c)] <- 0
+nlsy97$bw3a[is.na(nlsy97$bw3a)] <- 0
+nlsy97$bw3b[is.na(nlsy97$bw3b)] <- 0
+nlsy97$bw3c[is.na(nlsy97$bw3c)] <- 0
 
-summary(data_inc$bw3a)
-summary(data_inc$bw3b)
-summary(data_inc$bw3c)
+summary(nlsy97$bw3a)
+summary(nlsy97$bw3b)
+summary(nlsy97$bw3c)
 
 #Birth year by age_birth & marst
-data_inc %>%
+nlsy97 %>%
   filter(!is.na(mar_t0)) %>%
   ggplot(aes(birth_year, age_birth, color = mar_t0)) +
   geom_point(position = "jitter") +
@@ -404,32 +412,34 @@ data_inc %>%
        color = "Marital status",
        caption = "Source: National Longitudinal Survey of Youth | 1997 \n Analysis by: Joanna R. Pepin")
 
+###################################################################
+# These graphs no longer work.......... :/
 #Age_birth by inc_t1 & marst
-data_inc %>%
+nlsy97 %>%
   filter(!is.na(mar_t0)) %>%
   ggplot(aes(age_birth, log10(inc_t0), color = mar_t0)) +
   geom_point(position = "jitter") +
   theme_minimal()
 
 #Age_birth by totinc_t1 & marst
-data_inc %>%
+nlsy97 %>%
   filter(!is.na(mar_t0)) %>%
   ggplot(aes(age_birth, totinc_t0, color = mar_t0)) +
   geom_point(position = "jitter") +
   theme_minimal()
 
 #Birth year by age_birth & breadwinner
-data_inc %>%
-  filter(!is.na(bw_t0)) %>%
+nlsy97 %>%
+  filter(!is.na(bw5_t0)) %>%
   filter(mar_t0 != "Div/Sep/Wid" & !is.na(mar_t0)) %>%
-  ggplot(aes(age_birth, totinc_t0, color = bw_t0)) +
+  ggplot(aes(age_birth, totinc_t0, color = bw5_t0)) +
   facet_wrap(~ mar_t0) +
   geom_point(position = "jitter") +
   theme_minimal()
 
 ## Early births
 
-early <- data_inc %>%
+early <- nlsy97 %>%
   filter(birth_year <= 2006)
 
 table(early$bw_t0)
