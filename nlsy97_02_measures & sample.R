@@ -738,14 +738,16 @@ remove(chsup, dvdend, gftinc, govpro1, govpro2, govpro3, inhinc,
        intrst, mominc, mombiz, othinc, rntinc, wcomp, totinc, 
        hhinc, spbiz, spinc, wcomp_sp)
 
-# Sample
+##############################################################################
+# Create the sample
+## Data is in long format, multiple rows per person.
 incdata <- merge(incdata, new_data[, c("PUBID_1997", "age_birth")], by="PUBID_1997") # Add age at first birth to data
 
 incdata <- incdata %>%
   filter(birth_year != 0) # limit to mothers
 
 incdata <- incdata %>%
-  filter(age_birth >= 18 & age_birth <=27) # limit to mothers 18 - 27 at first birth
+  filter(age_birth >= 18 & age_birth <=30) # limit to mothers 18 - 30 at first birth
 
 ## MISSING DATA
 ### Create copy of dataset to evaluate missing income data
@@ -764,3 +766,5 @@ incdata[incdata == -2] <- NA # Dont know
 incdata[incdata == -1] <- NA # Refused 
 
 incdata <- arrange(incdata, PUBID_1997, year)
+
+print("End of nlsy97_02_measures & sample") # Marks end of R Script
