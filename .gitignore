@@ -1,0 +1,12 @@
+setup_kraley.do
+setup_joanna.do
+
+*.dta
+*.dat
+*.dct
+*.gz
+*.Rhistory
+.Rproj.user
+*.Rproj
+DemographySupplement/
+
