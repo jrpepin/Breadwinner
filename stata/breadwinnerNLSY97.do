@@ -3,15 +3,11 @@
 * breadwinnnerNLSY97.do
 * Joanna Pepin
 *-------------------------------------------------------------------------------
-/*
-The goal of these scripts are to create three types of estimates 
-for the first 10 years of motherhood:
-	1. Risk of entering breadwinning (at each duration of motherhood)
-	2. Risk of entering breadwinning, censoring on previous breadwinning
-	3. Proportion of breadwinning at each age that have previously breadwon
-*/
+* The goal of these files is to create estimates of breadwinning in order to
+* better account for repeat breadwinning using the SIPP
+
 ********************************************************************************
-* A1. ENVIRONMENT
+* A. ENVIRONMENT
 ********************************************************************************
 * There are two scripts users need to run before importing the data. 
 * First, create a personal setup file using the setup_example.do script as a template
@@ -28,24 +24,22 @@ for the first 10 years of motherhood:
 * The logs for these files are generated within each .do files.
 
 ********************************************************************************
-* B1. Risk of entering breadwinning (at each duration of motherhood)
+* B. Risk of entering breadwinning for the first 10 years of motherhood
 ********************************************************************************
-** This is just the proportion breadwinning at each duration, right?
 	
 // Breadwinning estimates at the 50% threshold
-    do "stata/nlsy97_hh50_dur.do"
+    do "stata/nlsy97_hh50_risk.do"
+	
+// Breadwinning estimates at the 60% threshold
+    do "stata/nlsy97_hh60_risk.do"
 	
 ********************************************************************************
-* B2. Risk of entering breadwinning, censoring on previous breadwinning
+* C. Predict breadwinning status relative to the specific duration of motherhood
 ********************************************************************************
-*?*?* JP : This is what we did before. Is that the same as censored breadwinning?
+*?*?* JP : This is what we did before. Is that the same as censored breadwinning (B2)?
 
 // Breadwinning estimates at the 50% threshold
-    do "stata/nlsy97_hh50.do"
+    do "stata/nlsy97_hh50_pred.do"
 
-// Breadwinning estimates at the 50% threshold
-    do "stata/nlsy97_hh60.do"
-
-********************************************************************************
-* B3. Proportion of breadwinning at each age that have previously breadwon
-********************************************************************************
+// Breadwinning estimates at the 60% threshold
+    do "stata/nlsy97_hh60_pred.do"
