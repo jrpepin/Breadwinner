@@ -2,7 +2,7 @@
 data_hh   <- incdata
 
 data_hh  <- data_hh  %>%
-  select(PUBID_1997, year, birth_year, wages, mombiz, spwages, spbiz, hhinc)
+  select(PUBID_1997, year, birth_year, age_birth, wages, mombiz, spwages, spbiz, hhinc)
 
 ## Create data_hh summary variables
 data_hh  <- data_hh  %>%
@@ -18,7 +18,9 @@ data_hh$birth_year <- as.numeric(data_hh$birth_year)
 
 data_hh  <- data_hh  %>%
   group_by(PUBID_1997) %>%  
-  mutate(birth_year = max(birth_year, na.rm = TRUE))
+  mutate(birth_year = max(birth_year, na.rm = TRUE), # Complete year data
+         age_birth  = max(age_birth, na.rm = TRUE))  # Complete age_birth data
+
 
 ## Birth year breadwinning 50%
 ## Careful - t0 is birth year plus 1 for data_hh because respondents report data_hh from the previous year
@@ -156,7 +158,7 @@ data_hh <- data_hh %>%
 
 ## Tidy data
 data_hh <- data_hh %>%
-  select(PUBID_1997, year, birth_year, momearn, famearn, starts_with("hhe"))
+  select(PUBID_1997, year, birth_year, age_birth, momearn, famearn, starts_with("hhe"))
 
 data_hh$hhe5_m2  <- factor(data_hh$hhe5_m2)
 data_hh$hhe5_m1  <- factor(data_hh$hhe5_m1)
@@ -224,12 +226,14 @@ data_hh <- data_hh %>%
       (year >= birth_year)   ~ 1,
       (year < birth_year)    ~ 0))
 
+newValue = date[value == 4L])
+
 # Restructure the data
 ## 50% Breadwinning data
 data_hh50 <- data_hh %>%
-  select(PUBID_1997, year, firstbirth, birth_year, time, starts_with("hhe5")) %>%
+  select(PUBID_1997, year, firstbirth, birth_year, age_birth, time, starts_with("hhe5")) %>%
   group_by(PUBID_1997) %>%
-  gather(status, hhe50, -PUBID_1997, -year, -firstbirth, -birth_year, -time) %>%
+  gather(status, hhe50, -PUBID_1997, -year, -firstbirth, -birth_year, -age_birth, -time) %>%
   separate(status, c("type", "status"), "_")
 
 data_hh50$hhe50[data_hh50$hhe50 == "Not a breadwinner"] = 0L  # Not a breadwinner
@@ -259,14 +263,19 @@ data_hh50 <- data_hh50 %>%
 
 data_hh50 <- arrange(data_hh50, PUBID_1997, year)
 
-
+# Create age variable
+data_hh50 <- data_hh50 %>%
+  group_by(PUBID_1997) %>%
+  mutate(age = case_when(
+    time ==0 ~ as.integer(age_birth),
+    time >=1 ~ as.integer(age_birth) + row_number() - 1L))
 
 # Restructure the data
 ## 60% Breadwinning data
 data_hh60 <- data_hh %>%
-  select(PUBID_1997, year, firstbirth, birth_year, time, starts_with("hhe6")) %>%
+  select(PUBID_1997, year, firstbirth, birth_year, age_birth, time, starts_with("hhe6")) %>%
   group_by(PUBID_1997) %>%
-  gather(status, hhe60, -PUBID_1997, -year, -firstbirth, -birth_year, -time) %>%
+  gather(status, hhe60, -PUBID_1997, -year, -firstbirth, -birth_year, -age_birth, -time) %>%
   separate(status, c("type", "status"), "_")
 
 data_hh60$hhe60[data_hh60$hhe60 == "Not a breadwinner"] = 0L  # Not a breadwinner
@@ -296,15 +305,21 @@ data_hh60 <- data_hh60 %>%
 
 data_hh60 <- arrange(data_hh60, PUBID_1997, year)
 
+# Create age variable
+data_hh60 <- data_hh60 %>%
+  group_by(PUBID_1997) %>%
+  mutate(age = case_when(
+    time ==0 ~ as.integer(age_birth),
+    time >=1 ~ as.integer(age_birth) + row_number() - 1L))
 
 #Create datasets
 data_hh50 <- data_hh50 %>%
   ungroup() %>%
-  select(PUBID_1997, year, firstbirth, hhe50, time)
+  select(PUBID_1997, year, firstbirth, hhe50, time, birth_year, age_birth, age)
 
 data_hh60 <- data_hh60 %>%
   ungroup() %>%
-  select(PUBID_1997, year, firstbirth, hhe60, time)
+  select(PUBID_1997, year, firstbirth, hhe60, time, birth_year, age_birth, age)
 
 require(foreign)
 write.dta(data_hh50, "stata/NLSY97_hh50.dta")
