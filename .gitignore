@@ -1,5 +1,6 @@
 setup_kraley.do
 setup_joanna.do
+DemographySupplement/
 
 *.dta
 *.dat
@@ -7,5 +8,7 @@ setup_joanna.do
 *.gz
 *.Rhistory
 *.Rproj.user
+*.Rprofile
 *.Rproj
-DemographySupplement/
+
+
