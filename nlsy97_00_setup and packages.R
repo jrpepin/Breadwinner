@@ -59,3 +59,5 @@ if (!dir.exists(here::here(outDir))){
 } else {
   print("Output directory already exists!")
 }
+
+message("End of nlsy97_00_setup and packages") # Marks end of R Script

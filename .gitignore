@@ -6,9 +6,9 @@ DemographySupplement/
 *.dat
 *.dct
 *.gz
-*.Rhistory
-*.Rproj.user
-*.Rprofile
-*.Rproj
 
-
+renv/library
+.Rhistory
+.Rproj.user
+.Rprofile
+.Rproj

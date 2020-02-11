@@ -5,21 +5,17 @@
 #------------------------------------------------------------------------------------
 
 # Use this script after the Investigator R script
-# Assumes user marked out the "Handle missing values" code in the Investigator script to analyze type of missing data
+# Assumes user marked out the "Handle missing values" code in the Investigator script 
+# to analyze type of missing data
 
 #####################################################################################
-## Prep the data for analysis
+# Prep the data for analysis
 #####################################################################################
 
 ## Fix caseID in categories dataset
 categories$PUBID_1997 <- new_data$PUBID_1997
 
-# Map special values to NA in every NUMERIC column: Refusal(-1), Don't Know(-2), Invalid Skip (-3),VALID SKIP(-4), NON-INTERVIEW(-5)
-# library(naniar)
-# na_special <- c(-1,-2,-3,-4,-5)
-# new_data <- new_data %>%
-  #replace_with_na_if(.predicate = is.integer,
-   #                  condition = ~.x %in% (na_special))
+# Identify moms---------------------------------------------------------------------
 
 ## Limit to women
 summary(categories$KEY_SEX_1997)
@@ -30,12 +26,7 @@ categories <- filter(categories, sex == "Female")
 colnames(new_data)[colnames(new_data) == 'KEY_SEX_1997'] <- 'sex'
 new_data <- filter(new_data, sex == "2")
 
-## Create age variable
-new_data$dob <- mdy(paste(new_data$KEY_BDATE_M_1997, "1", new_data$KEY_BDATE_Y_1997, sep='-'))
-
-## Indentify moms
-
-### birth month
+## birth month
 mom_month <- new_data %>%
   select(PUBID_1997, starts_with("CV_CHILD_BIRTH_DATE.01~M"))
 
@@ -45,7 +36,7 @@ mom_month <- mom_month %>%
   gather(var, birth_month, -PUBID_1997)
 mom_month <- aggregate(birth_month ~ PUBID_1997, data = mom_month, first)
 
-### birth year
+## birth year
 mom_year <- new_data %>%
   select(PUBID_1997, starts_with("CV_CHILD_BIRTH_DATE.01~Y"))
 
@@ -55,22 +46,26 @@ mom_year <- mom_year %>%
   gather(var, birth_year, -PUBID_1997)
 mom_year <- aggregate(birth_year ~ PUBID_1997, data = mom_year, first)
 
-
-### Add new variables to original dataset
+## Add new variables to original dataset
 new_data   <- left_join(new_data,   mom_month)
 new_data   <- left_join(new_data,   mom_year)
 
 remove(mom_month)
 remove(mom_year)
 
-### combine child dob variables
+## combine child dob variables
 new_data$birth <- mdy(paste(new_data$birth_month, "1", new_data$birth_year, sep='-'))
  # new_data <- subset(new_data, select = -c(birth_month, birth_year))
 
-### Create age at first birth variable
+# Demographics----------------------------------------------------------------------
+
+## Age
+new_data$dob <- mdy(paste(new_data$KEY_BDATE_M_1997, "1", new_data$KEY_BDATE_Y_1997, sep='-'))
+
+## Age at first birth
 new_data$age_birth <-round((time_length(difftime(new_data$birth, new_data$dob), "years")), digits = 0)
 
-# Marital status variables
+## Marital status
 marstat <- categories %>%
   select(PUBID_1997, starts_with("CV_MARSTAT_"))
 
@@ -97,6 +92,7 @@ marstat <- marstat %>%
 
 marstat$marst <- factor(marstat$marst, levels = c("Married", "Cohab", "Never married", "Div/Sep/Wid"))
 
+## Marital status at each duration of motherhood
 marstat <- marstat %>%
   group_by(PUBID_1997) %>% 
   mutate(
@@ -119,8 +115,8 @@ marstat <- subset(marstat, select = -c(year, marst, birth_year)) # drop extra va
 new_data   <- left_join(new_data,   marstat)
 
 remove(marstat)
-  
-# R's Income
+
+# Income Variables------------------------------------------------------------------
 
 ## Personal Income of R by year
 
@@ -130,7 +126,8 @@ remove(marstat)
 # YINC-1800 - ESTIMATED INCOME FROM WAGES AND SALARY IN PAST YEAR (wages_est)
 
 mominc <- new_data %>%
-  select(PUBID_1997, starts_with("YINC-1700"), starts_with("YINC-1400"), starts_with("YINC-1500"), starts_with("YINC-1800")) %>%
+  select(PUBID_1997,  starts_with("YINC-1700"), starts_with("YINC-1400"), 
+                      starts_with("YINC-1500"), starts_with("YINC-1800")) %>%
   gather(var, val, -PUBID_1997) %>%
   separate(var, c("type", "year"), "_")
 
@@ -690,8 +687,12 @@ totinc <- new_data %>%
   gather(var, totinc, -PUBID_1997) %>%
   separate(var, c("type", "year"), -4)
 
+####################################################################################
 # Create dataset with all income variables
-##  wages, mombiz, chsup, dvdend, gftinc, govpro1, govpro2, govpro3, inhinc, intrst, othinc, rntinc, wcomp, hhinc, totinc
+####################################################################################
+## wages, mombiz, chsup, dvdend, gftinc, govpro1, govpro2, govpro3, inhinc, 
+## intrst, othinc, rntinc, wcomp, hhinc, totinc
+
 incdata   <- mominc
 incdata   <- left_join(incdata,   mombiz)
 incdata   <- left_join(incdata,   chsup)
@@ -713,10 +714,11 @@ incdata   <- left_join(incdata,   spinc)
 incdata   <- left_join(incdata,   wcomp_sp)
 
 incdata <- incdata %>%
-  select(PUBID_1997, year, birth_year, wages, mombiz, chsup, dvdend, gftinc, govpro1, govpro2, govpro3, inhinc, intrst, othinc, rntinc, wcomp, 
+  select(PUBID_1997, year, birth_year, wages, mombiz, chsup, dvdend, gftinc, 
+         govpro1, govpro2, govpro3, inhinc, intrst, othinc, rntinc, wcomp, 
          hhinc, totinc, spwages, spbiz, spwages, wcomp_sp)
 
-## Create the birth year plus 1 variables
+## Income at each duration of motherhood
 incdata$birth_year1   <- incdata$birth_year + 1
 incdata$birth_year2   <- incdata$birth_year + 2
 incdata$birth_year3   <- incdata$birth_year + 3
@@ -734,33 +736,39 @@ incdata$birth_minus2 <- incdata$birth_year - 2
 incdata$birth_minus3 <- incdata$birth_year - 3
 incdata$birth_minus4 <- incdata$birth_year - 4
 
-### Clean up console
-is.logical(length(unique(incdata$PUBID_1997)) == length(unique(new_data$PUBID_1997))) # Check to make sure N in incdata = N in new_data
+# Clean up console -----------------------------------------------------------------
+## Check to make sure N in incdata = N in new_data
+is.logical(length(unique(incdata$PUBID_1997)) == length(unique(new_data$PUBID_1997))) 
 
 remove(chsup, dvdend, gftinc, govpro1, govpro2, govpro3, inhinc, 
        intrst, mominc, mombiz, othinc, rntinc, wcomp, totinc, 
        hhinc, spbiz, spinc, wcomp_sp)
 
-##############################################################################
+#####################################################################################
 # Create the sample
+#####################################################################################
 ## Data is in long format, multiple rows per person.
-incdata <- merge(incdata, new_data[, c("PUBID_1997", "age_birth")], by="PUBID_1997") # Add age at first birth to data
 
-incdata <- incdata %>%
-  filter(birth_year != 0) # limit to mothers
+## Add age at first birth to data
+incdata <- merge(incdata, new_data[, c("PUBID_1997", "age_birth")], by="PUBID_1997") 
 
+## Apply sample restrictions
 incdata <- incdata %>%
+  filter(birth_year != 0) %>%              # limit to mothers
   filter(age_birth >= 18 & age_birth <=30) # limit to mothers 18 - 30 at first birth
 
-## MISSING DATA
-### Create copy of dataset to evaluate missing income data
+#####################################################################################
+# Address missing data
+#####################################################################################
+
+## Create copy of dataset to evaluate missing income data later
 miss_data <- incdata
 
-### Handle the missing data for all of these variables before combining them.......
+## Handle the missing data for all of these variables before combining them
 incdata[incdata == -4] = 0  # Valid missing
 
 incdata <- incdata %>%
-  filter(wages != -5)         # Non-interview
+  filter(wages != -5)       # Non-interview
 
 incdata[is.na(incdata)] = 0 # Make missing 0 so don't drop them just because variable didn't exist that year
 
@@ -770,4 +778,5 @@ incdata[incdata == -1] <- NA # Refused
 
 incdata <- arrange(incdata, PUBID_1997, year)
 
-print("End of nlsy97_02_measures & sample") # Marks end of R Script
+#-----------------------------------------------------------------------------------
+message("End of nlsy97_02_measures & sample") # Marks end of R Script
