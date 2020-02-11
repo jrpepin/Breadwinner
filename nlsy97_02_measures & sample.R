@@ -4,9 +4,12 @@
 # Joanna Pepin
 #------------------------------------------------------------------------------------
 
-# Use this script after the Investigator R script
-# Assumes user marked out the "Handle missing values" code in the Investigator script 
-# to analyze type of missing data
+# This file creates the variables for analysis and limits the sample to mothers who
+# had their first birth between the ages 18 and 30.
+
+## Use this script after the Investigator R script
+## Assumes user marked out the "Handle missing values" code in the Investigator script 
+## to analyze type of missing data
 
 #####################################################################################
 # Prep the data for analysis
