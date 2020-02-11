@@ -1,8 +1,7 @@
-
 # Set working directory
-setwd("C:/Users/Joanna/Dropbox/Repositories/NLSY97_Breadwinning/nlsy9717_tagset")
+# setwd()
 
-new_data <- read.table('nlsy9717.dat', sep=' ')
+new_data <- read.table(here(dataDir, 'nlsy9717.dat'), sep=' ')
 names(new_data) <- c('R0000100',
   'R0352200',
   'R0489900',
