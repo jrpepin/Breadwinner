@@ -26,7 +26,8 @@ The goal of this file is to create three types of estimates
 for the first 10 years of motherhood:
 	1. Risk of entering breadwinning (at each duration of motherhood)
 	2. Risk of entering breadwinning, censoring on previous breadwinning
-	3. Proportion of breadwinning at each age that have previously breadwon
+	3. Proportion of breadwinning at each duration of motherhood that have previously breadwon
+		D -- women who are breadwinning N -- proportion who had previously breadwon (only for each time)
 */
 
 * This data used in this file were created from the R script nlsy97_04_hhearn, 
