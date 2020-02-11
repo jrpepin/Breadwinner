@@ -6,7 +6,6 @@ setup_joanna.do
 *.dct
 *.gz
 *.Rhistory
-.Rproj.user
+*.Rproj.user
 *.Rproj
 DemographySupplement/
-
