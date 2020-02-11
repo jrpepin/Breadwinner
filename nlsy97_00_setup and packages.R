@@ -7,10 +7,9 @@
 #####################################################################################
 ## Install and load required packages
 #####################################################################################
-
-if(!require(here)){
-  install.packages("here")
-  library(here)
+if(!require(renv)){           # https://rstudio.github.io/renv/articles/renv.html
+  install.packages("renv")
+  library(renv)
 }
 
 if(!require(tidyverse)){
@@ -23,6 +22,22 @@ if(!require(lubridate)){
   library(lubridate)
 }
 
+if(!require(here)){
+  install.packages("here")
+  library(here)
+}
+
+if(!require(conflicted)){
+  devtools::install_github("r-lib/conflicted")
+  library(conflicted)
+}
+
+renv::snapshot() # Save the state of the project library to the lockfile (called renv.lock)
+
+# Address any conflicts in the packages
+conflict_scout() # Identify the conflicts
+conflict_prefer("here", "here")
+
 #####################################################################################
 # Set-up the Directories
 #####################################################################################
@@ -33,13 +48,13 @@ figDir  <- "figures"        # Name of the sub-folder where we will save generate
 outDir  <- "results"        # Name of the sub-folder where we will save output
 
 ## This will create sub-directory folders in the projDir if they don't exist
-if (!dir.exists(here(figDir))){
+if (!dir.exists(here::here(figDir))){
   dir.create(figDir)
 } else {
   print("Figure directory already exists!")
 }
 
-if (!dir.exists(here(outDir))){
+if (!dir.exists(here::here(outDir))){
   dir.create(outDir)
 } else {
   print("Output directory already exists!")

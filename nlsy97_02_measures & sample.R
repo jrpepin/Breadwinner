@@ -1,11 +1,15 @@
-
+#------------------------------------------------------------------------------------
+# BREADWINNER PROJECT
+# nlsy97_02_measures & sample.R
+# Joanna Pepin
+#------------------------------------------------------------------------------------
 
 # Use this script after the Investigator R script
-# marked out the "Handle missing values" code in the Investigator script to analyze type of missing data
+# Assumes user marked out the "Handle missing values" code in the Investigator script to analyze type of missing data
 
-library(tidyverse)
-library(lubridate)
-
+#####################################################################################
+## Prep the data for analysis
+#####################################################################################
 
 ## Fix caseID in categories dataset
 categories$PUBID_1997 <- new_data$PUBID_1997
