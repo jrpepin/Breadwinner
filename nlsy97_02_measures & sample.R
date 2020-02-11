@@ -1,8 +1,7 @@
-# Change the working directory to the repository
-setwd("C:/Users/Joanna/Dropbox/Repositories/NLSY97_Breadwinning")
+
 
 # Use this script after the Investigator R script
-# mark out the "Handle missing values" code in the Investigator script to analyze type of missing data
+# marked out the "Handle missing values" code in the Investigator script to analyze type of missing data
 
 library(tidyverse)
 library(lubridate)
