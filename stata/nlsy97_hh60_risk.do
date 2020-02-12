@@ -51,13 +51,13 @@ drop firstbirth 		// this variable has no variation now
 ********************************************************************************
 * Generate basic descriptives
 ********************************************************************************
-tab time 		hhe50, row
-tab marst 		hhe50, row
-tab age_birth 	hhe50, row
+tab time 		hhe60, row
+tab marst 		hhe60, row
+tab age_birth 	hhe60, row
 
 
-table time marst, contents(mean hhe50)		// Duration of motherhood by marst
-table age_birth marst, contents(mean hhe50) // Age at first birth by marst
+table time marst, contents(mean hhe60)		// Duration of motherhood by marst
+table age_birth marst, contents(mean hhe60) // Age at first birth by marst
 
 
 ********************************************************************************
