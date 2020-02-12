@@ -37,6 +37,8 @@ renv::snapshot() # Save the state of the project library to the lockfile (called
 # Address any conflicts in the packages
 conflict_scout() # Identify the conflicts
 conflict_prefer("here", "here")
+conflict_prefer("filter", "dplyr")
+conflict_prefer("remove", "base")
 
 #####################################################################################
 # Set-up the Directories
