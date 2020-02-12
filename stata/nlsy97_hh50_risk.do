@@ -47,6 +47,17 @@ keep if firstbirth==1 	// selected on this in R already
 drop firstbirth 		// this variable has no variation now
 
 ********************************************************************************
+* Generate basic descriptives
+********************************************************************************
+tab time 		hhe50, row
+tab marst 		hhe50, row
+tab age_birth 	hhe50, row
+
+
+table time marst, contents(mean hhe50)		// Duration of motherhood by marst
+table age_birth marst, contents(mean hhe50) // Age at first birth by marst
+
+********************************************************************************
 * B1. Estimates of breadwinning (at each duration of motherhood)
 ********************************************************************************
 tab time hhe50, r
