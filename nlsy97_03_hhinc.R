@@ -329,6 +329,15 @@ table(nlsy97$birth_year, nlsy97$bw5_t5)
 table(nlsy97$birth_year, nlsy97$bw5_t6)
 table(nlsy97$birth_year, nlsy97$bw5_m1)
 
+table(nlsy97$age_birth, nlsy97$bw5_t0)
+table(nlsy97$age_birth, nlsy97$bw5_t1)
+table(nlsy97$age_birth, nlsy97$bw5_t2)
+table(nlsy97$age_birth, nlsy97$bw5_t3)
+table(nlsy97$age_birth, nlsy97$bw5_t4)
+table(nlsy97$age_birth, nlsy97$bw5_t5)
+table(nlsy97$age_birth, nlsy97$bw5_t6)
+table(nlsy97$age_birth, nlsy97$bw5_m1)
+
 table(nlsy97$bw5_t0)
 table(nlsy97$bw5_t1)
 table(nlsy97$bw5_t2)
@@ -408,7 +417,7 @@ nlsy97 %>%
   scale_y_continuous(name = "Age at 1st birth", breaks = c(18, 20, 22, 24, 26, 28)) +
   scale_x_continuous(name = "Year of 1st birth", breaks = c(1996, 2000, 2004, 2008, 2012)) +
   labs(title = "Mothers' marital status at the time of 1st birth", 
-       subtitle = "Mothers aged 18 - 27 at 1st birth",
+       subtitle = "Mothers aged 18 - 30 at 1st birth",
        color = "Marital status",
        caption = "Source: National Longitudinal Survey of Youth | 1997 \n Analysis by: Joanna R. Pepin")
 
