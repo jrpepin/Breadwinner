@@ -226,14 +226,25 @@ data_hh <- data_hh %>%
       (year >= birth_year)   ~ 1,
       (year < birth_year)    ~ 0))
 
- # newValue = date[value == 4L] *?*?*? What was I trying to do here??
+# Add marital status variable
+marstat <- new_data %>%
+  select(PUBID_1997, starts_with("mar_")) %>%
+  gather(var, marst, -PUBID_1997) %>%
+  separate(var, c("drop", "time"), "_t") %>%
+  subset(select = -c(drop))
+
+marstat$time <- as.integer(marstat$time)
+
+data_hh  <- full_join(data_hh, marstat, by = c("PUBID_1997", "time"))
+
+remove(marstat)
 
 # Restructure the data
 ## 50% Breadwinning data
 data_hh50 <- data_hh %>%
-  select(PUBID_1997, year, firstbirth, birth_year, age_birth, time, starts_with("hhe5")) %>%
+  select(PUBID_1997, year, firstbirth, birth_year, age_birth, time, marst, starts_with("hhe5")) %>%
   group_by(PUBID_1997) %>%
-  gather(status, hhe50, -PUBID_1997, -year, -firstbirth, -birth_year, -age_birth, -time) %>%
+  gather(status, hhe50, -PUBID_1997, -year, -firstbirth, -birth_year, -age_birth, -time, -marst) %>%
   separate(status, c("type", "status"), "_")
 
 data_hh50$hhe50[data_hh50$hhe50 == "Not a breadwinner"] = 0L  # Not a breadwinner
@@ -271,9 +282,9 @@ data_hh50 <- data_hh50 %>%
 # Restructure the data
 ## 60% Breadwinning data
 data_hh60 <- data_hh %>%
-  select(PUBID_1997, year, firstbirth, birth_year, age_birth, time, starts_with("hhe6")) %>%
+  select(PUBID_1997, year, firstbirth, birth_year, age_birth, time, marst, starts_with("hhe6")) %>%
   group_by(PUBID_1997) %>%
-  gather(status, hhe60, -PUBID_1997, -year, -firstbirth, -birth_year, -age_birth, -time) %>%
+  gather(status, hhe60, -PUBID_1997, -year, -firstbirth, -birth_year, -age_birth, -time, -marst) %>%
   separate(status, c("type", "status"), "_")
 
 data_hh60$hhe60[data_hh60$hhe60 == "Not a breadwinner"] = 0L  # Not a breadwinner
@@ -311,12 +322,11 @@ data_hh60 <- data_hh60 %>%
 #Create datasets
 data_hh50 <- data_hh50 %>%
   ungroup() %>%
-  select(PUBID_1997, year, firstbirth, hhe50, time, birth_year, age_birth, age)
+  select(PUBID_1997, year, firstbirth, hhe50, time, marst, birth_year, age_birth, age)
 
 data_hh60 <- data_hh60 %>%
   ungroup() %>%
-  select(PUBID_1997, year, firstbirth, hhe60, time, birth_year, age_birth, age)
+  select(PUBID_1997, year, firstbirth, hhe60, time, marst, birth_year, age_birth, age)
 
-require(foreign)
 write.dta(data_hh50, "stata/NLSY97_hh50.dta")
 write.dta(data_hh60, "stata/NLSY97_hh60.dta")
