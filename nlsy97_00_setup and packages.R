@@ -22,6 +22,11 @@ if(!require(lubridate)){
   library(lubridate)
 }
 
+if(!require(foreign)){
+  install.packages("foreign")
+  library(foreign)
+}
+
 if(!require(here)){
   install.packages("here")
   library(here)
