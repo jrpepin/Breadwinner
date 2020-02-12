@@ -158,7 +158,7 @@ data_hh <- data_hh %>%
 
 ## Tidy data
 data_hh <- data_hh %>%
-  select(PUBID_1997, year, birth_year, age_birth, momearn, famearn, starts_with("hhe"))
+  select(PUBID_1997, year, birth_year, age_birth, momearn, starts_with("hhe"))
 
 data_hh$hhe5_m2  <- factor(data_hh$hhe5_m2)
 data_hh$hhe5_m1  <- factor(data_hh$hhe5_m1)
@@ -226,7 +226,7 @@ data_hh <- data_hh %>%
       (year >= birth_year)   ~ 1,
       (year < birth_year)    ~ 0))
 
-newValue = date[value == 4L])
+ # newValue = date[value == 4L] *?*?*? What was I trying to do here??
 
 # Restructure the data
 ## 50% Breadwinning data
@@ -240,8 +240,6 @@ data_hh50$hhe50[data_hh50$hhe50 == "Not a breadwinner"] = 0L  # Not a breadwinne
 data_hh50$hhe50[data_hh50$hhe50 == "Breadwinner"]       = 1L  # Breadwinner
 
 data_hh50$hhe50 <- as.numeric(data_hh50$hhe50)
-
-data_hh50 <- data_hh50
 
 data_hh50 <- data_hh50 %>%
   group_by(PUBID_1997, status) %>%
@@ -282,8 +280,6 @@ data_hh60$hhe60[data_hh60$hhe60 == "Not a breadwinner"] = 0L  # Not a breadwinne
 data_hh60$hhe60[data_hh60$hhe60 == "Breadwinner"]       = 1L  # Breadwinner
 
 data_hh60$hhe60 <- as.numeric(data_hh60$hhe60)
-
-data_hh60 <- data_hh60
 
 data_hh60 <- data_hh60 %>%
   group_by(PUBID_1997, status) %>%
