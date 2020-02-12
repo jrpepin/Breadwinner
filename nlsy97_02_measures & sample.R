@@ -711,15 +711,14 @@ incdata   <- left_join(incdata,   rntinc)
 incdata   <- left_join(incdata,   wcomp)
 incdata   <- left_join(incdata,   hhinc)
 incdata   <- left_join(incdata,   totinc)
-incdata   <- left_join(incdata,   spwages)
-incdata   <- left_join(incdata,   spbiz)
 incdata   <- left_join(incdata,   spinc)
+incdata   <- left_join(incdata,   spbiz)
 incdata   <- left_join(incdata,   wcomp_sp)
 
 incdata <- incdata %>%
   select(PUBID_1997, year, birth_year, wages, mombiz, chsup, dvdend, gftinc, 
          govpro1, govpro2, govpro3, inhinc, intrst, othinc, rntinc, wcomp, 
-         hhinc, totinc, spwages, spbiz, spwages, wcomp_sp)
+         hhinc, totinc, spwages, spbiz, wcomp_sp)
 
 ## Income at each duration of motherhood
 incdata$birth_year1   <- incdata$birth_year + 1
