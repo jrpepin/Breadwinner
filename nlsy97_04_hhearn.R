@@ -2,13 +2,14 @@
 data_hh   <- incdata
 
 data_hh  <- data_hh  %>%
-  select(PUBID_1997, year, birth_year, age_birth, wages, mombiz, spwages, spbiz, hhinc)
+  select(PUBID_1997, year, birth_year, age_birth, wages, mombiz, spwages, spbiz, hhinc, totinc)
 
 ## Create data_hh summary variables
 data_hh  <- data_hh  %>%
-  group_by(PUBID_1997, year) %>%  
-  mutate(momearn = wages + mombiz,
-         hhearn  = wages + mombiz + spwages + spbiz + hhinc)
+  group_by(PUBID_1997, year) %>%
+  mutate( momearn = wages + mombiz,
+          hhearn  = totinc)
+       #   hhearn  = wages + mombiz + spwages + spbiz + hhinc) # original way
 
 ## Tidy year vars
 data_hh$year       <- as.numeric(data_hh$year)
