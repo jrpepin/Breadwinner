@@ -36,9 +36,9 @@ use 	"stata\nlsy97_hh60.dta", clear
 fre year // Make sure the data includes all survey years (1997 - 2017)
 
 // Select only observations since first birth
-keep if firstbirth==1 	// selected on this in R already
-drop firstbirth 		// this variable has no variation now
-drop age_birth age		// These variables get in the way for this analysis
+keep if firstbirth==1 			// selected on this in R already
+drop firstbirth 				// this variable has no variation now
+drop age_birth age marst		// These variables get in the way for this analysis
 
 ********************************************************************************
 * Reshape the data

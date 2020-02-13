@@ -3,7 +3,7 @@ data_inc <- incdata
 
 ## Create mom's total income variable
 data_inc <- data_inc %>%
-  group_by(PUBID_1997, year) %>%  
+  group_by(PUBID_1997, year) %>%
   mutate(momtot = wages + mombiz + chsup + dvdend + gftinc + govpro1 + govpro2 + govpro3 + inhinc + intrst + othinc + rntinc + wcomp)
 
 # give people the income they reported for each of the income plus 1 variables
