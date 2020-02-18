@@ -53,7 +53,7 @@ collapse 	(count) monthsobserved=one  nmos_bw50=mbw50 nmos_bw60=mbw60 		///
 			(sum) 	tpearn thearn 												///
 			(mean) 	spouse partner numtype2 wpfinwgt 							///
 			(max) 	minorchildren minorbiochildren raceth educ tceb oldest_age 	///
-					start_spartner last_spartner 								///
+					start_spartner last_spartner tage							///
 			(min) 	durmom youngest_age first_wave,								///
 			by(SSUID PNUM year)
 			
