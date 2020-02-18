@@ -26,17 +26,18 @@
 ********************************************************************************
 * B. Risk of entering breadwinning for the first 10 years of motherhood
 ********************************************************************************
+/* 
+ CURRENTLY DOING ALL OF THESE IN C FILES
 	
 // Breadwinning estimates at the 50% threshold
     do "stata/nlsy97_hh50_risk.do"
 	
 // Breadwinning estimates at the 60% threshold
     do "stata/nlsy97_hh60_risk.do"
-	
+ */
 ********************************************************************************
 * C. Predict breadwinning status relative to the specific duration of motherhood
 ********************************************************************************
-*?*?* JP : This is what we did before. Is that the same as censored breadwinning (B2)?
 
 // Breadwinning estimates at the 50% threshold
     do "stata/nlsy97_hh50_pred.do"
