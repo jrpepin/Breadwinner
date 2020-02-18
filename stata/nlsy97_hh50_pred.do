@@ -56,6 +56,13 @@ drop age_birth age marst		// These variables get in the way for this analysis
 ********************************************************************************
 reshape wide year hhe50, i(PUBID_1997) j(time)
 
+// create lagged measures of breadwinning. We only need one lag for transtion
+//  into breadwinning and measres of whether any breadwinning up to this point in time
+
+* set the first lag to 0 because it is not possible to be a breadwinning mother
+* before being a mother.
+gen hh50_minus1_0=0
+
 forvalues t=1/9{
     local s=`t'-1
     gen hhe50_minus1_`t'=hhe50`s' 
@@ -101,52 +108,67 @@ forvalues t=9/9{
     gen hhe50_minus9_`t'=hhe50`v' 
 }
 
+// creating indicators for whether R has been observed as a 
+// breadwinning mother at any previous duration of motherhood
+
+gen prevbreadwon0=0 // can't have previously breadwon and duration 0
+forvalues t=1/9 {
+	gen prevbreadwon`t'=0
+	local s=`t'-1
+    * loop over all earlier duratons looking for any breadwinning
+	forvalues u=0/`s' { 
+		replace prevbreadwon`t'=1 if hhe50`u'==1
+	}
+}
+
 reshape long year hhe50 hhe50_minus1_ hhe50_minus2_ hhe50_minus3_ hhe50_minus4_ ///
-						hhe50_minus5_ hhe50_minus6_ hhe50_minus7_ hhe50_minus8_ ///
-						hhe50_minus9_, i(PUBID_1997) j(time)
+             hhe50_minus5_ hhe50_minus6_ hhe50_minus7_ hhe50_minus8_  ///
+			 hhe50_minus9_ prevbreadwon, i(PUBID_1997) j(time)
 
 * clean up observations created because reshape creates some number of observations for each (PUBID_1997)
 drop if missing(year)
 
-
 ********************************************************************************
-* B1. Estimates of breadwinning (at each duration of motherhood)
+* B1. Estimates of transitions into breadwinning (at each duration of motherhood)
 ********************************************************************************
 
 preserve
-forvalues t = 1/9 {
+forvalues t = 0/9 {
+	drop if hhe50_minus1_ == 1
 	tab hhe50 if time == `t'
-	drop if hhe50_minus`t'_ == 1
+
 	}
 restore
-
 
 ********************************************************************************
 * B2. Risk of entering breadwinning, censoring on previous breadwinning
 ********************************************************************************
-// Create ever breadwinning variable
-bysort PUBID_1997 (time) : gen everbw = sum(hhe50)
-replace everbw = 1 if everbw >= 1
+// Create ever breadwinning prior to this duration variable
+
+bysort PUBID_1997 (time) : gen everbw = sum(hhe50_minus1_) // 
+replace everbw = 1 if everbw >= 1 
 
 tab time everbw, row
 
 preserve
-forvalues t = 1/9 {
+forvalues t = 0/9 {
+	drop if prevbreadwon == 1 
 	tab hhe50 if time == `t'
-	drop if everbw == 1 & time == `t'
 	}
 restore
 
 ********************************************************************************
-* B3. Proportion of breadwinning at each duration of motherhood that have previously breadwon
+* B3. Proportion breadwinning at each duration of motherhood that have previously breadwon
 ********************************************************************************
 // Create a lagged ever bw variable (so current bw doesn't count)
-sort PUBID_1997 time 
-by PUBID_1997: gen ebwlag = everbw[_n-1]
+*sort PUBID_1997 time 
+*by PUBID_1997: gen ebwlag = everbw[_n-1]
 
 forvalues t = 1/9 {
-	tab ebwlag hhe50 if time ==`t', col
+	tab everbw hhe50 if time ==`t', col
 	}
+
+table time prevbreadwon, contents(mean hhe50) col
 
 ********************************************************************************
 * Create lifetable
@@ -168,9 +190,9 @@ ltable _t _d, failure
 ********************************************************************************
 * Predict breadwinning
 ********************************************************************************
-logit hhe50 hhe50_minus1 i.time
-logit hhe50 hhe50_minus1 hhe50_minus2 i.time
-logit hhe50 hhe50_minus1 hhe50_minus2 hhe50_minus3 i.time
-logit hhe50 hhe50_minus1 hhe50_minus2 hhe50_minus3 hhe50_minus4 i.time
+logit hhe50 hhe50_minus1_ i.time
+logit hhe50 hhe50_minus1_ hhe50_minus2_ i.time
+logit hhe50 hhe50_minus1_ hhe50_minus2_ hhe50_minus3_ i.time
+logit hhe50 hhe50_minus1_ hhe50_minus2_ hhe50_minus3_ hhe50_minus4_ i.time
 
 log close
