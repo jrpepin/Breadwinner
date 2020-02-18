@@ -1370,6 +1370,50 @@ Min:              0        Max:              1        Mean:                 .75
 Lead In: R12357.00[Default]
 Default Next Question: R12359.00
 --------------------------------------------------------------------------------
+R12361.01    [SAMPLING_WEIGHT_CC]                           Survey Year: 1997
+  PRIMARY VARIABLE
+
+ 
+             ROUND 1 SAMPLING WEIGHT CUMULATIVE CASES METHOD
+ 
+Sampling Weight: Cumulative Cases Method   0 thru 9999999  (2 implied decimal 
+places)
+0 THRU 9999999 (2 IMPLIED DECIMAL PLACES)
+ 
+       0           0
+       0       30000 TO 59999: 300.00-599.99
+    1445       60000 TO 99999: 600.00-999.99
+    1883      100000 TO 149999: 1000.00-1499.99
+     214      150000 TO 199999: 1500.00-1999.99
+     514      200000 TO 249999: 2000.00-2499.99
+    3354      250000 TO 299999: 2500.00-2999.99
+    1442      300000 TO 349999: 3000.00-3499.99
+      97      350000 TO 399999: 3500.00-3999.99
+      22      400000 TO 449999: 4000.00-4499.99
+       8      450000 TO 499999: 4500.00-4999.99
+       4      500000 TO 549999: 5000.00-5499.99
+       0      550000 TO 599999: 5500.00-5999.99
+       0      600000 TO 649999: 6000.00-6499.99
+       0      650000 TO 699999: 6500.00-6999.99
+       0      700000 TO 749999: 7000.00-7499.99
+       0      750000 TO 799999: 7500.00-7999.99
+       0      800000 TO 849999: 8000.00-8499.99
+       1      850000 TO 9999999: 8500.00+
+  -------
+    8984
+ 
+Refusal(-1)            0
+Don't Know(-2)         0
+TOTAL =========>    8984   VALID SKIP(-4)       0     NON-INTERVIEW(-5)       0
+ 
+Min:          76071        Max:        1576182        Mean:           215699.61
+ 
+Hard Minimum: [0]  Hard Maximum: [9999999]
+Soft Minimum: [0]  Soft Maximum: [9999999]
+ 
+Lead In: R12361.00[Default]
+Default Next Question: R12362.01
+--------------------------------------------------------------------------------
 R14826.00    [KEY!RACE_ETHNICITY]                           Survey Year: 1997
   PRIMARY VARIABLE
 
