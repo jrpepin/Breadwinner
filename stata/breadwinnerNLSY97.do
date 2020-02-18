@@ -42,5 +42,6 @@
 // Breadwinning estimates at the 50% threshold
     do "stata/nlsy97_hh50_pred.do"
 
+	* Haven't updated 60 yet.
 // Breadwinning estimates at the 60% threshold
-    do "stata/nlsy97_hh60_pred.do"
+   // do "stata/nlsy97_hh60_pred.do"
