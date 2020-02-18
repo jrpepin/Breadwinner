@@ -24,17 +24,14 @@ This R code was executed in the open source edition of [RStudio](https://www.rst
 
 After extracting the downloaded files, open the R file.
 
-## Set the working directory file path
+## 1. Set the working directory file path
 You will need to your computer where to look for the downloaded data, which should be saved in dataDir, a sub-folder of the projDir.
 Instead of changing the "setwd" as instructed, let's just change the relative file path using the "here" package
 ``` {r eval = FALSE}
 new_data <- read.table(here(dataDir, 'nlsy9717.dat'), sep=' ') #The .dat should be the name of your downloaded data file.
 ```
 
-``` {r setup, echo = FALSE}
-knitr::opts_knit$set(root.dir = 'C:/Users/Joanna/Dropbox/Repositories/NLSY97_Breadwinning/NLSY97_tagset')
-```
-Search for the missing codes and add the '#' before the lines so we can see why values are missing.
+## 2. Search for the missing codes and add the '#' before the lines so we can see why values are missing.
 
 ## Handle missing values
 
@@ -44,7 +41,7 @@ Search for the missing codes and add the '#' before the lines so we can see why 
 #  new_data[new_data == -4] = NA  # Valid missing 
 #  new_data[new_data == -5] = NA  # Non-interview 
   
-At the bottom of the script, remove three '#' signs to create a data file called "categories" with value labels and to rename variables using Qnames instead of Reference Numbers. Then, run the entire script.
+## 3. At the bottom of the script, remove three '#' signs to create a data file called "categories" with value labels and to rename variables using Qnames instead of Reference Numbers. Then, run the entire script.
 
 # Measures and Sample
 Open the "nlsy97_measures & sample" R script to begin managing the data.
