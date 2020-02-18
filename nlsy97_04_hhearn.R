@@ -325,9 +325,13 @@ data_hh50 <- data_hh50 %>%
   ungroup() %>%
   select(PUBID_1997, year, firstbirth, hhe50, time, marst, birth_year, age_birth, age)
 
+data_hh50$wt1997     <- nlsy97$wt1997[match(data_hh50$PUBID_1997, nlsy97$PUBID_1997)]  # Add 1997 survey weights
+
 data_hh60 <- data_hh60 %>%
   ungroup() %>%
   select(PUBID_1997, year, firstbirth, hhe60, time, marst, birth_year, age_birth, age)
+
+data_hh60$wt1997     <- nlsy97$wt1997[match(data_hh60$PUBID_1997, nlsy97$PUBID_1997)]  # Add 1997 survey weights
 
 write.dta(data_hh50, "stata/NLSY97_hh50.dta")
 write.dta(data_hh60, "stata/NLSY97_hh60.dta")

@@ -314,7 +314,7 @@ nlsy97 <- data_inc # Create a newly named dataset
 nlsy97$birth_year <- new_data$birth_year[match(nlsy97$PUBID_1997, new_data$PUBID_1997)] # Add birth year
 nlsy97$mar_t0     <- new_data$mar_t0[match(nlsy97$PUBID_1997, new_data$PUBID_1997)]     # Add marst at t0
 nlsy97$age_birth  <- new_data$age_birth[match(nlsy97$PUBID_1997, new_data$PUBID_1997)]  # Add age at first birth
-
+nlsy97$wt1997     <- new_data$SAMPLING_WEIGHT_CC_1997[match(nlsy97$PUBID_1997, new_data$PUBID_1997)]  # Add 1997 survey weights
 ###############################################################
 # Descriptives
 table(nlsy97$birth_year, nlsy97$mar_t0, exclude = NULL)
