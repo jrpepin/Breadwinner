@@ -17,23 +17,24 @@ set more off
 
 use 	"stata/nlsy97_hh50.dta", clear
 
-tab age time, nofreq col
+tab age time [fweight=wt1997], nofreq col
 
 forvalues d=0/9 {
-	gen dur`d'=1 if time==`d'
+	gen dur`d'=wt1997 if time==`d'
 	forvalues a=18/38 {
-		gen age`a'dur`d'=1 if age==`a' & time==`d'
+		gen age`a'dur`d'=wt1997 if age==`a' & time==`d'
 		
 	}
 }
 
 forvalues d=0/9 {
-	egen numdur`d'=count(dur`d')
+	egen numdur`d'=sum(dur`d')
 	forvalues a=18/38 {
-		egen numage`a'dur`d'=count(age`a'dur`d')
+		egen numage`a'dur`d'=sum(age`a'dur`d')
 		gen propage`a'dur`d'=numage`a'dur`d'/numdur`d'
 	}
 }
+
 
 keep propage* 
 
@@ -41,13 +42,12 @@ keep if _n==1
 
 gen one=1
 
+
 reshape long propage18dur propage19dur propage20dur propage21dur propage22dur propage23dur propage24dur propage25dur propage26dur propage27dur propage28dur propage29dur propage30dur propage31dur propage32dur propage33dur propage34dur propage35dur propage36dur propage37dur propage38dur, i(one) j(time)
 
 rename propage??dur propage??
 rename time durmom
 
 drop one
-
-tab age time, nofreq row
 
 save "$NLSYkeep/agedist.dta", replace

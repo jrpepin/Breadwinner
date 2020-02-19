@@ -135,7 +135,7 @@ drop if missing(year)
 preserve
 forvalues t = 0/9 {
 	drop if hhe50_minus1_ == 1
-	tab hhe50 if time == `t'
+	tab hhe50 if time == `t' [fweight=wt1997]
 
 	}
 restore
@@ -153,7 +153,7 @@ tab time everbw, row
 preserve
 forvalues t = 0/9 {
 	drop if prevbreadwon == 1 
-	tab hhe50 if time == `t'
+	tab hhe50 if time == `t' [fweight=wt1997]
 	}
 restore
 
