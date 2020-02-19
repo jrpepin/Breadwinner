@@ -11,18 +11,28 @@
 
 use "$SIPP14keep/bw_transitions.dta", clear
 
+replace durmom=durmom-1
+
+keep if durmom >= 0
+
+gen intweight=int(wpfinwgt*10000)
+
+tab tage durmom
+
+tab tage durmom [fweight=intweight], nofreq col
+
 forvalues d=0/9 {
-	gen dur`d'=1 if durmom==`d'
+	gen dur`d'=intweight if durmom==`d'
 	forvalues a=18/38 {
-		gen age`a'dur`d'=1 if tage==`a' & durmom==`d'
+		gen age`a'dur`d'=intweight if tage==`a' & durmom==`d'
 		
 	}
 }
 
 forvalues d=0/9 {
-	egen numdur`d'=count(dur`d')
+	egen numdur`d'=sum(dur`d')
 	forvalues a=18/38 {
-		egen numage`a'dur`d'=count(age`a'dur`d')
+		egen numage`a'dur`d'=sum(age`a'dur`d')
 		gen propage`a'dur`d'=numage`a'dur`d'/numdur`d'
 	}
 }
@@ -55,3 +65,23 @@ keep durmom w*
 reshape long w, i(durmom) j(tage)
 
 save "$SIPP14keep/NLSYageweights.dta", replace
+
+* Check does adusting the weights make the age distribution of the SIPP look like that of the NLSY?
+
+use "$SIPP14keep/bw_transitions.dta", clear
+
+replace durmom=durmom-1
+
+keep if durmom >= 0
+
+merge m:1 durmom tage using "$SIPP14keep/NLSYageweights.dta"
+
+gen intweight=int(wpfinwgt*10000)
+
+gen adjwgt=intweight/w
+
+tab tage durmom [aweight=adjwgt], nofreq col
+
+save "$SIPP14keep/bw_transitions_NLSYwgt.dta", replace
+
+* Compare this table to the age by time table in the NLSYagedist result. It's exactly the same!!
