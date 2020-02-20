@@ -9,12 +9,12 @@
 ********************************************************************************
 local logdate = string( d(`c(current_date)'), "%dCY.N.D" ) 	// create a macro for the date
 
-local list : dir . files "$logdir\*nlsy97_hh50_pred_*.log"	// Delete earlier versions of the log
+local list : dir . files "$logdir/*nlsy97_hh50_pred_*.log"	// Delete earlier versions of the log
 foreach f of local list {
     erase "`f'"
 }
 
-log using "$logdir\nlsy97_hh50_pred_`logdate'.log", t replace
+log using "$logdir/nlsy97_hh50_pred_`logdate'.log", t replace
 
 di "$S_DATE"
 
@@ -32,7 +32,7 @@ di "$S_DATE"
 clear
 set more off
 
-use 	"stata\nlsy97_hh50.dta", clear
+use 	"stata/NLSY97_hh50.dta", clear
 fre year // Make sure the data includes all survey years (1997 - 2017)
 
 ********************************************************************************
@@ -135,7 +135,7 @@ drop if missing(year)
 preserve
 forvalues t = 0/9 {
 	drop if hhe50_minus1_ == 1
-	tab hhe50 if time == `t' [fweight=wt1997]
+	tab hhe50 if time == `t'
 
 	}
 restore
@@ -168,13 +168,21 @@ forvalues t = 1/9 {
 	tab everbw hhe50 if time ==`t', col
 	}
 
-table time prevbreadwon, contents(mean hhe50) col
+table time prevbreadwon [fweight=wt1997], contents(mean hhe50) col
 
 ********************************************************************************
 * Create lifetable
 ********************************************************************************
 // Tell Stata the format of the survival data
+
+* STS wants the time variable to start at 1
+replace time=time+1 
+
 stset time, id(PUBID_1997) failure(hhe50==1)
+
+* why does sts think we start with 2371 observations unweighted. It's 1678.
+* The problem is missing values for hhe50
+sts list
 
 sort PUBID_1997
 list PUBID_1997 time year hhe50 _st _d _t _t0 in 1/20
