@@ -1,18 +1,41 @@
 Breadwinner Estimates (SIPP 2014 reweighted to look like NLSY age distribution)
 ================================================================================
+
 ~~~~
 <<dd_do: quietly>>
+
 * This file estimates lifetables using SIPP data weighted to look like NLSY
 
 use "$SIPP14keep/bw_transitions_NLSYwgt.dta", clear
 
+********************************************************************************
+* Describe percent breadwinning in the first year
+********************************************************************************
+// The percent breadwinning (50% threhold) in the first year. (~25%)
+	sum bw50 if durmom	==0 [aweight=adjwgt] // Breadwinning in the year of the birth
+
+	gen per_bw50_atbirth	=100*`r(mean)'
+	gen notbw50_atbirth		=1-`r(mean)'
+
+// The percent breadwinning (60% threhold) in the first year. (~17%)
+	sum bw60 if durmom	==0 [aweight=adjwgt] // Breadwinning in the year of the birth
+
+	gen per_bw60_atbirth	=100*`r(mean)'
+	gen notbw60_atbirth		=1-`r(mean)'
+
 tab durmom trans_bw50, matcell(bw50uw)
 
 tab durmom trans_bw60, matcell(bw60uw) // just to check n's 
+
+
 <</dd_do>>
 ~~~~
+
 First, a description of the age distribution of the SIPP weighted to be the same
 as the NLSY 97
+
+~~~~
+<<dd_do>>
 
 tab tage durmom [aweight=adjwgt], nofreq col
 
@@ -23,6 +46,7 @@ A table describing weighted transition rates at all durations:
 
 ~~~~
 <<dd_do>>
+
 tab durmom trans_bw50 [aweight=adjwgt] if trans_bw50 !=2 , matcell(bw50w) nofreq row
 tab durmom trans_bw60 [aweight=adjwgt] if trans_bw60 !=2 , matcell(bw60w) nofreq row
 
