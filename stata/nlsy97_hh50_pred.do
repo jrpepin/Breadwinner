@@ -52,17 +52,19 @@ drop firstbirth 				// this variable has no variation now
 drop age_birth age marst		// These variables get in the way for this analysis
 
 ********************************************************************************
-* Reshape the data
+* Create lagged measures of breadwinning
 ********************************************************************************
+* We only need one lag for transtion into breadwinning and measures of whether 
+* any breadwinning up to this point in time
+
+// Reshape the data
 reshape wide year hhe50, i(PUBID_1997) j(time)
 
-// create lagged measures of breadwinning. We only need one lag for transtion
-//  into breadwinning and measres of whether any breadwinning up to this point in time
-
-* set the first lag to 0 because it is not possible to be a breadwinning mother
-* before being a mother.
+// Set the first lag to 0 because it is not possible to be a breadwinning mother
+// before being a mother.
 gen hh50_minus1_0=0
 
+// Create the lagged measures
 forvalues t=1/9{
     local s=`t'-1
     gen hhe50_minus1_`t'=hhe50`s' 
@@ -108,10 +110,11 @@ forvalues t=9/9{
     gen hhe50_minus9_`t'=hhe50`v' 
 }
 
-// creating indicators for whether R has been observed as a 
+// Create indicators for whether R has been observed as a 
 // breadwinning mother at any previous duration of motherhood
 
 gen prevbreadwon0=0 // can't have previously breadwon and duration 0
+
 forvalues t=1/9 {
 	gen prevbreadwon`t'=0
 	local s=`t'-1
