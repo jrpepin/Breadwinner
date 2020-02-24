@@ -30,7 +30,7 @@ table durmom wave, contents(mean bw50) format(%3.2g)
 local change_variables 	year monthsobserved nmos_bw50 nmos_bw60 tpearn thearn spouse partner	///
 						wpfinwgt minorchildren minorbiochildren tceb oldest_age start_spartner 	///
 						last_spartner durmom youngest_age anytype2 hh_noearnings bw50 bw60 		///
-						gain_partner lost_partner partial_year raceth educ tage
+						gain_partner lost_partner partial_year raceth educ tage ageb1
 						
 // Create macros for reshape command
 local i_vars "SSUID PNUM"

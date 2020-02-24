@@ -17,21 +17,21 @@ keep if durmom >= 0
 
 gen intweight=int(wpfinwgt*10000)
 
-tab tage durmom
+tab durmom bw50 [fweight=intweight], row
 
-tab tage durmom [fweight=intweight], nofreq col
+tab ageb1 durmom [fweight=intweight], col
 
 forvalues d=0/9 {
 	gen dur`d'=intweight if durmom==`d'
-	forvalues a=18/38 {
-		gen age`a'dur`d'=intweight if tage==`a' & durmom==`d'
+	forvalues a=18/31 {
+		gen age`a'dur`d'=intweight if ageb1==`a' & durmom==`d'
 		
 	}
 }
 
 forvalues d=0/9 {
 	egen numdur`d'=sum(dur`d')
-	forvalues a=18/38 {
+	forvalues a=18/31 {
 		egen numage`a'dur`d'=sum(age`a'dur`d')
 		gen propage`a'dur`d'=numage`a'dur`d'/numdur`d'
 	}
@@ -43,7 +43,7 @@ keep if _n==1
 
 gen one=1
 
-reshape long propage18dur propage19dur propage20dur propage21dur propage22dur propage23dur propage24dur propage25dur propage26dur propage27dur propage28dur propage29dur propage30dur propage31dur propage32dur propage33dur propage34dur propage35dur propage36dur propage37dur propage38dur, i(one) j(durmom)
+reshape long propage18dur propage19dur propage20dur propage21dur propage22dur propage23dur propage24dur propage25dur propage26dur propage27dur propage28dur propage29dur propage30dur propage31dur, i(one) j(durmom)
 
 rename propage* Spropage*
 rename Spropage??dur Spropage??
@@ -53,16 +53,16 @@ drop one
 // read in NLSY age distribution data. Code is in separate repository.
 merge 1:1 durmom using "$NLSYkeep/agedist.dta"
 
-sum Spropage18-Spropage38
-sum propage18-propage38
+sum Spropage18-Spropage31
+sum propage18-propage31
 
-forvalues a=18/38 {
+forvalues a=18/31 {
     gen w`a'=Spropage`a'/propage`a'
 }
 
 keep durmom w*
 
-reshape long w, i(durmom) j(tage)
+reshape long w, i(durmom) j(ageb1)
 
 save "$SIPP14keep/NLSYageweights.dta", replace
 
@@ -74,7 +74,7 @@ replace durmom=durmom-1
 
 keep if durmom >= 0
 
-merge m:1 durmom tage using "$SIPP14keep/NLSYageweights.dta"
+merge m:1 durmom ageb1 using "$SIPP14keep/NLSYageweights.dta"
 
 gen intweight=int(wpfinwgt*10000)
 

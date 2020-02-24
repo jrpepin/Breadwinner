@@ -78,12 +78,16 @@ clear
 
 // Create an indicator of how many years have elapsed since individual transitioned to parenthood
    gen durmom=year-yrfirstbirth if !missing(yrfirstbirth)
-	
+   
 // Create a flag if year of first birth is > respondents year of birth+9
    gen 		mybirthyear		= year-tage
    gen 		birthyear_error	= 1 			if mybirthyear+9  > yrfirstbirth & !missing(yrfirstbirth)  // too young
    replace 	birthyear_error	= 1 			if mybirthyear+50 < yrfirstbirth & !missing(yrfirstbirth)  // too old
 
+// create an indicator of age at first birth to be able to compare to NLSY analysis
+   gen ageb1=yrfirstbirth-mybirthyear
+   
+   
 // Create a race/ethnicity variable and a recoded education variable
 
 gen raceth=erace
