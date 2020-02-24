@@ -733,11 +733,6 @@ incdata$birth_year9   <- incdata$birth_year + 9
 incdata$birth_year10  <- incdata$birth_year + 10
 incdata$birth_year11  <- incdata$birth_year + 11
 
-incdata$birth_minus1 <- incdata$birth_year - 1
-incdata$birth_minus2 <- incdata$birth_year - 2
-incdata$birth_minus3 <- incdata$birth_year - 3
-incdata$birth_minus4 <- incdata$birth_year - 4
-
 # Clean up console -----------------------------------------------------------------
 ## Check to make sure N in incdata = N in new_data
 is.logical(length(unique(incdata$PUBID_1997)) == length(unique(new_data$PUBID_1997))) 
