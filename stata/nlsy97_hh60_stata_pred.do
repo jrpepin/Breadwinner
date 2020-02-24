@@ -1,6 +1,6 @@
 *-------------------------------------------------------------------------------
 * BREADWINNER PROJECT - NLSY97 Component
-* nlsy97_hh60_pred.do
+* nlsy97_hh60_stata_pred.do
 * Joanna Pepin
 *-------------------------------------------------------------------------------
 
@@ -9,12 +9,12 @@
 ********************************************************************************
 local logdate = string( d(`c(current_date)'), "%dCY.N.D" ) 	// create a macro for the date
 
-local list : dir . files "$logdir/*nlsy97_hh60_pred_*.log"	// Delete earlier versions of the log
+local list : dir . files "$logdir/*nlsy97_hh60_stata_pred_*.log"	// Delete earlier versions of the log
 foreach f of local list {
     erase "`f'"
 }
 
-log using "$logdir/nlsy97_hh60_pred_`logdate'.log", t replace
+log using "$logdir/nlsy97_hh60_stata_pred_`logdate'.log", t replace
 
 di "$S_DATE"
 
@@ -32,9 +32,10 @@ di "$S_DATE"
 clear
 set more off
 
-use 	"stata/NLSY97_hh60.dta", clear
+use 	"stata/NLSY97_processed.dta", clear
 fre year // Make sure the data includes all survey years (1997 - 2017)
 
+keep if firstbirth==1 // didn't drop in R already
 ********************************************************************************
 * Generate basic descriptives
 ********************************************************************************
@@ -47,7 +48,7 @@ table age_birth marst, contents(mean hhe60) // BW by age at first birth & marst
 
 
 // Select only observations since first birth
-keep if firstbirth==1 			// selected on this in R already
+keep if firstbirth==1 			// diff from before
 drop firstbirth 				// this variable has no variation now
 drop age_birth age marst		// These variables get in the way for this analysis
 
@@ -58,6 +59,7 @@ drop age_birth age marst		// These variables get in the way for this analysis
 * any breadwinning up to this point in time
 
 // Reshape the data
+keep  year hhe60 PUBID_1997 time wt1997
 reshape wide year hhe60, i(PUBID_1997) j(time)
 
 // Set the first lag to 0 because it is not possible to be a breadwinning mother
