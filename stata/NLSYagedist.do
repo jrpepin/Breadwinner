@@ -15,7 +15,9 @@
 clear
 set more off
 
-use 	"stata/nlsy97_hh50.dta", clear
+use 	"stata/NLSY97_hh50.dta", clear
+
+keep if !missing(hhe50)
 
 tab age_birth time [fweight=wt1997], nofreq col
 

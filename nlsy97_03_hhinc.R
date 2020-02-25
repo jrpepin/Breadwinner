@@ -1,5 +1,17 @@
+#------------------------------------------------------------------------------------
+# BREADWINNER PROJECT
+# nlsy97_03_hhinc.R
+# Joanna Pepin
+#------------------------------------------------------------------------------------
+
+# This script creates breadwinning indcators using all household INCOME variables.
+
 # Household Income Variables
 data_inc <- incdata
+
+#####################################################################################
+# Create income variables
+#####################################################################################
 
 ## Create mom's total income variable
 data_inc <- data_inc %>%
@@ -54,6 +66,9 @@ data_inc <- data_inc %>%
          totinc_m4 = case_when(birth_minus3 == year ~ totinc),
          totinc_m5 = case_when(birth_minus4 == year ~ totinc))
 
+#####################################################################################
+# Reshape and clean the data
+#####################################################################################
 
 # aggregate the data so there is 1 row per person
 data_inc <- data_inc %>%
@@ -103,6 +118,9 @@ data_inc$totinc_m3[is.nan(data_inc$totinc_m3)] <- NA
 data_inc$totinc_m4[is.nan(data_inc$totinc_m4)] <- NA
 data_inc$totinc_m5[is.nan(data_inc$totinc_m5)] <- NA
 
+#####################################################################################
+# Create the breadwinner indicators
+#####################################################################################
 
 # BREADWINNER 50%
 data_inc <- data_inc %>%
