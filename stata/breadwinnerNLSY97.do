@@ -51,6 +51,8 @@ if (_rc) {
 ********************************************************************************
 * C. Same as above, but with bw indicators created in Stata
 ********************************************************************************
+// Look at descriptive statistics
+	do "stata/nlsy97_descriptives"
 
 // Create Breadwinning measures
 	do "stata/nlsy97_bw measures"

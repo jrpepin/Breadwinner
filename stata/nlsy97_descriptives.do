@@ -77,3 +77,5 @@ univar per_wages per_mombiz per_spwages per_spbiz per_hhinc, by(time)
 foreach var of varlist per_wages per_mombiz per_spwages per_spbiz per_hhinc {
 tab time `var'  if `var' <= 1, row
 }
+
+log close
