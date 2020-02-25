@@ -17,19 +17,19 @@ set more off
 
 use 	"stata/nlsy97_hh50.dta", clear
 
-tab age time [fweight=wt1997], nofreq col
+tab age_birth time [fweight=wt1997], nofreq col
 
 forvalues d=0/9 {
 	gen dur`d'=wt1997 if time==`d'
-	forvalues a=18/38 {
-		gen age`a'dur`d'=wt1997 if age==`a' & time==`d'
+	forvalues a=18/31 {
+		gen age`a'dur`d'=wt1997 if age_birth==`a' & time==`d'
 		
 	}
 }
 
 forvalues d=0/9 {
 	egen numdur`d'=sum(dur`d')
-	forvalues a=18/38 {
+	forvalues a=18/31 {
 		egen numage`a'dur`d'=sum(age`a'dur`d')
 		gen propage`a'dur`d'=numage`a'dur`d'/numdur`d'
 	}
