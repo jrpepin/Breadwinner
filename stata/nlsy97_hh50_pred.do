@@ -118,30 +118,31 @@ reshape long year hhe50 hhe50_minus1_ hhe50_minus2_ hhe50_minus3_ hhe50_minus4_ 
 * clean up observations created because reshape creates some number of observations for each (PUBID_1997)
 drop if missing(year)
 
-********************************************************************************
-* B1. Estimates of transitions into breadwinning (at each duration of motherhood)
-********************************************************************************
-preserve
-	keep if hhe50_minus1_ == 0
-	tab time hhe50 [fweight=wt1997], row
-	tab time hhe50, row
-restore
-
-********************************************************************************
-* B2. Risk of entering breadwinning, censoring on previous breadwinning
-********************************************************************************
 // Create ever breadwinning prior to this duration variable
 
 bysort PUBID_1997 (time) : gen everbw = sum(hhe50_minus1_) // 
 replace everbw = 1 if everbw >= 1 
 
-tab time everbw, row
+save "stata/bw50_analysis.dta", replace
+
+********************************************************************************
+* B1. Estimates of transitions into breadwinning (at each duration of motherhood)
+********************************************************************************
 
 preserve
-	keep if hhe50_minus1_ == 0 // drops missing and those breadwinning in previous wave
+	keep if hhe50_minus1_ == 0
+	tab time hhe50 [fweight=wt1997], row
+	tab time hhe50, row
+
+
+********************************************************************************
+* B2. Risk of entering breadwinning, censoring on previous breadwinning
+********************************************************************************
+
 	drop if everbw == 1 
 
 	tab time hhe50 [fweight=wt1997], row
+
 restore
 
 ********************************************************************************
