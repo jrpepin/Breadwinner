@@ -45,10 +45,14 @@ order PUBID_1997 year birth_year time momearn wages mombiz totinc hhearn
 * spbiz		- SP/P'S TOTAL INCOME FROM BUSINESS OR FARM IN PAST YEAR
 * hhinc		- TOTAL COMBINED INCOME OTHER ADULT HOUSEHOLD FAMILY MEMBERS IN PAST YEAR
 
+* momearn	- sum of wages and mombiz
+* hhearn	- copy of totinc (NLSY provided R's Total Household Income by year)
+
 // Lag the income variables for analysis by time
 sort PUBID_1997 time
 
-foreach var of varlist 	wages mombiz chsup dvdend gftinc 	///
+foreach var of varlist 	momearn hhearn						///
+						wages mombiz chsup dvdend gftinc 	///
 						govpro1 govpro2 govpro3 inhinc 		///
 						intrst othinc rntinc wcomp 			///
 						hhinc totinc spwages spbiz wcomp_sp{
