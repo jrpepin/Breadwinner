@@ -78,6 +78,8 @@ foreach var of varlist wages mombiz spwages spbiz hhinc{
 
 univar per_wages per_mombiz per_spwages per_spbiz per_hhinc, by(time)
 
+tab PUBID_1997 if per_wages > 1 & per_wages < .
+
 foreach var of varlist per_wages per_mombiz per_spwages per_spbiz per_hhinc {
 tab time `var'  if `var' <= 1, row
 }
