@@ -70,3 +70,10 @@ if (_rc) {
         `"you can do so by clicking this link: {stata "ssc install fre":auto-install fre}"'
     exit 199
 }
+
+capture : which univar
+if (_rc) {
+    display as error in smcl `"Please install package {it:univar} from SSC in order to run these do-files;"' _newline ///
+        `"you can do so by clicking this link: {stata "ssc install univar":auto-install univar}"'
+    exit 199
+}
