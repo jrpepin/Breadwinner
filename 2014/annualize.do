@@ -88,21 +88,6 @@ collapse 	(count) monthsobserved=one  nmos_bw50=mbw50 nmos_bw60=mbw60 		///
 	// 60% breadwinning threshold
 	gen 	bw60= (tpearn > .6*thearn) 	if hh_noearnings !=1 & !missing(tpearn)
 	replace bw60= 0 					if hh_noearnings==1
-
-********************************************************************************
-* Describe percent breadwinning in the first year
-********************************************************************************
-// The percent breadwinning (50% threhold) in the first year. (~25%)
-	sum bw50 if durmom		==0 // Breadwinning in the year of the birth
-
-	gen per_bw50_atbirth	=100*`r(mean)'
-	gen notbw50_atbirth		=1-`r(mean)'
-
-// The percent breadwinning (60% threhold) in the first year. (~17%)
-	sum bw60 if durmom		==0 // Breadwinning in the year of the birth
-
-	gen per_bw60_atbirth	=100*`r(mean)'
-	gen notbw60_atbirth		=1-`r(mean)'
 	
 gen wave=year-2012
 	

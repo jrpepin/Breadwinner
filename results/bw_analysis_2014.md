@@ -146,6 +146,23 @@ replace durmom=durmom-1
 
 drop if durmom < 0
 
+gen intweight=int(wpfinwgt*10000)
+
+********************************************************************************
+* Describe percent breadwinning in the first year
+********************************************************************************
+// The percent breadwinning (50% threhold) in the first year. (~25%)
+	sum bw50 if durmom	==0 [aweight=wpfinwgt] // Breadwinning in the year of the birth
+
+	gen per_bw50_atbirth	=100*`r(mean)'
+	gen notbw50_atbirth		=1-`r(mean)'
+
+// The percent breadwinning (60% threhold) in the first year. (~17%)
+	sum bw60 if durmom	==0 [aweight=wpfinwgt] // Breadwinning in the year of the birth
+
+	gen per_bw60_atbirth	=100*`r(mean)'
+	gen notbw60_atbirth		=1-`r(mean)'
+
 tab durmom trans_bw50, matcell(bw50uw)
 
 tab durmom trans_bw60, matcell(bw60uw) // just to check n's 
