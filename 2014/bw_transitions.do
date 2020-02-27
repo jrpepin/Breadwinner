@@ -24,7 +24,7 @@ tab first_wave wave
 table durmom wave, contents(mean bw50) format(%3.2g)
 
 * List of variables that should be constants:
-	* per_bw50_atbirth notbw50_atbirth pper_bw60_atbirth notbw50_atbirth first_wave
+	* notbw50_atbirth first_wave
 
 // List of variables that change over time
 local change_variables 	year monthsobserved nmos_bw50 nmos_bw60 tpearn thearn spouse partner	///
