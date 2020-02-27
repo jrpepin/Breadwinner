@@ -1,0 +1,176 @@
+<pre><code></code></pre>
+<h2><a href="#comparison-of-sipp-and-nlsy" id="comparison-of-sipp-and-nlsy">Comparison of SIPP and NLSY</a></h2>
+<p>This analysis creates estimates of &ldquo;lifetime&rdquo; breadwinning by age 10 to compare to the NLSY.</p>
+<pre><code></code></pre>
+<p>First, just a description of the transition rates by duration since becoming a mother using the SIPP 2014. Note that the file is set up a bit differently than the file for the NLSY analysis so that trans_bw50 at durmom==0 is the rate of transition into breadwinning from not breadwinning in the birth year to breadwinning in the year the first child has her first birthday. In short, compare durmom=0 in the SIPP to time==1 in the NLSY.</p>
+<pre><code>. 
+. sum per_bw50_atbirth
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+per_bw50_a~h |     11,042    21.29496           0   21.29496   21.29496
+
+. tab durmom trans_bw50 [aweight=wpfinwgt] if trans_bw50 !=2 , matcell(bw50w) nofreq row
+
+     (min) |      trans_bw50
+    durmom |         0          1 |     Total
+-----------+----------------------+----------
+         0 |     91.26       8.74 |    100.00 
+         1 |     88.88      11.12 |    100.00 
+         2 |     87.58      12.42 |    100.00 
+         3 |     90.57       9.43 |    100.00 
+         4 |     91.39       8.61 |    100.00 
+         5 |     87.02      12.98 |    100.00 
+         6 |     88.00      12.00 |    100.00 
+         7 |     87.76      12.24 |    100.00 
+         8 |     92.24       7.76 |    100.00 
+         9 |     90.43       9.57 |    100.00 
+        10 |     87.18      12.82 |    100.00 
+        11 |     90.95       9.05 |    100.00 
+        12 |     91.84       8.16 |    100.00 
+        13 |     90.07       9.93 |    100.00 
+        14 |     90.10       9.90 |    100.00 
+        15 |     89.78      10.22 |    100.00 
+        16 |     89.90      10.10 |    100.00 
+        17 |     90.80       9.20 |    100.00 
+        18 |     90.77       9.23 |    100.00 
+-----------+----------------------+----------
+     Total |     89.83      10.17 |    100.00 
+
+. 
+. sum per_bw60_atbirth
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+per_bw60_a~h |     11,042    12.81369           0   12.81369   12.81369
+
+. tab durmom trans_bw60 [aweight=wpfinwgt] if trans_bw60 !=2 , matcell(bw60w) nofreq row
+
+     (min) |      trans_bw60
+    durmom |         0          1 |     Total
+-----------+----------------------+----------
+         0 |     94.22       5.78 |    100.00 
+         1 |     91.39       8.61 |    100.00 
+         2 |     90.14       9.86 |    100.00 
+         3 |     90.96       9.04 |    100.00 
+         4 |     92.59       7.41 |    100.00 
+         5 |     90.79       9.21 |    100.00 
+         6 |     90.36       9.64 |    100.00 
+         7 |     91.91       8.09 |    100.00 
+         8 |     93.07       6.93 |    100.00 
+         9 |     91.17       8.83 |    100.00 
+        10 |     91.37       8.63 |    100.00 
+        11 |     92.49       7.51 |    100.00 
+        12 |     92.15       7.85 |    100.00 
+        13 |     91.59       8.41 |    100.00 
+        14 |     92.41       7.59 |    100.00 
+        15 |     91.75       8.25 |    100.00 
+        16 |     91.53       8.47 |    100.00 
+        17 |     93.10       6.90 |    100.00 
+        18 |     92.43       7.57 |    100.00 
+-----------+----------------------+----------
+     Total |     91.85       8.15 |    100.00 
+
+. 
+</code></pre>
+<pre><code></code></pre>
+<h2><a href="#results" id="results">Results</a></h2>
+<p>We observe 21.3% breadwining as defined by earning more than 50% of the household income in the year of their first birth. This estimate is lower (12.8 percent) using a 60% threshold.</p>
+<p>The percentage never breadwinning by the time their first child reaches age 10 is 28.7, or 40.0 using the 60% threshold.</p>
+<p>The percentage breadwinning by the time their first child reaches age 10 is 71.3% or 60.0% using the 60% threshold.</p>
+<h2><a href="#weighting-to-match-nlsy-population" id="weighting-to-match-nlsy-population">Weighting to match NLSY population</a></h2>
+<pre><code></code></pre>
+<p>First, a description of the age distribution of the SIPP weighted to be the same as the NLSY 97</p>
+<pre><code>. 
+. sum per_bw50_atbirth
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+per_bw50_a~h |     11,042    21.29496           0   21.29496   21.29496
+
+. tab tage durmom [aweight=adjwgt], nofreq col
+
+           |                                 (min) durmom
+(max) tage |         0          1          2          3          4          5          6 |     Total
+-----------+-----------------------------------------------------------------------------+----------
+        19 |      9.04       0.00       0.00       0.00       0.00       0.00       0.00 |      0.78 
+        20 |      9.99       9.11       0.00       0.00       0.00       0.00       0.00 |      1.81 
+        21 |     10.33      10.07       9.07       0.00       0.00       0.00       0.00 |      2.90 
+        22 |      9.13      10.36      10.10       9.02       0.00       0.00       0.00 |      3.93 
+        23 |      7.66       9.21      10.25      10.14       9.26       0.00       0.00 |      4.79 
+        24 |      9.43       7.56       9.23      10.26      10.36       9.51       0.00 |      5.80 
+        25 |      6.99       9.38       7.63       9.26      10.46      10.64       9.85 |      6.69 
+        26 |      6.35       6.96       9.46       7.68       9.48      10.68      11.02 |      7.45 
+        27 |      5.68       6.40       6.95       9.44       7.88       9.77      11.03 |      8.24 
+        28 |      7.41       5.67       6.46       6.97       9.68       8.07      10.02 |      9.00 
+        29 |      6.20       7.39       5.65       6.44       7.15       9.97       8.34 |      8.68 
+        30 |      5.79       6.12       7.40       5.68       6.36       7.31      10.07 |      8.15 
+        31 |      6.00       5.72       5.98       7.43       5.77       6.49       7.54 |      7.62 
+        32 |      0.00       6.05       5.77       5.97       7.43       5.80       6.72 |      6.72 
+        33 |      0.00       0.00       6.04       5.75       6.06       7.66       6.01 |      5.84 
+        34 |      0.00       0.00       0.00       5.94       5.47       5.57       7.85 |      4.69 
+        35 |      0.00       0.00       0.00       0.00       4.63       4.64       5.12 |      3.27 
+        36 |      0.00       0.00       0.00       0.00       0.00       3.88       4.07 |      2.12 
+        37 |      0.00       0.00       0.00       0.00       0.00       0.00       2.37 |      1.08 
+        38 |      0.00       0.00       0.00       0.00       0.00       0.00       0.00 |      0.39 
+        39 |      0.00       0.00       0.00       0.00       0.00       0.00       0.00 |      0.05 
+-----------+-----------------------------------------------------------------------------+----------
+     Total |    100.00     100.00     100.00     100.00     100.00     100.00     100.00 |    100.00 
+
+
+           |           (min) durmom
+(max) tage |         7          8          9 |     Total
+-----------+---------------------------------+----------
+        19 |      0.00       0.00       0.00 |      0.78 
+        20 |      0.00       0.00       0.00 |      1.81 
+        21 |      0.00       0.00       0.00 |      2.90 
+        22 |      0.00       0.00       0.00 |      3.93 
+        23 |      0.00       0.00       0.00 |      4.79 
+        24 |      0.00       0.00       0.00 |      5.80 
+        25 |      0.00       0.00       0.00 |      6.69 
+        26 |     10.44       0.00       0.00 |      7.45 
+        27 |     11.72      11.27       0.00 |      8.24 
+        28 |     11.70      12.73      12.25 |      9.00 
+        29 |     10.59      12.70      13.67 |      8.68 
+        30 |      8.90      11.50      13.61 |      8.15 
+        31 |     10.53       9.56      12.39 |      7.62 
+        32 |      7.91      11.28      10.40 |      6.72 
+        33 |      6.95       8.59      12.06 |      5.84 
+        34 |      6.29       7.30       8.73 |      4.69 
+        35 |      6.99       5.35       6.70 |      3.27 
+        36 |      3.86       5.48       4.51 |      2.12 
+        37 |      2.95       2.29       3.91 |      1.08 
+        38 |      1.17       1.66       1.42 |      0.39 
+        39 |      0.00       0.27       0.36 |      0.05 
+-----------+---------------------------------+----------
+     Total |    100.00     100.00     100.00 |    100.00 
+
+. 
+</code></pre>
+<p>Below is a table describing weighted transition rates at all durations.</p>
+<pre><code>. 
+. tab durmom trans_bw50 [aweight=adjwgt] if trans_bw50 !=2 , matcell(bw50w) nofreq row
+
+     (min) |      trans_bw50
+    durmom |         0          1 |     Total
+-----------+----------------------+----------
+         0 |     91.06       8.94 |    100.00 
+         1 |     89.50      10.50 |    100.00 
+         2 |     87.87      12.13 |    100.00 
+         3 |     90.82       9.18 |    100.00 
+         4 |     90.37       9.63 |    100.00 
+         5 |     88.39      11.61 |    100.00 
+         6 |     87.29      12.71 |    100.00 
+         7 |     88.33      11.67 |    100.00 
+         8 |     89.63      10.37 |    100.00 
+         9 |     92.16       7.84 |    100.00 
+-----------+----------------------+----------
+     Total |     89.49      10.51 |    100.00 
+
+. 
+</code></pre>
+<pre><code></code></pre>
+<h2><a href="#results" id="results">Results</a></h2>
+<p>Weigting the SIPP to have the same distribution on age at first birth by duration as the NLSY, we observe 21.3% breadwining, or earning more than 50% of the household income in the year of their first birth.</p>
+<p>The percentage never breadwinning by the time their first child reaches age 10 is 26.0.</p>
+<p>The percentage breadwinning by the time their first child reaches age 10 is %.</p>
