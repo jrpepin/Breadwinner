@@ -1,6 +1,6 @@
 *-------------------------------------------------------------------------------
 * BREADWINNER PROJECT - NLSY97 Component
-* nlsy97_hh60_pred.do
+* nlsy97_hh50_stata_pred.do
 * Joanna Pepin
 *-------------------------------------------------------------------------------
 
@@ -9,12 +9,12 @@
 ********************************************************************************
 local logdate = string( d(`c(current_date)'), "%dCY.N.D" ) 	// create a macro for the date
 
-local list : dir . files "$logdir/*nlsy97_hh60_pred_*.log"	// Delete earlier versions of the log
+local list : dir . files "$logdir/*nlsy97_hh50_stata_pred_*.log"	// Delete earlier versions of the log
 foreach f of local list {
     erase "`f'"
 }
 
-log using "$logdir/nlsy97_hh60_pred_`logdate'.log", t replace
+log using "$logdir/nlsy97_hh50_stata_pred_`logdate'.log", t replace
 
 di "$S_DATE"
 
@@ -32,22 +32,23 @@ di "$S_DATE"
 clear
 set more off
 
-use 	"stata/NLSY97_hh60.dta", clear
+use 	"stata/NLSY97_processed.dta", clear
 fre year // Make sure the data includes all survey years (1997 - 2017)
 
+keep if firstbirth==1 // didn't drop in R already
 ********************************************************************************
 * Generate basic descriptives
 ********************************************************************************
-tab time 		hhe60, row
-tab marst 		hhe60, row
-tab age_birth 	hhe60, row
+tab time 		hhe50, row
+tab marst 		hhe50, row
+tab age_birth 	hhe50, row
 
-table time marst, contents(mean hhe60) col	// BW by duration of motherhood & marst
-table age_birth marst, contents(mean hhe60) // BW by age at first birth & marst
+table time marst, contents(mean hhe50) col	// BW by duration of motherhood & marst
+table age_birth marst, contents(mean hhe50) // BW by age at first birth & marst
 
 
 // Select only observations since first birth
-keep if firstbirth==1 			// selected on this in R already
+keep if firstbirth==1 			// diff from before
 drop firstbirth 				// this variable has no variation now
 drop age_birth age marst		// These variables get in the way for this analysis
 
@@ -58,7 +59,8 @@ drop age_birth age marst		// These variables get in the way for this analysis
 * any breadwinning up to this point in time
 
 // Reshape the data
-reshape wide year hhe60, i(PUBID_1997) j(time)
+keep  year hhe50 PUBID_1997 time wt1997
+reshape wide year hhe50, i(PUBID_1997) j(time)
 
 // Set the first lag to 0 because it is not possible to be a breadwinning mother
 // before being a mother.
@@ -67,47 +69,47 @@ gen hh50_minus1_0=0
 // Create the lagged measures
 forvalues t=1/9{
     local s=`t'-1
-    gen hhe60_minus1_`t'=hhe60`s' 
+    gen hhe50_minus1_`t'=hhe50`s' 
 }
 
 forvalues t=2/9{
     local r=`t'-2
-    gen hhe60_minus2_`t'=hhe60`r' 
+    gen hhe50_minus2_`t'=hhe50`r' 
 }
 
 forvalues t=3/9{
     local u=`t'-3
-    gen hhe60_minus3_`t'=hhe60`u' 
+    gen hhe50_minus3_`t'=hhe50`u' 
 }
 
 forvalues t=4/9{
     local v=`t'-4
-    gen hhe60_minus4_`t'=hhe60`v' 
+    gen hhe50_minus4_`t'=hhe50`v' 
 }
 
 forvalues t=5/9{
     local v=`t'-5
-    gen hhe60_minus5_`t'=hhe60`v' 
+    gen hhe50_minus5_`t'=hhe50`v' 
 }
 
 forvalues t=6/9{
     local v=`t'-6
-    gen hhe60_minus6_`t'=hhe60`v' 
+    gen hhe50_minus6_`t'=hhe50`v' 
 }
 
 forvalues t=7/9{
     local v=`t'-7
-    gen hhe60_minus7_`t'=hhe60`v' 
+    gen hhe50_minus7_`t'=hhe50`v' 
 }
 
 forvalues t=8/9{
     local v=`t'-8
-    gen hhe60_minus8_`t'=hhe60`v' 
+    gen hhe50_minus8_`t'=hhe50`v' 
 }
 
 forvalues t=9/9{
     local v=`t'-9
-    gen hhe60_minus9_`t'=hhe60`v' 
+    gen hhe50_minus9_`t'=hhe50`v' 
 }
 
 // Create indicators for whether R has been observed as a 
@@ -120,13 +122,13 @@ forvalues t=1/9 {
 	local s=`t'-1
     * loop over all earlier duratons looking for any breadwinning
 	forvalues u=0/`s' { 
-		replace prevbreadwon`t'=1 if hhe60`u'==1
+		replace prevbreadwon`t'=1 if hhe50`u'==1
 	}
 }
 
-reshape long year hhe60 hhe60_minus1_ hhe60_minus2_ hhe60_minus3_ hhe60_minus4_ ///
-             hhe60_minus5_ hhe60_minus6_ hhe60_minus7_ hhe60_minus8_  ///
-			 hhe60_minus9_ prevbreadwon, i(PUBID_1997) j(time)
+reshape long year hhe50 hhe50_minus1_ hhe50_minus2_ hhe50_minus3_ hhe50_minus4_ ///
+             hhe50_minus5_ hhe50_minus6_ hhe50_minus7_ hhe50_minus8_  ///
+			 hhe50_minus9_ prevbreadwon, i(PUBID_1997) j(time)
 
 * clean up observations created because reshape creates some number of observations for each (PUBID_1997)
 drop if missing(year)
@@ -137,8 +139,8 @@ drop if missing(year)
 
 preserve
 forvalues t = 0/9 {
-	drop if hhe60_minus1_ == 1
-	tab hhe60 if time == `t'
+	drop if hhe50_minus1_ == 1
+	tab hhe50 if time == `t'
 
 	}
 restore
@@ -148,7 +150,7 @@ restore
 ********************************************************************************
 // Create ever breadwinning prior to this duration variable
 
-bysort PUBID_1997 (time) : gen everbw = sum(hhe60_minus1_) // 
+bysort PUBID_1997 (time) : gen everbw = sum(hhe50_minus1_) // 
 replace everbw = 1 if everbw >= 1 
 
 tab time everbw, row
@@ -156,7 +158,7 @@ tab time everbw, row
 preserve
 forvalues t = 0/9 {
 	drop if prevbreadwon == 1 
-	tab hhe60 if time == `t' [fweight=wt1997]
+	tab hhe50 if time == `t' [fweight=wt1997]
 	}
 restore
 
@@ -168,10 +170,10 @@ restore
 *by PUBID_1997: gen ebwlag = everbw[_n-1]
 
 forvalues t = 1/9 {
-	tab everbw hhe60 if time ==`t', col
+	tab everbw hhe50 if time ==`t', col
 	}
 
-table time prevbreadwon [fweight=wt1997], contents(mean hhe60) col
+table time prevbreadwon [fweight=wt1997], contents(mean hhe50) col
 
 ********************************************************************************
 * Create lifetable
@@ -181,14 +183,14 @@ table time prevbreadwon [fweight=wt1997], contents(mean hhe60) col
 * STS wants the time variable to start at 1
 replace time=time+1 
 
-stset time, id(PUBID_1997) failure(hhe60==1)
+stset time, id(PUBID_1997) failure(hhe50==1)
 
 * why does sts think we start with 2371 observations unweighted. It's 1678.
-* The problem is missing values for hhe60
+* The problem is missing values for hhe50
 sts list
 
 sort PUBID_1997
-list PUBID_1997 time year hhe60 _st _d _t _t0 in 1/20
+list PUBID_1997 time year hhe50 _st _d _t _t0 in 1/20
 
 stdescribe
 stsum
@@ -201,9 +203,9 @@ ltable _t _d, failure
 ********************************************************************************
 * Predict breadwinning
 ********************************************************************************
-logit hhe60 hhe60_minus1_ i.time
-logit hhe60 hhe60_minus1_ hhe60_minus2_ i.time
-logit hhe60 hhe60_minus1_ hhe60_minus2_ hhe60_minus3_ i.time
-logit hhe60 hhe60_minus1_ hhe60_minus2_ hhe60_minus3_ hhe60_minus4_ i.time
+logit hhe50 hhe50_minus1_ i.time
+logit hhe50 hhe50_minus1_ hhe50_minus2_ i.time
+logit hhe50 hhe50_minus1_ hhe50_minus2_ hhe50_minus3_ i.time
+logit hhe50 hhe50_minus1_ hhe50_minus2_ hhe50_minus3_ hhe50_minus4_ i.time
 
 log close

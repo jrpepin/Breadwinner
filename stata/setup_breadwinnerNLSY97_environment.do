@@ -62,10 +62,18 @@ if ("$logdir" == "") {
 ********************************************************************************
 * This checks for packages that the user should install prior to running the project do files.
 
+
 // fre: https://ideas.repec.org/c/boc/bocode/s456835.html
 capture : which fre
 if (_rc) {
     display as error in smcl `"Please install package {it:fre} from SSC in order to run these do-files;"' _newline ///
         `"you can do so by clicking this link: {stata "ssc install fre":auto-install fre}"'
+    exit 199
+}
+
+capture : which univar
+if (_rc) {
+    display as error in smcl `"Please install package {it:univar} from SSC in order to run these do-files;"' _newline ///
+        `"you can do so by clicking this link: {stata "ssc install univar":auto-install univar}"'
     exit 199
 }

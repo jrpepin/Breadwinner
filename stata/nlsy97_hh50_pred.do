@@ -112,77 +112,66 @@ forvalues t=9/9{
 // creating indicators for whether R has been observed as a 
 // breadwinning mother at any previous duration of motherhood
 
-gen prevbreadwon0=0 // can't have previously breadwon and duration 0
-forvalues t=1/9 {
-	gen prevbreadwon`t'=0
-	local s=`t'-1
-    * loop over all earlier duratons looking for any breadwinning
-	forvalues u=0/`s' { 
-		replace prevbreadwon`t'=1 if hhe50`u'==1
-	}
-}
-
 reshape long year hhe50 hhe50_minus1_ hhe50_minus2_ hhe50_minus3_ hhe50_minus4_ ///
              hhe50_minus5_ hhe50_minus6_ hhe50_minus7_ hhe50_minus8_  ///
-			 hhe50_minus9_ prevbreadwon, i(PUBID_1997) j(time)
+			 hhe50_minus9_, i(PUBID_1997) j(time)
 
 * clean up observations created because reshape creates some number of observations for each (PUBID_1997)
 drop if missing(year)
+
+// Create ever breadwinning prior to this duration variabl
+bysort PUBID_1997 (time) : gen everbw = sum(hhe50_minus1_) // 
+replace everbw = 1 if everbw >= 1 
+
+save "stata/bw50_analysis.dta", replace
 
 ********************************************************************************
 * B1. Estimates of transitions into breadwinning (at each duration of motherhood)
 ********************************************************************************
 
 preserve
-forvalues t = 0/9 {
-	drop if hhe50_minus1_ == 1
-	tab hhe50 if time == `t' [aweight=wt1997]
-
-	}
-restore
+	keep if hhe50_minus1_ == 0
+	tab time hhe50 [fweight=wt1997], row
+	tab time hhe50, row
 
 ********************************************************************************
 * B2. Risk of entering breadwinning, censoring on previous breadwinning
 ********************************************************************************
-// Create ever breadwinning prior to this duration variable
 
-bysort PUBID_1997 (time) : gen everbw = sum(hhe50_minus1_) // 
-replace everbw = 1 if everbw >= 1 
+	drop if everbw == 1
 
-tab time everbw, row
 
-preserve
-forvalues t = 0/9 {
-	drop if prevbreadwon == 1 
-	tab hhe50 if time == `t' [fweight=wt1997]
-	}
+	tab time everbw, row
+
 restore
+
 
 ********************************************************************************
 * B3. Proportion breadwinning at each duration of motherhood that have previously breadwon
 ********************************************************************************
 // Create a lagged ever bw variable (so current bw doesn't count)
-*sort PUBID_1997 time 
-*by PUBID_1997: gen ebwlag = everbw[_n-1]
 
 forvalues t = 1/9 {
 	tab everbw hhe50 if time ==`t', col
 	}
 
-table time prevbreadwon [fweight=wt1997], contents(mean hhe50) col
+table time everbw, contents(mean hhe50) col
 
 ********************************************************************************
 * Create lifetable
 ********************************************************************************
 // Tell Stata the format of the survival data
+gen momyr=time+1
+keep if hhe50_minus1_==0
+drop if hhe50==.
 
-* STS wants the time variable to start at 1
-replace time=time+1 
+stset momyr, id(PUBID_1997) failure(hhe50==1)
 
-stset time, id(PUBID_1997) failure(hhe50==1)
+tab momyr hhe50, row
 
-* why does sts think we start with 2371 observations unweighted. It's 1678.
-* The problem is missing values for hhe50
+* The sts list result doesn't look like our lifetable result because 
+* some observations that are missing at birth appear in the data later.
+* sts counts these observations in the denominator until they are observed breadwinning
 sts list
 
 sort PUBID_1997
@@ -192,6 +181,10 @@ stdescribe
 stsum
 stvary
 
+
+* ltable works only with individual-level data (i.e. with each record representing
+* an individual or aggregation of individuals. It is not designed for person-year
+* data.
 ltable _t _d
 ltable _t _d, hazard
 ltable _t _d, failure
