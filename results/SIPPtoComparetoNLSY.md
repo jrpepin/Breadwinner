@@ -3,12 +3,15 @@
 
 * This file descibes results from the SIPP and NLSY analysis for the breadwinning paper.
 
+* Run SIPPagedist before running this script
+
 <</dd_do>>
 ~~~~
 
 Comparison of SIPP and NLSY
 ----------------------------
-This analysis creates estimates of "lifetime" breadwinning by age 10 to compare to the NLSY.
+This analysis creates estimates of "lifetime" breadwinning by age 10 using SIPP
+2014 to compare to the NLSY.
 
 ~~~~
 <<dd_do: quietly>>
@@ -69,7 +72,8 @@ First, just a description of the transition rates by duration since becoming a m
 using the SIPP 2014. Note that the file is set up a bit differently than the file for the 
 NLSY analysis so that trans_bw50 at durmom==0 is the rate of transition into breadwinning from not
 breadwinning in the birth year to breadwinning in the year the first child has her first birthday. 
-In short, compare durmom=0 in the SIPP to time==1 in the NLSY.
+In short, compare durmom=0 in the SIPP to time==1 in the NLSY. per_bw50_atbirth gives the
+percent breadwinnng at birth.
 
 ~~~~
 <<dd_do>>
@@ -134,7 +138,7 @@ Results
 We observe <<dd_di: %4.1f `p_bw50_atbirth'>>% breadwining as defined by earning more than 50% of the household income in the year of their first birth. 
 This estimate is lower (<<dd_di: %4.1f `p_bw60_atbirth'>> percent) using a 60% threshold.
 
-The percentage never breadwinning by the time their first child reaches age 10 is <<dd_di: %4.1f `notbw50'>>, or <<dd_di: %4.1f `notbw60'>> using the 60% threshold.
+The percentage never breadwinning by the time their first child reaches age 10 is <<dd_di: %4.1f `notbw50'>>%, or <<dd_di: %4.1f `notbw60'>> using the 60% threshold.
 
 The percentage breadwinning by the time their first child reaches age 10 is <<dd_di: %4.1f `bw50_bydur10'>>% or <<dd_di: %4.1f `bw60_bydur10'>>% using the 60% threshold.
 
@@ -227,6 +231,6 @@ Results
 Weigting the SIPP to have the same distribution on age at first birth by duration as the 
 NLSY, we observe <<dd_di: %4.1f `per_bw50_atbirth'>>% breadwining, or earning more than 50% of the household income in the year of their first birth. 
 
-The percentage never breadwinning by the time their first child reaches age 10 is <<dd_di: %4.1f `notbw50'>>.
+The percentage never breadwinning by the time their first child reaches age 10 is <<dd_di: %4.1f `notbw50'>> by the 50% threshold.
 
-The percentage breadwinning by the time their first child reaches age 10 is <<dd_di: %4.1f `bw50_bydur9'>>%.
+The percentage breadwinning by the time their first child reaches age 10 is <<dd_di: %4.1f `bw50_bydur10'>>%.
