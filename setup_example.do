@@ -5,6 +5,7 @@ global projcode 		"$homedir/github/breadwinner"
 global logdir 			"$homedir/logs/breadwinner"
 global tempdir 			"$projcode/data/tmp"
 global results 			"$projcode/results"
+global output 			"$homedir/projects/breadwinner/results" // wherever you want html or putdoc files to go
 
 * SIPP 2014
 global SIPP2014 		"/data/sipp/2014"
