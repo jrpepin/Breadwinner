@@ -62,7 +62,7 @@ reshape wide year hhe50, i(PUBID_1997) j(time)
 
 * set the first lag to 0 because it is not possible to be a breadwinning mother
 * before being a mother.
-gen hh50_minus1_0=0
+gen hhe50_minus1_0=0
 
 forvalues t=1/9{
     local s=`t'-1
@@ -108,9 +108,6 @@ forvalues t=9/9{
     local v=`t'-9
     gen hhe50_minus9_`t'=hhe50`v' 
 }
-
-// creating indicators for whether R has been observed as a 
-// breadwinning mother at any previous duration of motherhood
 
 reshape long year hhe50 hhe50_minus1_ hhe50_minus2_ hhe50_minus3_ hhe50_minus4_ ///
              hhe50_minus5_ hhe50_minus6_ hhe50_minus7_ hhe50_minus8_  ///
