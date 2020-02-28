@@ -39,6 +39,7 @@ fre year // Make sure the data includes all survey years (1997 - 2017)
 * Generate basic descriptives
 ********************************************************************************
 tab time 		hhe50, row
+tab time 		hhe50 [aweight=wt1997], row
 tab marst 		hhe50, row
 tab age_birth 	hhe50, row
 
@@ -135,7 +136,7 @@ drop if missing(year)
 preserve
 forvalues t = 0/9 {
 	drop if hhe50_minus1_ == 1
-	tab hhe50 if time == `t'
+	tab hhe50 if time == `t' [aweight=wt1997]
 
 	}
 restore
