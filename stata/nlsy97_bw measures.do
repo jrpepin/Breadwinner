@@ -1,6 +1,6 @@
 *-------------------------------------------------------------------------------
 * BREADWINNER PROJECT - NLSY97 Component
-* nlsy97_measures.do
+* nlsy97_bw measures.do
 * Joanna Pepin
 *-------------------------------------------------------------------------------
 * The goal of these files is to create the breadwinning measures to corroborate
@@ -54,10 +54,18 @@ egen 		hhtot= rowtotal(wages mombiz chsup dvdend gftinc govpro1 govpro2 govpro3 
 							wcomp_sp)
 replace 	hhtot 	=. if totinc==.
 
+*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?
+*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?
 * My constructed total household income variable doesn't match the NLSY provided one.
 unique 	PUBID_1997
 unique 	PUBID_1997 if totinc != hhtot
+
+sum totinc
+sum hhtot
+
 browse 	PUBID_1997 year time momearn momtot wages mombiz totinc hhtot if totinc != hhtot
+list 	PUBID_1997 year time momearn momtot wages mombiz totinc hhtot if totinc != hhtot in 1/50
+
 
 // Create indicator for negative household earnings & no earnings. 
 cap drop hh_noearnings

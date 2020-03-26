@@ -15,19 +15,6 @@
 * Second, run the setup_breadwinnerNLSY97_environment script to set the project filepaths and macros.
 
 //------------------------------------------------------------------------------
-/*
-Thinking of changing the workflow to make use of project
-// Make sure project command is installed to set up the repository
-*  project: https://ideas.repec.org/c/boc/bocode/s457685.html
-capture : which project
-if (_rc) {
-    display as error in smcl `"Please install package {it:project} from SSC in order to run these do-files;"' _newline ///
-        `"you can do so by clicking this link: {stata "ssc install project":auto-install project}"'
-    exit 199
-}
-
-*/
-//------------------------------------------------------------------------------
 
 // The current directory is assumed to be the base project directory.
 // change to the directory before running breadwinnerNLSY97.do
@@ -37,6 +24,15 @@ if (_rc) {
 	do "stata/setup_breadwinnerNLSY97_environment"
 	
 * The logs for these files are generated within each .do files.
+
+********************************************************************************
+* A. Data Import and Measures Creation
+********************************************************************************
+
+// Create sample and demographic variables
+	do "stata/nlsy97_sample & demo.do"
+	
+// Create DV variables
 
 ********************************************************************************
 * B. Risk of entering breadwinning for the first 10 years of motherhood
