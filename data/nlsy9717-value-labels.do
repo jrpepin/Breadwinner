@@ -2310,7 +2310,7 @@ label values U2861100 vlU2861100
  * This command does not guarantee uniqueness
  */
   /* *start* */
-/*
+
   rename R0000100 PUBID_1997 
   rename R0352200 YSAQ_324_1997   // YSAQ-324
   rename R0489900 YINC_1400_1997   // YINC-1400
@@ -2341,9 +2341,9 @@ label values U2861100 vlU2861100
   rename R0496000 YINC_7700_1997   // YINC-7700
   rename R0496100 YINC_7800_1997   // YINC-7800
   rename R0533100 YOUTH_HHBIOKID_01_1997   // YOUTH_HHBIOKID.01
-  rename R0536300 KEY!SEX_1997 
-  rename R0536401 KEY!BDATE_M_1997 
-  rename R0536402 KEY!BDATE_Y_1997 
+  rename R0536300 SEX_1997 
+  rename R0536401 BDATE_M_1997 
+  rename R0536402 BDATE_Y_1997 
   rename R1200500 CV_CHILD_BIRTH_DATE_01_M_1997   // CV_CHILD_BIRTH_DATE.01_M
   rename R1200501 CV_CHILD_BIRTH_DATE_01_Y_1997   // CV_CHILD_BIRTH_DATE.01_Y
   rename R1204500 CV_INCOME_GROSS_YR_1997 
@@ -2353,7 +2353,7 @@ label values U2861100 vlU2861100
   rename R1211100 CV_BIO_CHILD_HH_1997 
   rename R1235800 CV_SAMPLE_TYPE_1997 
   rename R1236101 SAMPLING_WEIGHT_CC_1997 
-  rename R1482600 KEY!RACE_ETHNICITY_1997 
+  rename R1482600 RACE_ETHNICITY_1997 
   rename R2185600 YSAQ_324_1998   // YSAQ-324
   rename R2185900 YSAQ_326D_1998   // YSAQ-326D
   rename R2340900 YINC_1400_1998   // YINC-1400
@@ -3092,7 +3092,7 @@ label values U2861100 vlU2861100
   rename U2860800 YINC_7800_2017   // YINC-7800
   rename U2861100 YINC_11600B_2017   // YINC-11600B
 
-*/
+
   /* *end* */  
 /* To convert variable names to lower case use the TOLOWER command 
  *      (type findit tolower and follow the links to install).
