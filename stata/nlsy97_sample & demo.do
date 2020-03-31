@@ -8,7 +8,7 @@
 ********************************************************************************
 * Setup the log file
 ********************************************************************************
-local logdate = string( d(`c(current_date)'), "%dCY.N.D" ) 	// create a macro for the date
+local logdate = string( d(`c(current_date)'), "%dCY.N.D" ) 		// create a macro for the date
 
 local list : dir . files "$logdir/*nlsy97_sample & demo_*.log"	// Delete earlier versions of the log
 foreach f of local list {
@@ -119,6 +119,16 @@ drop 		dob_child1
 cap drop 	age_birth
 gen 		age_birth	=floor((datchild1 - datbirth)/365.25)
 fre			age_birth
+
+** Marital Status at 1st birth--------------------------------------------------
+// Rs marital or cohabitation status as of the survey date.
+summarize CV_MARSTAT_*
+
+preserve
+keep PUBID_1997 mom_yr CV_MARSTAT_*
+reshape long CV_MARSTAT_, i(PUBID_1997) j(year)
+save "$tempdir/nlsy97_marstat.dta", replace
+restore
 
 ********************************************************************************
 * Sample Restrictions
