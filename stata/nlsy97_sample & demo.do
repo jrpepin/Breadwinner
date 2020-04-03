@@ -72,6 +72,9 @@ unique 		PUBID_1997				// Number of mothers in sample
 	egen mom = nvals(PUBID_1997)
 	global mom_n = mom
 	di "$mom_n"
+	
+** Create motherhood duration identifier----------------------------------------
+
 
 ********************************************************************************
 * Demographic Variables

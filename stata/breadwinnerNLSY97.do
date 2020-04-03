@@ -32,7 +32,8 @@
 // Create sample and demographic variables
 	do "stata/nlsy97_sample & demo.do"
 	
-// Create DV variables
+// Create time-varying variables
+	do "stata/nlsy97_time-varying.do"
 
 ********************************************************************************
 * B. Risk of entering breadwinning for the first 10 years of motherhood
