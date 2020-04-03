@@ -107,7 +107,7 @@ fre 		mom_m
 
 // Convert and combine child DOB vars
 describe mom_*
-tostring mom_*, replace			// Make them string variables
+tostring mom_*, replace			// Make them string variables to create dob vars
 
 cap drop 	dob_child1
 egen 		dob_child1	= concat(mom_m day mom_yr), punct(-)
@@ -125,11 +125,25 @@ fre			age_birth
 summarize CV_MARSTAT_*
 
 preserve
-keep PUBID_1997 mom_yr CV_MARSTAT_*
-reshape long CV_MARSTAT_, i(PUBID_1997) j(year)
-save "$tempdir/nlsy97_marstat.dta", replace
+	keep 		PUBID_1997 mom_yr CV_MARSTAT_*
+	reshape long CV_MARSTAT_, i(PUBID_1997) j(year)
+
+	destring 	mom_yr, replace
+
+	cap drop 	mar_t1
+	clonevar 	mar_t1 = CV_MARSTAT_ if year == mom_yr 
+
+	keep PUBID_1997 mar_t1
+	drop if 		mar_t1 ==.
+	count
+
+	save "$tempdir/nlsy97_marstat.dta", replace
 restore
 
+merge 1:1 PUBID_1997 using "$tempdir/nlsy97_marstat.dta"
+drop _merge
+
+capture erase "$tempdir/nlsy97_marstat.dta"
 ********************************************************************************
 * Sample Restrictions
 ********************************************************************************
