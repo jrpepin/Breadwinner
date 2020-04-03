@@ -124,12 +124,15 @@ fre			age_birth
 // Rs marital or cohabitation status as of the survey date.
 summarize CV_MARSTAT_*
 
-preserve
+snapshot save, label("nlsy97_temp")		// Create a temporary copy of data in memory
+
+// Reshape the data to generate marital status at time 1 var
 	keep 		PUBID_1997 mom_yr CV_MARSTAT_*
 	reshape long CV_MARSTAT_, i(PUBID_1997) j(year)
 
 	destring 	mom_yr, replace
 
+// Create marital status at year of fist birth var
 	cap drop 	mar_t1
 	clonevar 	mar_t1 = CV_MARSTAT_ if year == mom_yr 
 
@@ -138,12 +141,17 @@ preserve
 	count
 
 	save "$tempdir/nlsy97_marstat.dta", replace
-restore
+	
+snapshot restore 1			// recall the original data in memory
 
+// Merge maritatl status at time 1 to original data
 merge 1:1 PUBID_1997 using "$tempdir/nlsy97_marstat.dta"
+// _merge==1 are moms with missing marital staus at birth year
 drop _merge
 
-capture erase "$tempdir/nlsy97_marstat.dta"
+// Remove temporary data
+capture erase 	"$tempdir/nlsy97_marstat.dta"		
+snapshot erase 	1
 ********************************************************************************
 * Sample Restrictions
 ********************************************************************************
@@ -162,9 +170,9 @@ keep if 	age_birth >= 18
 keep if 	age_birth <= 30
 
 // Display lost cases macros
-di "$all_n"			// Total # respondents
+di "$all_n" 		// Total # respondents
 di "$women_n"		// Total # women
-di "$mom_n"			// Total # mothers
+di "$mom_n" 		// Total # mothers
 di "$mom18plus_n"	// Total # moms 18+ at first birth
 di "$momunder30_n"	// Total # moms <30 at first birth
 
