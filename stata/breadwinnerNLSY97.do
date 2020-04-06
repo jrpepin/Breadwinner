@@ -33,11 +33,8 @@
 	do "stata/nlsy97_sample & demo.do"
 	
 // Create time-varying variables
-	do "stata/nlsy97_time-varying.do"
+	do "stata/nlsy97_time_varying.do"
 	
-// Create Breadwinning measures
-	do "stata/nlsy97_bw measures"
-
 // Look at descriptive statistics
 	do "stata/nlsy97_descriptives"
 
