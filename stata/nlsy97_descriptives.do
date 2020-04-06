@@ -29,12 +29,50 @@ set more off
 
 use "stata/NLSY97_bw.dta", clear
 
-// Keep only mothers in first 10 years of motherhood
-unique 	PUBID_1997 
-keep if time >=0 & time <= 10 & firstbirth ==1 // Need 10 until income vars are lagged
+// Count number of respondents
 unique 	PUBID_1997
 
-order PUBID_1997 year birth_year time momearn wages mombiz totinc hhearn
+// Make sure the data includes all survey years (1997 - 2017)
+fre year
+
+********************************************************************************
+* Describe percent breadwinning in the first year
+********************************************************************************
+// The percent breadwinning (50% threhold) in the first year. (~25%)
+	sum hhe50 if time		==0 // Breadwinning in the year of the birth
+
+	gen per_hhe50_atbirth	=100*`r(mean)'
+	gen nothhe50_atbirth	=1-`r(mean)'
+
+// The percent breadwinning (60% threhold) in the first year. (~17%)
+	sum hhe60 if time		==0 // Breadwinning in the year of the birth
+
+	gen per_hhe60_atbirth	=100*`r(mean)'
+	gen nothhe60_atbirth	=1-`r(mean)'
+
+/*	
+*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?
+	This is sample code to use to verify I can replicate the NLSY's total hh income
+	variable with all its components. Spoiler, I can't. 
+
+	// Create a hh total income variable
+	cap drop 	hhtot
+	egen 		hhtot= rowtotal(wages mombiz chsup dvdend gftinc 	///
+								govpro1 govpro2 govpro3 			///
+								inhinc intrst othinc rntinc 		///
+								wcomp hhinc spwages spbiz  			///
+								wcomp_sp)
+	replace 	hhtot 	=. if totinc==.
+
+	* My constructed total hh income variable doesn't match the NLSY provided one.
+	unique 	PUBID_1997
+	unique 	PUBID_1997 if totinc != hhtot
+
+	sum totinc
+	sum hhtot
+
+	browse 	PUBID_1997 year time momearn momwages mombiz totinc hhtot if totinc != hhtot
+	list 	PUBID_1997 year time momearn momwages mombiz totinc hhtot if totinc != hhtot in 1/50
 
 ********************************************************************************
 * Evaluate component variables
@@ -48,39 +86,30 @@ order PUBID_1997 year birth_year time momearn wages mombiz totinc hhearn
 * momearn	- sum of wages and mombiz
 * hhearn	- copy of totinc (NLSY provided R's Total Household Income by year)
 
-// Lag the income variables for analysis by time
-sort PUBID_1997 time
 
-foreach var of varlist 	momearn hhearn						///
-						wages mombiz chsup dvdend gftinc 	///
-						govpro1 govpro2 govpro3 inhinc 		///
-						intrst othinc rntinc wcomp 			///
-						hhinc totinc spwages spbiz wcomp_sp{
-	by PUBID_1997:  replace `var' = `var'[_n+1]
-}
-
-drop if time==10
+*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?
+*/
 
 // Summary statistics-----------------------------------------------------------
-foreach var of varlist wages mombiz spwages spbiz hhinc{
+foreach var of varlist momwages mombiz momearn totinc hhe50 hhe60{
 	sum `var'
 	}
 
 // Summary stats of key vars by time
-univar wages mombiz spwages spbiz hhinc, by(time)
+univar momwages mombiz momearn totinc hhe50 hhe60, by(time)
 
 // Percent of each component
 * Note: Some of these are over 1. Looked back at raw data, and they really are impossible proportions.
-foreach var of varlist wages mombiz spwages spbiz hhinc{
+foreach var of varlist momwages mombiz momearn totinc{
 	cap drop 	per_`var'
-	gen 		per_`var'= round(`var'/hhearn, .1)
+	gen 		per_`var'= round(`var'/totinc, .1)
 }
 
-univar per_wages per_mombiz per_spwages per_spbiz per_hhinc, by(time)
+univar per_momwages per_mombiz per_momearn per_totinc, by(time)
 
-tab PUBID_1997 if per_wages > 1 & per_wages < .
+tab PUBID_1997 if per_momwages > 1 & per_momwages < .
 
-foreach var of varlist per_wages per_mombiz per_spwages per_spbiz per_hhinc {
+foreach var of varlist per_momwages per_mombiz per_momearn per_totinc {
 tab time `var'  if `var' <= 1, row
 }
 
