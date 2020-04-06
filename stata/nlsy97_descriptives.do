@@ -27,7 +27,7 @@ di "$S_DATE"
 clear
 set more off
 
-use "stata/NLSY97.dta", clear
+use "stata/NLSY97_bw.dta", clear
 
 // Keep only mothers in first 10 years of motherhood
 unique 	PUBID_1997 

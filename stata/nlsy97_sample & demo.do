@@ -73,9 +73,6 @@ unique 		PUBID_1997				// Number of mothers in sample
 	global mom_n = mom
 	di "$mom_n"
 	
-** Create motherhood duration identifier----------------------------------------
-
-
 ********************************************************************************
 * Demographic Variables
 ********************************************************************************
@@ -178,5 +175,7 @@ di "$women_n"		// Total # women
 di "$mom_n" 		// Total # mothers
 di "$mom18plus_n"	// Total # moms 18+ at first birth
 di "$momunder30_n"	// Total # moms <30 at first birth
+
+save "$tempdir/nlsy97_sample.dta", replace
 
 log close

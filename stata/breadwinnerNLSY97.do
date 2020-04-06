@@ -34,25 +34,16 @@
 	
 // Create time-varying variables
 	do "stata/nlsy97_time-varying.do"
+	
+// Create Breadwinning measures
+	do "stata/nlsy97_bw measures"
+
+// Look at descriptive statistics
+	do "stata/nlsy97_descriptives"
 
 ********************************************************************************
 * B. Risk of entering breadwinning for the first 10 years of motherhood
 ********************************************************************************
-
-// Breadwinning estimates at the 50% threshold
-    do "stata/nlsy97_hh50_pred.do"
-
-// Breadwinning estimates at the 60% threshold
-	do "stata/nlsy97_hh60_pred.do"
-
-********************************************************************************
-* C. Same as above, but with bw indicators created in Stata
-********************************************************************************
-// Look at descriptive statistics
-	do "stata/nlsy97_descriptives"
-
-// Create Breadwinning measures
-	do "stata/nlsy97_bw measures"
 	
 // Breadwinning estimates at the 50% threshold
 	 do "stata/nlsy97_hh50_stata_pred.do"

@@ -6,10 +6,11 @@
 * The goal of these files is to create the breadwinning measures to corroborate
 * creation of measures in R.
 
+* The data for this file were produced by nlsy97_time_varying.do
 ********************************************************************************
 * Setup the log file
 ********************************************************************************
-local logdate = string( d(`c(current_date)'), "%dCY.N.D" ) 	// create a macro for the date
+local logdate = string( d(`c(current_date)'), "%dCY.N.D" ) 		// create a macro for the date
 
 local list : dir . files "$logdir/*nlsy97_bw_measures_*.log"	// Delete earlier versions of the log
 foreach f of local list {
@@ -26,7 +27,7 @@ di "$S_DATE"
 clear
 set more off
 
-use 	"stata/NLSY97.dta", clear
+use 	"$tempdir/nlsy97_time_varying.dta", clear
 fre year // Make sure the data includes all survey years (1997 - 2017)
 
 // Keep only mothers in first 10 years of motherhood
@@ -118,6 +119,6 @@ keep if time <=9 // Keep only first 10 years of motherhood
 	gen per_hhe60_atbirth	=100*`r(mean)'
 	gen nothhe60_atbirth		=1-`r(mean)'
 
-save "stata/NLSY97_processed.dta", replace
+save "stata/NLSY97_bw.dta", replace
 
 log close
