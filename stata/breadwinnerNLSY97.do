@@ -41,7 +41,7 @@
 ********************************************************************************
 * B. Risk of entering breadwinning for the first 10 years of motherhood
 ********************************************************************************
-	
+**** THESE HAVEN'T BEEN UPDATED TO PULL DATA FROM NEW DO FILES YET. START HERE.
 // Breadwinning estimates at the 50% threshold
 	 do "stata/nlsy97_hh50_stata_pred.do"
 	 
