@@ -5,7 +5,7 @@
 *-------------------------------------------------------------------------------
 
 * The goal of this file is to create the time-varying covariates.
-* Data comes from working memory produced by "nlsy97_sample & demo.do"
+* Data was produced by "nlsy97_sample & demo.do"
 
 ********************************************************************************
 * Setup the log file
@@ -24,6 +24,7 @@ di "$S_DATE"
 ********************************************************************************
 * Create long mini-data files for processing
 ********************************************************************************
+use "$tempdir/nlsy97_sample.dta", clear
 
 foreach var in 	YINC_1400 YINC_1500 YINC_1700 YINC_1800 ///
 				YINC_2000 YINC_2100 YINC_2200 			///
@@ -40,27 +41,130 @@ restore
 ********************************************************************************
 use "$tempdir/nlsy97_YINC_1400.dta", clear
 
-merge 1:1 PUBID_1997 year using "$tempdir/nlsy97_YINC_1500.dta"
+foreach var in 	YINC_1500 YINC_1700 YINC_1800 			///
+				YINC_2000 YINC_2100 YINC_2200 			///
+				CV_INCOME_GROSS_YR CV_INCOME_FAMILY {
+merge 1:1 PUBID_1997 year using "$tempdir/nlsy97_`var'.dta"
 drop _merge
-merge 1:1 PUBID_1997 year using "$tempdir/nlsy97_YINC_1700.dta"
+}
 
-// Moms' Income Variables-------------------------------------------------------
+** MISSING CODES----------------------------------------------------------------
 
-// YINC-1400 - R RECEIVE INCOME FROM JOB IN PAST YEAR? (incd)
-// YINC-1500 - INCOME IN WAGES, SALARY, TIPS FROM REGULAR OR ODD JOBS (incd2)
-// YINC-1700 - TOTAL INCOME FROM WAGES AND SALARY IN PAST YEAR (wages)
-// YINC-1800 - ESTIMATED INCOME FROM WAGES AND SALARY IN PAST YEAR (wages_est)
+* -1 Refused
+* -2 Dont know
+* -3 Invalid missing
+* -4 Valid missing
+* -5 Non-interview
 
+** Moms' Income Variables-------------------------------------------------------
 
-// Moms' Business earnings------------------------------------------------------
+* YINC-1400 - R RECEIVE INCOME FROM JOB IN PAST YEAR? (incd)
+* YINC-1500 - INCOME IN WAGES, SALARY, TIPS FROM REGULAR OR ODD JOBS (incd2)
+* YINC-1700 - TOTAL INCOME FROM WAGES AND SALARY IN PAST YEAR (wages)
+* YINC-1800 - ESTIMATED INCOME FROM WAGES AND SALARY IN PAST YEAR (wages_est)
 
-// YINC-2000 - ANY INCOME FROM OWN BUSINESS OR FARM IN PAST YEAR (mombizd)
-// YINC-2100 - TOTAL INCOME FROM BUSINESS OR FARM IN PAST YEAR (mombiz)
-// YINC-2200 - ESTIMATED INCOME FROM BUSINESS OR FARM IN PAST YEAR (mombiz_est)
+rename 		YINC_1400_ incd
+rename 		YINC_1500_ incd2
+rename 		YINC_1700_ wages
+rename 		YINC_1800_ wages_est
 
+cap drop 	mominc
+clonevar 	mominc = wages 	if incd 		!= 0	// has wages
+replace		mominc = 0 		if incd 		== 0	// doesn't have wages
+replace		mominc = 0 		if incd2 		== 0	// doesn't have wages if answered dk to incd
+
+replace		mominc = 2500 	if wages_est	== 1	// A. $1 - $5,000
+replace		mominc = 7500 	if wages_est	== 2	// B. $5,001 - $10,000
+replace		mominc = 17500 	if wages_est	== 3	// C. $10,001 - $25,000
+replace		mominc = 37500 	if wages_est	== 4	// D. $25,001 - $50,000
+replace		mominc = 75000 	if wages_est	== 5	// E. $50,001 - $100,000
+replace		mominc = 175000	if wages_est	== 6	// F. $100,001 - $250,000
+replace		mominc = 250001	if wages_est	== 7	// G. More than $250,000
+
+replace		mominc = . 		if mominc		<  0	// Address missing	
+
+** Moms' Business earnings------------------------------------------------------
+
+* YINC-2000 - ANY INCOME FROM OWN BUSINESS OR FARM IN PAST YEAR (bizd)
+* YINC-2100 - TOTAL INCOME FROM BUSINESS OR FARM IN PAST YEAR (bizinc)
+* YINC-2200 - ESTIMATED INCOME FROM BUSINESS OR FARM IN PAST YEAR (biz_est)
+
+rename 		YINC_2000_ bizd
+rename 		YINC_2100_ bizinc
+rename 		YINC_2200_ biz_est
+
+cap drop 	mombiz
+clonevar	mombiz = bizinc if bizd			!=0		// has business income
+replace		mombiz = 0		if bizd			==0		// doesn't have business income
+
+replace 	mombiz = 0		if biz_est		==1		// A. LOST/WOULD LOSE MONEY
+replace		mombiz = 2500	if biz_est		==2		// B. $1 - $5,000
+replace		mombiz = 7500	if biz_est		==3		// C. $5,001 - $10,000
+replace		mombiz = 17500	if biz_est		==4		// D. $10,001 - $25,000
+replace		mombiz = 37500	if biz_est		==5		// E. $25,001 - $50,000
+replace		mombiz = 75000	if biz_est		==6		// F. $50,001 - $100,000
+replace		mombiz = 175000	if biz_est		==7		// G. $100,001 - $250,000
+replace		mombiz = 250001	if biz_est		==8		// H. More than $250,000
+
+replace		mombiz = . 		if mombiz		<  0	// Address missing
+
+** Total Household Income Variables---------------------------------------------
+* CV_INCOME_GROSS_YR
+* CV_INCOME_FAMILY
+
+cap drop	totinc
+gen			totinc = .
+replace		totinc = CV_INCOME_GROSS_YR 	if CV_INCOME_GROSS_YR_ !=.
+replace		totinc = CV_INCOME_FAMILY_ 		if CV_INCOME_FAMILY_   !=.
+
+replace		totinc = . 		if totinc		<  0	// Address missing
 
 ********************************************************************************
 * Merge with wide file data
 ********************************************************************************
+// Clean up datafile
+keep PUBID_1997 year mominc mombiz totinc
 
-// Then create a "time -- motherhood duration variable" limit to moms with duration <= 10
+// Add back the original datafile
+merge m:1 PUBID_1997 using "$tempdir/nlsy97_sample.dta"
+assert 	_merge==3 		//all records matched
+drop 	_merge
+
+// Clean up temporary datafiles
+foreach var in 	YINC_1500 YINC_1700 YINC_1800 			///
+				YINC_2000 YINC_2100 YINC_2200 			///
+				CV_INCOME_GROSS_YR CV_INCOME_FAMILY {
+erase "$tempdir/nlsy97_`var'.dta"
+}
+
+********************************************************************************
+* Process motherhood duration and save datafile
+********************************************************************************
+
+** Create motherhood duration identifier----------------------------------------
+destring 	mom_yr, replace
+
+cap drop 	time
+gen			time = .
+replace		time = 0 if year == mom_yr
+
+forvalues i = 1/18 {
+replace time = `i' if year == mom_yr + `i'
+}
+
+// Keep only mothers in first 10 years of motherhood
+egen 		allrecords 	= count(_N)
+keep if 	time <= 10
+egen 		records10 	= count(_N)
+
+global 	allrecords_n	= allrecords
+global 	records10_n 	= records10
+
+di "$allrecords_n"	// Total # records
+di "$records10_n"	// Total # records for moms in first 10 years of motherhood
+
+
+// Save the new data file
+save "$tempdir/nlsy97_time_varying.dta", replace
+
+log close
