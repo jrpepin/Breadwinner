@@ -73,7 +73,7 @@ rename 		YINC_1700_ wages
 rename 		YINC_1800_ wages_est
 
 cap drop 	momwages
-clonevar 	momwages = wages 	if incd 		!= 0	// has wages
+clonevar	momwages = wages 	if incd 		!= 0	// has wages
 replace		momwages = 0 		if incd 		== 0	// doesn't have wages
 replace		momwages = 0 		if incd2 		== 0	// doesn't have wages if answered dk to incd
 
@@ -114,7 +114,7 @@ replace		mombiz = . 		if mombiz		<  0	// Address missing
 
 ** Mom's total earnings (wages + business income)-------------------------------
 cap drop 	momearn
-egen 		momearn		= rowtotal(wages mombiz)
+egen 		momearn		= rowtotal(momwages mombiz)
 replace 	momearn 	=. if momwages ==. | mombiz ==.
 
 ** Total Household Income Variables---------------------------------------------
