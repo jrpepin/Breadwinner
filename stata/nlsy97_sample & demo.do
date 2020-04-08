@@ -65,6 +65,7 @@ foreach var of varlist CV_CHILD_BIRTH_DATE_01_Y_*{
 egen 		mom_yr = rowmax(c_*)	// Identify the birth year of first child
 drop 		c_*
 fre 		mom_yr
+label var	mom_yr "Birth year of 1st child"
 
 keep if 	mom_yr !=.				// Keep only mothers
 unique 		PUBID_1997				// Number of mothers in sample
@@ -119,6 +120,7 @@ drop 		dob_child1
 cap drop 	age_birth
 gen 		age_birth	=floor((datchild1 - datbirth)/365.25)
 fre			age_birth
+label var	age_birth "Moms age at 1st birth"
 
 ** Marital Status at 1st birth--------------------------------------------------
 // Rs marital or cohabitation status as of the survey date.
@@ -133,13 +135,25 @@ snapshot save, label("nlsy97_temp")		// Create a temporary copy of data in memor
 	destring 	mom_yr, replace
 
 // Create marital status at year of fist birth var
-	cap drop 	mar_t1
-	clonevar 	mar_t1 = CV_MARSTAT_ if year == mom_yr 
+	cap drop 	marst
+	clonevar 	marst = CV_MARSTAT_ if year == mom_yr
+	
+// Process and label marst var
+	cap drop	mar_t1
+	recode 		marst (2=1)(1=2)(3/4=3)(5=2) (6 =4) (7=2) (8=4) (10=4) (else = .) , gen(mar_t1)
 
+label define mar   1 "Never married"	///
+                   2 "Cohabiting"		///
+                   3 "Married"			///
+                   4 "Sep/Div/Wid"
+		
+label values 	mar_t1 mar
+label var 		mar_t1 "Marital status at time of 1st birth"
+	
 	keep PUBID_1997 mar_t1
 	drop if 		mar_t1 ==.
 	count
-
+	
 	save "$tempdir/nlsy97_marstat.dta", replace
 
 // recall the original data in memory
@@ -183,7 +197,8 @@ label define ed    1 "less than hs"		///
                    3 "some college"		///
                    4 "college grad"
 		
-label values educ_t1 ed
+label values 	educ_t1 ed
+label var 		educ_t1 "Education at time of 1st birth"
 
 //Clean up and reshape data for merge
 	keep if year == mom_yr // 1 row per respondent

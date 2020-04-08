@@ -216,14 +216,12 @@ gen 	 hhe50 = (momearn > .5*totinc) if  hh_noearnings !=1 & !missing(momearn)
 cap drop hhe60
 gen 	 hhe60 = (momearn > .6*totinc) if  hh_noearnings !=1 & !missing(momearn)
 
-order PUBID_1997 year mom_yr time momearn totinc hhe50 hhe60 momwages mombiz
-list  PUBID_1997 year mom_yr time momearn totinc hhe50 hhe60 momwages mombiz in 1/30
-
 fre hhe50
 fre hhe60
 
 // Order and save the new data file
-order PUBID_1997 year mom_yr time momwages mombiz momearn totinc
+order PUBID_1997 year mom_yr time momearn totinc hhe50 hhe60 momwages mombiz mar_t1 educ_t1 age_birth
+list  PUBID_1997 year mom_yr time momearn totinc hhe50 hhe60 momwages mombiz mar_t1 educ_t1 age_birth in 1/30
 
 save "stata/nlsy97_bw.dta", replace
 
