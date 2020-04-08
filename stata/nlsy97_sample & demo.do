@@ -141,8 +141,9 @@ snapshot save, label("nlsy97_temp")		// Create a temporary copy of data in memor
 	count
 
 	save "$tempdir/nlsy97_marstat.dta", replace
-	
-snapshot restore 1			// recall the original data in memory
+
+// recall the original data in memory
+	snapshot restore 1			
 
 // Merge maritatl status at time 1 to original data
 merge 1:1 PUBID_1997 using "$tempdir/nlsy97_marstat.dta"
@@ -151,6 +152,55 @@ drop _merge
 
 // Remove temporary data
 capture erase 	"$tempdir/nlsy97_marstat.dta"		
+snapshot erase 	1
+
+** Education completed at 1st birth---------------------------------------------
+// What is the highest grade you have ever completed as of today?
+summarize YSCH_3112_*
+
+snapshot save, label("nlsy97_temp")	// Create a temporary copy of data in memory
+
+// Reshape the data to generate marital status at time 1 var
+	keep 		PUBID_1997 mom_yr YSCH_3112_*
+	reshape long YSCH_3112_, i(PUBID_1997) j(year)
+
+// Format vars for processing
+	destring 	mom_yr, 	replace
+	gen int 	educ = YSCH_3112_	// create integer var to use "max" command
+
+// Create education attainment at year of fist birth var
+	cap drop 				educ_t1
+	by PUBID_1997: gen 		educ_t1 = educ if year <= mom_yr & YSCH_3112_ >= 0
+	
+	egen max_edu = max(educ_t1), by(PUBID_1997) // capture highest level of educ
+
+// Process and label educ var
+	drop	educ_t1
+	recode max_edu (6/11=1)(12=2)(13/15=3)(16/20=4) (95 =.) , gen(educ_t1)
+
+label define ed    1 "less than hs"		///
+                   2 "high school"		///
+                   3 "some college"		///
+                   4 "college grad"
+		
+label values educ_t1 ed
+
+//Clean up and reshape data for merge
+	keep if year == mom_yr // 1 row per respondent
+	keep PUBID_1997 educ_t1
+
+	save "$tempdir/nlsy97_educ.dta", replace
+	
+// recall the original data in memory
+	snapshot restore 1			
+
+// Merge education attainment at time 1 to original data
+merge 1:1 PUBID_1997 using "$tempdir/nlsy97_educ.dta"
+// _merge==1 are moms with missing educational attainment at birth year
+drop _merge
+
+// Remove temporary data
+capture erase 	"$tempdir/nlsy97_educ.dta"		
 snapshot erase 	1
 ********************************************************************************
 * Sample Restrictions
