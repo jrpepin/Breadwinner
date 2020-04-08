@@ -1438,6 +1438,50 @@ Min:              1        Max:              4        Mean:                2.79
 Lead In: R05387.00[Default]
 Default Next Question: R05389.00
 --------------------------------------------------------------------------------
+R15824.00    [YSCH-3112]                                    Survey Year: 1998
+  PRIMARY VARIABLE
+
+ 
+             WHAT IS CURRENT HIGHEST GRADE EVER COMPLETED?
+ 
+What is the highest grade you have ever completed as of today?
+ 
+UNIVERSE: All
+ 
+       2       0 NONE
+       1       1 1ST GRADE
+       0       2 2ND GRADE
+       0       3 3RD GRADE
+       1       4 4TH GRADE
+       6       5 5TH GRADE
+     117       6 6TH GRADE
+     726       7 7TH GRADE
+    1973       8 8TH GRADE
+    1782       9 9TH GRADE
+    1655      10 10TH GRADE
+    1390      11 11TH GRADE
+     706      12 12TH GRADE
+      20      13 1ST YEAR COLLEGE
+       4      14 2ND YEAR COLLEGE
+       0      15 3RD YEAR COLLEGE
+       0      16 4TH YEAR COLLEGE
+       0      17 5TH YEAR COLLEGE
+       0      18 6TH YEAR COLLEGE
+       0      19 7TH YEAR COLLEGE
+       0      20 8TH YEAR COLLEGE OR MORE
+       2      95 UNGRADED
+  -------
+    8385
+ 
+Refusal(-1)            1
+Don't Know(-2)         0
+TOTAL =========>    8386   VALID SKIP(-4)       0     NON-INTERVIEW(-5)     598
+ 
+Min:              0        Max:             95        Mean:                9.36
+ 
+Lead In: R15823.00[Default]  R15820.00[1:1] R15822.00[1:1]
+Default Next Question: R15825.00
+--------------------------------------------------------------------------------
 R21856.00    [YSAQ-324]                                     Survey Year: 1998
   PRIMARY VARIABLE
 
@@ -2889,6 +2933,50 @@ Hard Minimum: [0]  Hard Maximum: [5]
  
 Lead In: R25700.00[Default]
 Default Next Question: R25702.00
+--------------------------------------------------------------------------------
+R28742.00    [YSCH-3112]                                    Survey Year: 1999
+  PRIMARY VARIABLE
+
+ 
+             WHAT IS CURRENT HIGHEST GRADE EVER COMPLETED?
+ 
+What is the highest grade you have ever completed as of today?
+ 
+UNIVERSE: All
+ 
+       2       0 NONE
+       0       1 1ST GRADE
+       0       2 2ND GRADE
+       0       3 3RD GRADE
+       0       4 4TH GRADE
+       2       5 5TH GRADE
+      16       6 6TH GRADE
+     124       7 7TH GRADE
+     905       8 8TH GRADE
+    1884       9 9TH GRADE
+    1765      10 10TH GRADE
+    1564      11 11TH GRADE
+    1540      12 12TH GRADE
+     383      13 1ST YEAR COLLEGE
+      15      14 2ND YEAR COLLEGE
+       3      15 3RD YEAR COLLEGE
+       0      16 4TH YEAR COLLEGE
+       0      17 5TH YEAR COLLEGE
+       0      18 6TH YEAR COLLEGE
+       0      19 7TH YEAR COLLEGE
+       0      20 8TH YEAR COLLEGE OR MORE
+       3      95 UNGRADED
+  -------
+    8206
+ 
+Refusal(-1)            0
+Don't Know(-2)         2
+TOTAL =========>    8208   VALID SKIP(-4)       0     NON-INTERVIEW(-5)     776
+ 
+Min:              0        Max:             95        Mean:               10.24
+ 
+Lead In: R28741.00[Default]  R28738.00[1:1] R28740.00[1:1]
+Default Next Question: R28743.00
 --------------------------------------------------------------------------------
 R35038.00    [YSAQ-326D]                                    Survey Year: 1999
   PRIMARY VARIABLE
@@ -4347,6 +4435,50 @@ Hard Minimum: [0]  Hard Maximum: [5]
  
 Lead In: R38920.00[Default]
 Default Next Question: R38922.00
+--------------------------------------------------------------------------------
+R41731.00    [YSCH-3112]                                    Survey Year: 2000
+  PRIMARY VARIABLE
+
+ 
+             WHAT IS CURRENT HIGHEST GRADE EVER COMPLETED?
+ 
+What is the highest grade you have ever completed as of today?
+ 
+UNIVERSE: All
+ 
+       3       0 NONE
+       0       1 1ST GRADE
+       1       2 2ND GRADE
+       1       3 3RD GRADE
+       0       4 4TH GRADE
+       1       5 5TH GRADE
+       6       6 6TH GRADE
+      39       7 7TH GRADE
+     296       8 8TH GRADE
+    1011       9 9TH GRADE
+    1856      10 10TH GRADE
+    1696      11 11TH GRADE
+    2097      12 12TH GRADE
+     772      13 1ST YEAR COLLEGE
+     264      14 2ND YEAR COLLEGE
+      26      15 3RD YEAR COLLEGE
+       2      16 4TH YEAR COLLEGE
+       0      17 5TH YEAR COLLEGE
+       0      18 6TH YEAR COLLEGE
+       0      19 7TH YEAR COLLEGE
+       0      20 8TH YEAR COLLEGE OR MORE
+       6      95 UNGRADED
+  -------
+    8077
+ 
+Refusal(-1)            1
+Don't Know(-2)         2
+TOTAL =========>    8080   VALID SKIP(-4)       0     NON-INTERVIEW(-5)     904
+ 
+Min:              0        Max:             95        Mean:               11.01
+ 
+Lead In: R41730.00[Default]  R41727.00[1:1] R41729.00[1:1]
+Default Next Question: R41732.00
 --------------------------------------------------------------------------------
 R49028.00    [YSAQ-326D]                                    Survey Year: 2000
   PRIMARY VARIABLE
@@ -5811,6 +5943,50 @@ Hard Minimum: [0]  Hard Maximum: [5]
  
 Lead In: R54740.00[Default]
 Default Next Question: R54742.00
+--------------------------------------------------------------------------------
+R58279.00    [YSCH-3112]                                    Survey Year: 2001
+  PRIMARY VARIABLE
+
+ 
+             WHAT IS CURRENT HIGHEST GRADE EVER COMPLETED?
+ 
+What is the highest grade you have ever completed as of today?
+ 
+UNIVERSE: All
+ 
+       2       0 NONE
+       1       1 1ST GRADE
+       2       2 2ND GRADE
+       1       3 3RD GRADE
+       0       4 4TH GRADE
+       1       5 5TH GRADE
+       7       6 6TH GRADE
+      22       7 7TH GRADE
+     187       8 8TH GRADE
+     409       9 9TH GRADE
+    1028      10 10TH GRADE
+    1816      11 11TH GRADE
+    2583      12 12TH GRADE
+     964      13 1ST YEAR COLLEGE
+     621      14 2ND YEAR COLLEGE
+     202      15 3RD YEAR COLLEGE
+      22      16 4TH YEAR COLLEGE
+       1      17 5TH YEAR COLLEGE
+       0      18 6TH YEAR COLLEGE
+       0      19 7TH YEAR COLLEGE
+       0      20 8TH YEAR COLLEGE OR MORE
+       9      95 UNGRADED
+  -------
+    7878
+ 
+Refusal(-1)            1
+Don't Know(-2)         3
+TOTAL =========>    7882   VALID SKIP(-4)       0     NON-INTERVIEW(-5)    1102
+ 
+Min:              0        Max:             95        Mean:               11.69
+ 
+Lead In: R58278.00[Default]  R58275.00[1:1] R58277.00[1:1]
+Default Next Question: R58280.00
 --------------------------------------------------------------------------------
 R65293.00    [YSAQ-326D]                                    Survey Year: 2001
   PRIMARY VARIABLE
@@ -7283,6 +7459,50 @@ Hard Minimum: [0]  Hard Maximum: [5]
  
 Lead In: R72377.00[Default]
 Default Next Question: R72379.00
+--------------------------------------------------------------------------------
+S02020.00    [YSCH-3112]                                    Survey Year: 2002
+  PRIMARY VARIABLE
+
+ 
+             WHAT IS CURRENT HIGHEST GRADE EVER COMPLETED?
+ 
+What is the highest grade you have ever completed as of today?
+ 
+UNIVERSE: All
+ 
+       3       0 NONE
+       0       1 1ST GRADE
+       1       2 2ND GRADE
+       2       3 3RD GRADE
+       1       4 4TH GRADE
+       0       5 5TH GRADE
+       5       6 6TH GRADE
+      21       7 7TH GRADE
+     163       8 8TH GRADE
+     315       9 9TH GRADE
+     519      10 10TH GRADE
+    1117      11 11TH GRADE
+    3072      12 12TH GRADE
+    1234      13 1ST YEAR COLLEGE
+     764      14 2ND YEAR COLLEGE
+     470      15 3RD YEAR COLLEGE
+     187      16 4TH YEAR COLLEGE
+       5      17 5TH YEAR COLLEGE
+       1      18 6TH YEAR COLLEGE
+       0      19 7TH YEAR COLLEGE
+       0      20 8TH YEAR COLLEGE OR MORE
+      14      95 UNGRADED
+  -------
+    7894
+ 
+Refusal(-1)            0
+Don't Know(-2)         2
+TOTAL =========>    7896   VALID SKIP(-4)       0     NON-INTERVIEW(-5)    1088
+ 
+Min:              0        Max:             95        Mean:               12.27
+ 
+Lead In: S02019.00[Default]  S02016.00[1:1] S02018.00[1:1]
+Default Next Question: S02021.00
 --------------------------------------------------------------------------------
 S10555.00    [YINC-1400]                                    Survey Year: 2002
   PRIMARY VARIABLE
@@ -9098,6 +9318,50 @@ Hard Minimum: [0]  Hard Maximum: [10]
 Lead In: S20226.00[Default]
 Default Next Question: S20228.00
 --------------------------------------------------------------------------------
+S22610.00    [YSCH-3112]                                    Survey Year: 2003
+  PRIMARY VARIABLE
+
+ 
+             WHAT IS CURRENT HIGHEST GRADE EVER COMPLETED?
+ 
+What is the highest grade you have ever completed as of today?
+ 
+UNIVERSE: All
+ 
+       4       0 NONE
+       4       1 1ST GRADE
+       5       2 2ND GRADE
+       4       3 3RD GRADE
+       3       4 4TH GRADE
+       1       5 5TH GRADE
+       6       6 6TH GRADE
+      27       7 7TH GRADE
+     160       8 8TH GRADE
+     286       9 9TH GRADE
+     477      10 10TH GRADE
+     660      11 11TH GRADE
+    2707      12 12TH GRADE
+    1351      13 1ST YEAR COLLEGE
+     984      14 2ND YEAR COLLEGE
+     535      15 3RD YEAR COLLEGE
+     452      16 4TH YEAR COLLEGE
+      72      17 5TH YEAR COLLEGE
+       3      18 6TH YEAR COLLEGE
+       0      19 7TH YEAR COLLEGE
+       0      20 8TH YEAR COLLEGE OR MORE
+      12      95 UNGRADED
+  -------
+    7753
+ 
+Refusal(-1)            0
+Don't Know(-2)         1
+TOTAL =========>    7754   VALID SKIP(-4)       0     NON-INTERVIEW(-5)    1230
+ 
+Min:              0        Max:             95        Mean:                12.6
+ 
+Lead In: S22609.00[Default]  S22606.00[1:1] S22608.00[1:1]
+Default Next Question: S22611.00
+--------------------------------------------------------------------------------
 S31344.00    [YINC-1400]                                    Survey Year: 2003
   PRIMARY VARIABLE
 
@@ -10747,6 +11011,50 @@ Hard Minimum: [0]  Hard Maximum: [10]
 Lead In: S38235.00[Default]
 Default Next Question: S38237.00
 --------------------------------------------------------------------------------
+S40325.00    [YSCH-3112]                                    Survey Year: 2004
+  PRIMARY VARIABLE
+
+ 
+             WHAT IS CURRENT HIGHEST GRADE EVER COMPLETED?
+ 
+What is the highest grade you have ever completed as of today?
+ 
+UNIVERSE: All
+ 
+       3       0 NONE
+       5       1 1ST GRADE
+      10       2 2ND GRADE
+      11       3 3RD GRADE
+      10       4 4TH GRADE
+       5       5 5TH GRADE
+       7       6 6TH GRADE
+      23       7 7TH GRADE
+     133       8 8TH GRADE
+     287       9 9TH GRADE
+     433      10 10TH GRADE
+     545      11 11TH GRADE
+    2346      12 12TH GRADE
+    1018      13 1ST YEAR COLLEGE
+    1120      14 2ND YEAR COLLEGE
+     663      15 3RD YEAR COLLEGE
+     671      16 4TH YEAR COLLEGE
+     153      17 5TH YEAR COLLEGE
+      36      18 6TH YEAR COLLEGE
+       3      19 7TH YEAR COLLEGE
+       1      20 8TH YEAR COLLEGE OR MORE
+      13      95 UNGRADED
+  -------
+    7496
+ 
+Refusal(-1)            0
+Don't Know(-2)         6
+TOTAL =========>    7502   VALID SKIP(-4)       0     NON-INTERVIEW(-5)    1482
+ 
+Min:              0        Max:             95        Mean:               12.89
+ 
+Lead In: S40324.00[Default]  S40321.00[1:1] S40323.00[1:1]
+Default Next Question: S40326.00
+--------------------------------------------------------------------------------
 S47994.00    [YINC-1400]                                    Survey Year: 2004
   PRIMARY VARIABLE
 
@@ -12355,6 +12663,50 @@ Hard Minimum: [0]  Hard Maximum: [10]
 Lead In: S54235.00[Default]
 Default Next Question: S54237.00
 --------------------------------------------------------------------------------
+S56129.00    [YSCH-3112]                                    Survey Year: 2005
+  PRIMARY VARIABLE
+
+ 
+             WHAT IS CURRENT HIGHEST GRADE EVER COMPLETED?
+ 
+What is the highest grade you have ever completed as of today?
+ 
+UNIVERSE: All
+ 
+       2       0 NONE
+       2       1 1ST GRADE
+       4       2 2ND GRADE
+      10       3 3RD GRADE
+       6       4 4TH GRADE
+       2       5 5TH GRADE
+       7       6 6TH GRADE
+      29       7 7TH GRADE
+     137       8 8TH GRADE
+     281       9 9TH GRADE
+     418      10 10TH GRADE
+     541      11 11TH GRADE
+    2225      12 12TH GRADE
+     783      13 1ST YEAR COLLEGE
+     953      14 2ND YEAR COLLEGE
+     688      15 3RD YEAR COLLEGE
+     879      16 4TH YEAR COLLEGE
+     256      17 5TH YEAR COLLEGE
+      72      18 6TH YEAR COLLEGE
+      22      19 7TH YEAR COLLEGE
+       2      20 8TH YEAR COLLEGE OR MORE
+      10      95 UNGRADED
+  -------
+    7329
+ 
+Refusal(-1)            1
+Don't Know(-2)         8
+TOTAL =========>    7338   VALID SKIP(-4)       0     NON-INTERVIEW(-5)    1646
+ 
+Min:              0        Max:             95        Mean:               13.06
+ 
+Lead In: S56128.00[Default]  S56125.00[1:1] S56127.00[1:1]
+Default Next Question: S56130.00
+--------------------------------------------------------------------------------
 S65008.00    [YINC-1400]                                    Survey Year: 2005
   PRIMARY VARIABLE
 
@@ -13918,6 +14270,50 @@ Hard Minimum: [0]  Hard Maximum: [10]
  
 Lead In: S75256.00[Default]
 Default Next Question: S75258.00
+--------------------------------------------------------------------------------
+S76832.00    [YSCH-3112]                                    Survey Year: 2006
+  PRIMARY VARIABLE
+
+ 
+             WHAT IS CURRENT HIGHEST GRADE EVER COMPLETED?
+ 
+What is the highest grade you have ever completed as of today?
+ 
+UNIVERSE: All
+ 
+       1       0 NONE
+       0       1 1ST GRADE
+       2       2 2ND GRADE
+       2       3 3RD GRADE
+       6       4 4TH GRADE
+       3       5 5TH GRADE
+       4       6 6TH GRADE
+      29       7 7TH GRADE
+     151       8 8TH GRADE
+     277       9 9TH GRADE
+     457      10 10TH GRADE
+     520      11 11TH GRADE
+    2247      12 12TH GRADE
+     798      13 1ST YEAR COLLEGE
+     820      14 2ND YEAR COLLEGE
+     562      15 3RD YEAR COLLEGE
+    1135      16 4TH YEAR COLLEGE
+     344      17 5TH YEAR COLLEGE
+     128      18 6TH YEAR COLLEGE
+      36      19 7TH YEAR COLLEGE
+      17      20 8TH YEAR COLLEGE OR MORE
+       7      95 UNGRADED
+  -------
+    7546
+ 
+Refusal(-1)            2
+Don't Know(-2)        11
+TOTAL =========>    7559   VALID SKIP(-4)       0     NON-INTERVIEW(-5)    1425
+ 
+Min:              0        Max:             95        Mean:               13.19
+ 
+Lead In: S76831.00[Default]  S76828.00[1:1] S76830.00[1:1]
+Default Next Question: S76833.00
 --------------------------------------------------------------------------------
 S84963.00    [YINC-1400]                                    Survey Year: 2006
   PRIMARY VARIABLE
@@ -15607,6 +16003,50 @@ Hard Minimum: [0]  Hard Maximum: [10]
 Lead In: T00259.00[Default]
 Default Next Question: T00261.00
 --------------------------------------------------------------------------------
+T01495.00    [YSCH-3112]                                    Survey Year: 2007
+  PRIMARY VARIABLE
+
+ 
+             WHAT IS CURRENT HIGHEST GRADE EVER COMPLETED?
+ 
+What is the highest grade you have ever completed as of today?
+ 
+UNIVERSE: All
+ 
+       0       0 NONE
+       3       1 1ST GRADE
+       4       2 2ND GRADE
+       4       3 3RD GRADE
+       5       4 4TH GRADE
+       4       5 5TH GRADE
+       8       6 6TH GRADE
+      20       7 7TH GRADE
+     152       8 8TH GRADE
+     276       9 9TH GRADE
+     449      10 10TH GRADE
+     498      11 11TH GRADE
+    2241      12 12TH GRADE
+     721      13 1ST YEAR COLLEGE
+     782      14 2ND YEAR COLLEGE
+     384      15 3RD YEAR COLLEGE
+    1190      16 4TH YEAR COLLEGE
+     386      17 5TH YEAR COLLEGE
+     184      18 6TH YEAR COLLEGE
+      64      19 7TH YEAR COLLEGE
+      33      20 8TH YEAR COLLEGE OR MORE
+       4      95 UNGRADED
+  -------
+    7412
+ 
+Refusal(-1)            0
+Don't Know(-2)         6
+TOTAL =========>    7418   VALID SKIP(-4)       0     NON-INTERVIEW(-5)    1566
+ 
+Min:              1        Max:             95        Mean:               13.23
+ 
+Lead In: T01494.00[Default]  T01491.00[1:1] T01493.00[1:1]
+Default Next Question: T01496.00
+--------------------------------------------------------------------------------
 T08896.00    [YINC-1400]                                    Survey Year: 2007
   PRIMARY VARIABLE
 
@@ -17281,6 +17721,50 @@ Min:              0        Max:              8        Mean:                 .34
 Lead In: T20209.00[Default]
 Default Next Question: T20211.00
 --------------------------------------------------------------------------------
+T21199.00    [YSCH-3112]                                    Survey Year: 2008
+  PRIMARY VARIABLE
+
+ 
+             WHAT IS CURRENT HIGHEST GRADE EVER COMPLETED?
+ 
+What is the highest grade you have ever completed as of today?
+ 
+UNIVERSE: R enrolled since DLI
+ 
+       1       0 NONE
+       3       1 1ST GRADE
+       4       2 2ND GRADE
+       2       3 3RD GRADE
+      11       4 4TH GRADE
+       7       5 5TH GRADE
+       2       6 6TH GRADE
+       3       7 7TH GRADE
+       6       8 8TH GRADE
+      10       9 9TH GRADE
+      24      10 10TH GRADE
+      24      11 11TH GRADE
+     226      12 12TH GRADE
+     251      13 1ST YEAR COLLEGE
+     294      14 2ND YEAR COLLEGE
+     199      15 3RD YEAR COLLEGE
+     319      16 4TH YEAR COLLEGE
+     204      17 5TH YEAR COLLEGE
+     167      18 6TH YEAR COLLEGE
+      77      19 7TH YEAR COLLEGE
+      45      20 8TH YEAR COLLEGE OR MORE
+       2      95 UNGRADED
+  -------
+    1881
+ 
+Refusal(-1)            1
+Don't Know(-2)         9
+TOTAL =========>    1891   VALID SKIP(-4)    5599     NON-INTERVIEW(-5)    1494
+ 
+Min:              0        Max:             95        Mean:               14.87
+ 
+Lead In: T21198.00[Default]  T21197.00[1:1]
+Default Next Question: T21200.00
+--------------------------------------------------------------------------------
 T30028.00    [YINC-1400]                                    Survey Year: 2008
   PRIMARY VARIABLE
 
@@ -18888,6 +19372,50 @@ Hard Minimum: [0]  Hard Maximum: [10]
  
 Lead In: T36115.00[Default]
 Default Next Question: T36117.00
+--------------------------------------------------------------------------------
+T37310.00    [YSCH-3112]                                    Survey Year: 2009
+  PRIMARY VARIABLE
+
+ 
+             WHAT IS CURRENT HIGHEST GRADE EVER COMPLETED?
+ 
+What is the highest grade you have ever completed as of today?
+ 
+UNIVERSE: R enrolled since DLI
+ 
+       1       0 NONE
+       2       1 1ST GRADE
+       4       2 2ND GRADE
+       3       3 3RD GRADE
+       3       4 4TH GRADE
+       2       5 5TH GRADE
+       3       6 6TH GRADE
+       2       7 7TH GRADE
+       8       8 8TH GRADE
+      14       9 9TH GRADE
+      28      10 10TH GRADE
+      30      11 11TH GRADE
+     221      12 12TH GRADE
+     231      13 1ST YEAR COLLEGE
+     302      14 2ND YEAR COLLEGE
+     201      15 3RD YEAR COLLEGE
+     247      16 4TH YEAR COLLEGE
+     178      17 5TH YEAR COLLEGE
+     154      18 6TH YEAR COLLEGE
+      80      19 7TH YEAR COLLEGE
+      70      20 8TH YEAR COLLEGE OR MORE
+       7      95 UNGRADED
+  -------
+    1791
+ 
+Refusal(-1)            0
+Don't Know(-2)         6
+TOTAL =========>    1797   VALID SKIP(-4)    5762     NON-INTERVIEW(-5)    1425
+ 
+Min:              0        Max:             95        Mean:               15.13
+ 
+Lead In: T37309.00[Default]  T37308.00[1:1]
+Default Next Question: T37311.00
 --------------------------------------------------------------------------------
 T44058.00    [YINC-1400]                                    Survey Year: 2009
   PRIMARY VARIABLE
@@ -20525,6 +21053,50 @@ Hard Minimum: [0]  Hard Maximum: [10]
  
 Lead In: T52116.00[Default]
 Default Next Question: T52118.00
+--------------------------------------------------------------------------------
+T53221.00    [YSCH-3112]                                    Survey Year: 2010
+  PRIMARY VARIABLE
+
+ 
+             WHAT IS CURRENT HIGHEST GRADE EVER COMPLETED?
+ 
+What is the highest grade you have ever completed as of today?
+ 
+UNIVERSE: R enrolled since DLI
+ 
+       0       0 NONE
+       1       1 1ST GRADE
+       2       2 2ND GRADE
+       7       3 3RD GRADE
+       4       4 4TH GRADE
+       3       5 5TH GRADE
+       5       6 6TH GRADE
+       1       7 7TH GRADE
+       4       8 8TH GRADE
+      11       9 9TH GRADE
+      21      10 10TH GRADE
+      35      11 11TH GRADE
+     223      12 12TH GRADE
+     238      13 1ST YEAR COLLEGE
+     293      14 2ND YEAR COLLEGE
+     181      15 3RD YEAR COLLEGE
+     227      16 4TH YEAR COLLEGE
+     124      17 5TH YEAR COLLEGE
+     150      18 6TH YEAR COLLEGE
+      82      19 7TH YEAR COLLEGE
+      92      20 8TH YEAR COLLEGE OR MORE
+      14      95 UNGRADED
+  -------
+    1718
+ 
+Refusal(-1)            0
+Don't Know(-2)         4
+TOTAL =========>    1722   VALID SKIP(-4)    5757     NON-INTERVIEW(-5)    1505
+ 
+Min:              1        Max:             95        Mean:               15.47
+ 
+Lead In: T53220.00[Default]  T53219.00[1:1]
+Default Next Question: T53222.00
 --------------------------------------------------------------------------------
 T60553.00    [YINC-1400]                                    Survey Year: 2010
   PRIMARY VARIABLE
@@ -22344,6 +22916,50 @@ Hard Minimum: [0]  Hard Maximum: [10]
 Lead In: T66630.00[Default]
 Default Next Question: T66632.00
 --------------------------------------------------------------------------------
+T67670.00    [YSCH-3112]                                    Survey Year: 2011
+  PRIMARY VARIABLE
+
+ 
+             WHAT IS CURRENT HIGHEST GRADE EVER COMPLETED?
+ 
+What is the highest grade you have ever completed as of today?
+ 
+UNIVERSE: R enrolled since DLI
+ 
+       2       0 NONE
+       3       1 1ST GRADE
+      10       2 2ND GRADE
+       4       3 3RD GRADE
+       4       4 4TH GRADE
+       4       5 5TH GRADE
+      11       6 6TH GRADE
+       3       7 7TH GRADE
+       9       8 8TH GRADE
+      12       9 9TH GRADE
+      20      10 10TH GRADE
+      37      11 11TH GRADE
+     190      12 12TH GRADE
+     213      13 1ST YEAR COLLEGE
+     277      14 2ND YEAR COLLEGE
+     170      15 3RD YEAR COLLEGE
+     188      16 4TH YEAR COLLEGE
+     103      17 5TH YEAR COLLEGE
+     120      18 6TH YEAR COLLEGE
+      66      19 7TH YEAR COLLEGE
+      99      20 8TH YEAR COLLEGE OR MORE
+       3      95 UNGRADED
+  -------
+    1548
+ 
+Refusal(-1)            3
+Don't Know(-2)         2
+TOTAL =========>    1553   VALID SKIP(-4)    5870     NON-INTERVIEW(-5)    1561
+ 
+Min:              0        Max:             95        Mean:               14.77
+ 
+Lead In: T67669.00[Default]  T67668.00[1:1]
+Default Next Question: T67671.00
+--------------------------------------------------------------------------------
 T75454.00    [YINC-1400]                                    Survey Year: 2011
   PRIMARY VARIABLE
 
@@ -24160,6 +24776,50 @@ Hard Minimum: [0]  Hard Maximum: [20]
 Lead In: T81342.00[Default]
 Default Next Question: T81344.00
 --------------------------------------------------------------------------------
+T82413.00    [YSCH-3112]                                    Survey Year: 2013
+  PRIMARY VARIABLE
+
+ 
+             WHAT IS CURRENT HIGHEST GRADE EVER COMPLETED?
+ 
+What is the highest grade you have ever completed as of today?
+ 
+UNIVERSE: R enrolled since DLI
+ 
+       2       0 NONE
+       0       1 1ST GRADE
+       0       2 2ND GRADE
+       4       3 3RD GRADE
+       2       4 4TH GRADE
+       3       5 5TH GRADE
+       2       6 6TH GRADE
+       1       7 7TH GRADE
+       6       8 8TH GRADE
+      10       9 9TH GRADE
+      24      10 10TH GRADE
+      30      11 11TH GRADE
+     157      12 12TH GRADE
+     182      13 1ST YEAR COLLEGE
+     285      14 2ND YEAR COLLEGE
+     201      15 3RD YEAR COLLEGE
+     224      16 4TH YEAR COLLEGE
+      91      17 5TH YEAR COLLEGE
+     112      18 6TH YEAR COLLEGE
+      78      19 7TH YEAR COLLEGE
+     159      20 8TH YEAR COLLEGE OR MORE
+      10      95 UNGRADED
+  -------
+    1583
+ 
+Refusal(-1)            1
+Don't Know(-2)        10
+TOTAL =========>    1594   VALID SKIP(-4)    5546     NON-INTERVIEW(-5)    1844
+ 
+Min:              0        Max:             95        Mean:               15.65
+ 
+Lead In: T82412.00[Default]  T82411.00[1:1]
+Default Next Question: T82414.00
+--------------------------------------------------------------------------------
 T89765.00    [YINC-1400]                                    Survey Year: 2013
   PRIMARY VARIABLE
 
@@ -25570,6 +26230,50 @@ Hard Minimum: [0]  Hard Maximum: [20]
  
 Lead In: U00147.00[Default]
 Default Next Question: U00149.00
+--------------------------------------------------------------------------------
+U01370.00    [YSCH-3112]                                    Survey Year: 2015
+  PRIMARY VARIABLE
+
+ 
+             WHAT IS CURRENT HIGHEST GRADE EVER COMPLETED?
+ 
+What is the highest grade you have ever completed as of today?
+ 
+UNIVERSE: R enrolled since DLI
+ 
+       0       0 NONE
+       0       1 1ST GRADE
+       2       2 2ND GRADE
+       1       3 3RD GRADE
+       3       4 4TH GRADE
+       0       5 5TH GRADE
+       2       6 6TH GRADE
+       0       7 7TH GRADE
+       5       8 8TH GRADE
+       9       9 9TH GRADE
+      14      10 10TH GRADE
+      24      11 11TH GRADE
+     105      12 12TH GRADE
+     109      13 1ST YEAR COLLEGE
+     233      14 2ND YEAR COLLEGE
+     171      15 3RD YEAR COLLEGE
+     187      16 4TH YEAR COLLEGE
+      73      17 5TH YEAR COLLEGE
+      88      18 6TH YEAR COLLEGE
+      61      19 7TH YEAR COLLEGE
+     126      20 8TH YEAR COLLEGE OR MORE
+       6      95 UNGRADED
+  -------
+    1219
+ 
+Refusal(-1)            1
+Don't Know(-2)         5
+TOTAL =========>    1225   VALID SKIP(-4)    5878     NON-INTERVIEW(-5)    1881
+ 
+Min:              2        Max:             95        Mean:               15.69
+ 
+Lead In: U01369.00[Default]  U01368.00[1:1]
+Default Next Question: U01371.00
 --------------------------------------------------------------------------------
 U09567.00    [YINC-1400]                                    Survey Year: 2015
   PRIMARY VARIABLE
@@ -26988,6 +27692,52 @@ Hard Minimum: [0]  Hard Maximum: [10]
  
 Lead In: U18525.00[Default]
 Default Next Question: U18527.00
+--------------------------------------------------------------------------------
+U19906.00    [YSCH-3112]                                    Survey Year: 2017
+  PRIMARY VARIABLE
+
+ 
+             WHAT IS CURRENT HIGHEST GRADE EVER COMPLETED?
+ 
+What is the highest grade you have ever completed as of today?
+ 
+UNIVERSE: R enrolled since DLI
+ 
+       1       0 NONE
+       1       1 1ST GRADE
+       2       2 2ND GRADE
+       2       3 3RD GRADE
+       4       4 4TH GRADE
+       0       5 5TH GRADE
+       4       6 6TH GRADE
+       0       7 7TH GRADE
+       2       8 8TH GRADE
+       5       9 9TH GRADE
+       6      10 10TH GRADE
+      16      11 11TH GRADE
+      75      12 12TH GRADE
+      84      13 1ST YEAR COLLEGE
+     167      14 2ND YEAR COLLEGE
+     123      15 3RD YEAR COLLEGE
+     184      16 4TH YEAR COLLEGE
+      57      17 5TH YEAR COLLEGE
+      87      18 6TH YEAR COLLEGE
+      35      19 7TH YEAR COLLEGE
+     125      20 8TH YEAR COLLEGE OR MORE
+       0      93 PRE-KINDERGARTEN
+       0      94 KINDERGARTEN
+       3      95 UNGRADED
+  -------
+     983
+ 
+Refusal(-1)            2
+Don't Know(-2)         3
+TOTAL =========>     988   VALID SKIP(-4)    5746     NON-INTERVIEW(-5)    2250
+ 
+Min:              0        Max:             95        Mean:               15.72
+ 
+Lead In: U19905.00[Default]  U19904.00[1:1]
+Default Next Question: U19907.00
 --------------------------------------------------------------------------------
 U28570.00    [YINC-1400]                                    Survey Year: 2017
   PRIMARY VARIABLE
