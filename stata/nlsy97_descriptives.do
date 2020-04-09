@@ -50,8 +50,27 @@ fre year
 	gen per_hhe60_atbirth	=100*`r(mean)'
 	gen nothhe60_atbirth	=1-`r(mean)'
 
-/*	
+********************************************************************************
+* Generate basic descriptives
+********************************************************************************
+// 50% threshold
+tab time 		hhe50, row
+tab mar_t1 		hhe50, row
+tab age_birth 	hhe50, row
+
+table time mar_t1, contents(mean hhe50) col		// BW by duration of motherhood & mar_t1
+table age_birth mar_t1, contents(mean hhe50) 	// BW by age at first birth & mar_t1
+
+// 60% threshold
+tab time 		hhe60, row
+tab mar_t1 		hhe60, row
+tab age_birth 	hhe60, row
+
+table time mar_t1, contents(mean hhe60) col		// BW by duration of motherhood & mar_t1
+table age_birth mar_t1, contents(mean hhe60) 	// BW by age at first birth & mar_t1
+
 *?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?*?
+/*	
 	This is sample code to use to verify I can replicate the NLSY's total hh income
 	variable with all its components. Spoiler, I can't. 
 
