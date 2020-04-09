@@ -1,6 +1,6 @@
 *-------------------------------------------------------------------------------
 * BREADWINNER PROJECT - NLSY97 Component
-* nlsy97_bw_estimtaes_hh50.do
+* nlsy97_bw_estimtaes_hh60.do
 * Joanna Pepin
 *-------------------------------------------------------------------------------
 
@@ -9,12 +9,12 @@
 ********************************************************************************
 local logdate = string( d(`c(current_date)'), "%dCY.N.D" ) 	// create a macro for the date
 
-local list : dir . files "$logdir/*nlsy97_bw_estimtaes_hh50_*.log"	// Delete earlier versions of the log
+local list : dir . files "$logdir/*nlsy97_bw_estimtaes_hh60_*.log"	// Delete earlier versions of the log
 foreach f of local list {
     erase "`f'"
 }
 
-log using "$logdir/nlsy97_bw_estimtaes_hh50_`logdate'.log", t replace
+log using "$logdir/nlsy97_bw_estimtaes_hh60_`logdate'.log", t replace
 
 di "$S_DATE"
 
@@ -48,7 +48,7 @@ reshape wide year hhe50, i(PUBID_1997) j(time)
 
 // Set the first lag to 0 because it is not possible to be a breadwinning mother
 // before being a mother.
-gen hh50_minus1_0=0
+gen hh60_minus1_0=0
 
 // Create the lagged measures
 forvalues t=1/9{

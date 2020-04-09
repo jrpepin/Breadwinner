@@ -36,14 +36,13 @@
 	do "stata/nlsy97_time_varying.do"
 	
 // Look at descriptive statistics
-	do "stata/nlsy97_descriptives"
+	do "stata/nlsy97_descriptives.do"
 
 ********************************************************************************
 * B. Risk of entering breadwinning for the first 10 years of motherhood
 ********************************************************************************
-**** THESE HAVEN'T BEEN UPDATED TO PULL DATA FROM NEW DO FILES YET. START HERE.
 // Breadwinning estimates at the 50% threshold
-	 do "stata/nlsy97_hh50_stata_pred.do"
+	 do "stata/nlsy97_bw_estimtaes_hh50.do"
 	 
 // Breadwinning estimates at the 60% threshold
-	 do "stata/nlsy97_hh60_stata_pred.do"
+	 do "stata/nlsy97_bw_estimtaes_hh60.do"
