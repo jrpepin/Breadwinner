@@ -21,10 +21,10 @@ di "$S_DATE"
 ********************************************************************************
 * DESCRIPTION
 ********************************************************************************
-* This file predictes breadwinning status relative to the specific duration of motherhood
+* This file predicts breadwinning status relative to the specific duration of motherhood
 
-* This data used in this file were created from the R script nlsy97_04_hhearn, 
-* located in the project directory.
+* This data used in this file were once created from the R script nlsy97_04_hhearn, 
+* located in the project directory, but now are created in stata.
 
 ********************************************************************************
 * Open and prep the data
@@ -99,7 +99,7 @@ forvalues t=9/9{
 // Create indicators for whether R has been observed as a 
 // breadwinning mother at any previous duration of motherhood
 
-gen prevbreadwon0=0 // can't have previously breadwon and duration 0
+gen prevbreadwon0=0 // can't have previously breadwon at duration 0
 
 forvalues t=1/9 {
 	gen prevbreadwon`t'=0
@@ -121,11 +121,17 @@ drop if missing(year)
 * B1. Estimates of transitions into breadwinning (at each duration of motherhood)
 ********************************************************************************
 
-preserve
-forvalues t = 0/9 {
-	drop if hhe50_minus1_ == 1
-	tab hhe50 if time == `t'
+display "The proportion breadwinning in year of birth."
+tab hhe50 if time == 0 [fweight=wt1997]
+* Note that it is impossible to be a breadwinning mother prior to birth and
+* anyone breadwinning in this year is considered to have transitioned into
+* breadwinning.
 
+preserve
+forvalues t = 1/9 {
+	drop if hhe50_minus1_ == 1
+	display "Estimate of (weighted) proportion transitioning into breadwinning at duration `t' without censoring on previous breadwinning"
+	tab hhe50 if time == `t' & !missing(hhe50_minus1) [fweight=wt1997]
 	}
 restore
 
@@ -137,12 +143,14 @@ restore
 bysort PUBID_1997 (time) : gen everbw = sum(hhe50_minus1_) // 
 replace everbw = 1 if everbw >= 1 
 
-tab time everbw, row
+save "stata/bw50_analysis.dta", replace
+
+tab time everbw, row // note that this does not yet censor on previous breadwinning
 
 preserve
 forvalues t = 0/9 {
 	drop if prevbreadwon == 1 
-	tab hhe50 if time == `t' [fweight=wt1997]
+	tab hhe50 if time == `t' [fweight=wt1997] // this does censor on previous bw
 	}
 restore
 
@@ -159,8 +167,9 @@ forvalues t = 1/9 {
 
 table time prevbreadwon [fweight=wt1997], contents(mean hhe50) col
 
+/*
 ********************************************************************************
-* Create lifetable
+* Create lifetable -- note that Kelly isn's sure that these canned packages do what we want
 ********************************************************************************
 // Tell Stata the format of the survival data
 

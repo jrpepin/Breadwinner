@@ -6,7 +6,7 @@
 ** at each duration of motherhood using data from the NLSY 1997
 
 * data produced by nlsy97_hh50_pred.do
-use "stata/bw50_analysis.dta", clear
+use "bw50_analysis.dta", clear
 
 keep if hhe50_minus1_ == 0
 
@@ -132,6 +132,9 @@ local bwc50_bydur10=100*(1-notbwc50)
 
 NLSY Results
 --------------------------------------------------------------------------------
+
+These results are out of date as the code above was written for an earlier version
+of the analysis file. 
 
 In the NLSY 1997, we observe <<dd_di: %4.1f `per_bw50_atbirth'>>% breadwining, 
 or earning more than 50% of the household income in the year of their first birth. 
