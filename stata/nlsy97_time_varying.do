@@ -223,6 +223,6 @@ fre hhe60
 order PUBID_1997 year mom_yr time momearn totinc hhe50 hhe60 momwages mombiz mar_t1 educ_t1 age_birth
 list  PUBID_1997 year mom_yr time momearn totinc hhe50 hhe60 momwages mombiz mar_t1 educ_t1 age_birth in 1/30
 
-save "stata/nlsy97_bw.dta", replace
+save "stata/NLSY97_bw.dta", replace
 
 log close
