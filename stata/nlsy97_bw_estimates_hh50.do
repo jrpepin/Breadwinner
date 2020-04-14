@@ -200,5 +200,5 @@ logit hhe50 hhe50_minus1_ i.time
 logit hhe50 hhe50_minus1_ hhe50_minus2_ i.time
 logit hhe50 hhe50_minus1_ hhe50_minus2_ hhe50_minus3_ i.time
 logit hhe50 hhe50_minus1_ hhe50_minus2_ hhe50_minus3_ hhe50_minus4_ i.time
-
+*/
 log close

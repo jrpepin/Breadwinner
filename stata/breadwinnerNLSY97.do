@@ -46,3 +46,11 @@
 	 
 // Breadwinning estimates at the 60% threshold
 	 do "stata/nlsy97_bw_estimates_hh60.do"
+********************************************************************************
+* C. dynamic document with some notes on logic
+********************************************************************************
+cd stata
+
+dyndoc bw50analysis.md, replace
+
+cd ..
