@@ -72,7 +72,7 @@ In any event, Table 3 is presents the information we need to calculate the perce
 (n)ever breadwinning 10 years after becoming a mother. 
 
 ~~~~
-<<dd_do>>
+<<dd_do: quietly>>
 // Now, calculating the proportions not (not!) transitioning into breadwining by hand.
 
 // estimate censored on prior breadwinning using Table 3 estimates saved in bw50wc
