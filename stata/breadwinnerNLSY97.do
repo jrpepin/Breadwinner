@@ -51,6 +51,6 @@
 ********************************************************************************
 cd stata
 
-dyndoc bw50analysis.md, replace
+dyndoc estimate_bw50_bydur9.md, replace
 
 cd ..
