@@ -48,7 +48,7 @@
 	 do "stata/nlsy97_bw_estimates_hh60.do"
 	 
 ********************************************************************************
-* C. dynamic document with some notes on logic
+* C. Dynamic document with results & notes on logic
 ********************************************************************************
 cd stata
 
