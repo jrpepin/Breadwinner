@@ -21,7 +21,7 @@
 *	cd "C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning" 
 
 // Run the setup script
-	do "stata/setup_breadwinnerNLSY97_environment"
+	do "stata/00_nlsy97_setup_breadwinner_environment"
 	
 * The logs for these files are generated within each .do files.
 
@@ -30,22 +30,22 @@
 ********************************************************************************
 
 // Create sample and demographic variables
-	do "stata/nlsy97_sample & demo.do"
+	do "stata/01_nlsy97_sample & demo.do"
 	
 // Create time-varying variables
-	do "stata/nlsy97_time_varying.do"
+	do "stata/02_nlsy97_time_varying.do"
 	
 // Look at descriptive statistics
-	do "stata/nlsy97_descriptives.do"
+	do "stata/03_nlsy97_descriptives.do"
 
 ********************************************************************************
 * B. Risk of entering breadwinning for the first 10 years of motherhood
 ********************************************************************************
 // Breadwinning estimates at the 50% threshold
-	 do "stata/nlsy97_bw_estimates_hh50.do"
+	 do "stata/04_nlsy97_bw_estimates_hh50.do"
 	 
 // Breadwinning estimates at the 60% threshold
-	 do "stata/nlsy97_bw_estimates_hh60.do"
+	 do "stata/05_nlsy97_bw_estimates_hh60.do"
 	 
 ********************************************************************************
 * C. Dynamic document with results & notes on logic
