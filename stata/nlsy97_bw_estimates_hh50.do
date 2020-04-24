@@ -1,7 +1,7 @@
 *-------------------------------------------------------------------------------
 * BREADWINNER PROJECT - NLSY97 Component
 * nlsy97_bw_estimtaes_hh50.do
-* Joanna Pepin
+* Joanna Pepin and Kelly Raley
 *-------------------------------------------------------------------------------
 
 ********************************************************************************
@@ -23,7 +23,7 @@ di "$S_DATE"
 ********************************************************************************
 * This file predicts breadwinning status relative to the specific duration of motherhood
 
-* This data used in this file were once created from the R script nlsy97_04_hhearn, 
+* This data used in this file were once created from the R script nlsy97_04_hhearn,
 * located in the project directory, but now are created in stata.
 
 ********************************************************************************
@@ -114,11 +114,13 @@ reshape long year hhe50 hhe50_minus1_ hhe50_minus2_ hhe50_minus3_ hhe50_minus4_ 
              hhe50_minus5_ hhe50_minus6_ hhe50_minus7_ hhe50_minus8_  ///
 			 hhe50_minus9_ prevbreadwon, i(PUBID_1997) j(time)
 
+label var prevbreadwon "R breadwon at any prior duration"
+
 * clean up observations created because reshape creates some number of observations for each (PUBID_1997)
 drop if missing(year)
 
 ********************************************************************************
-* B1. Estimates of transitions into breadwinning (at each duration of motherhood)
+* Estimates of transitions into breadwinning (at each duration of motherhood)
 ********************************************************************************
 
 display "The proportion breadwinning in year of birth."
@@ -136,12 +138,13 @@ forvalues t = 1/9 {
 restore
 
 ********************************************************************************
-* B2. Risk of entering breadwinning, censoring on previous breadwinning
+* Risk of entering breadwinning, censoring on previous breadwinning
 ********************************************************************************
 // Create ever breadwinning prior to this duration variable
 
 bysort PUBID_1997 (time) : gen everbw = sum(hhe50_minus1_) // 
-replace everbw = 1 if everbw >= 1 
+replace everbw = 1 if everbw >= 1
+label var everbw "Ever breadwon (not censored)"
 
 save "stata/bw50_analysis.dta", replace
 
@@ -154,8 +157,9 @@ forvalues t = 0/9 {
 	}
 restore
 
+
 ********************************************************************************
-* B3. Proportion breadwinning at each duration of motherhood that have previously breadwon
+* Proportion breadwinning at each duration of motherhood that have previously breadwon
 ********************************************************************************
 // Create a lagged ever bw variable (so current bw doesn't count)
 *sort PUBID_1997 time 
@@ -167,38 +171,4 @@ forvalues t = 1/9 {
 
 table time prevbreadwon [fweight=wt1997], contents(mean hhe50) col
 
-/*
-********************************************************************************
-* Create lifetable -- note that Kelly isn's sure that these canned packages do what we want
-********************************************************************************
-// Tell Stata the format of the survival data
-
-* STS wants the time variable to start at 1
-replace time=time+1 
-
-stset time, id(PUBID_1997) failure(hhe50==1)
-
-* why does sts think we start with 2371 observations unweighted. It's 1678.
-* The problem is missing values for hhe50
-sts list
-
-sort PUBID_1997
-list PUBID_1997 time year hhe50 _st _d _t _t0 in 1/20
-
-stdescribe
-stsum
-stvary
-
-ltable _t _d
-ltable _t _d, hazard
-ltable _t _d, failure
-
-********************************************************************************
-* Predict breadwinning
-********************************************************************************
-logit hhe50 hhe50_minus1_ i.time
-logit hhe50 hhe50_minus1_ hhe50_minus2_ i.time
-logit hhe50 hhe50_minus1_ hhe50_minus2_ hhe50_minus3_ i.time
-logit hhe50 hhe50_minus1_ hhe50_minus2_ hhe50_minus3_ hhe50_minus4_ i.time
-*/
 log close

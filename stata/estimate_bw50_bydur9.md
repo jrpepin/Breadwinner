@@ -8,23 +8,26 @@
 * data produced by nlsy97_bw_estimates_hh50.do
 use "bw50_analysis.dta", clear
 
-// to measure transitions into breadwinning, we need to limit the sample to 
-// those who were not breadwinning the previous year. At time==0, 
-// no one was a breadwinning mother in the previous year (and hhe50_minus1_ is 
-// missing. 
+* Measure transitions into breadwinning ----------------------------------------
+// Limit the sample to those who were not breadwinning the previous year. 
+// At time==0, no one was a breadwinning mother in the previous year 
+// (and hhe50_minus1_ is missing.
+
 keep if hhe50_minus1_ == 0 | time==0
 
 tab time hhe50, matcell(bw50uw) // just to check n's 
 
-gen countme1=1 if time==9
-gen countme2=1 if time==9 & everbw==0
-gen countme3=1 if time==1 & everbw==0 & hhe50==1
-egen numdur9uc=count(countme1)
-egen numdur9c=count(countme2)
-egen numbw9c=count(countme3)
-local numdur9uc=numdur9uc
-local numdur9c=numdur9c
-local numbw9c=numbw9c
+gen 	countme1=1 if time==9
+gen 	countme2=1 if time==9 & everbw==0
+gen 	countme3=1 if time==1 & everbw==0 & hhe50==1
+
+egen 	numdur9uc	=count(countme1)
+egen 	numdur9c	=count(countme2)
+egen 	numbw9c 	=count(countme3)
+
+local 	numdur9uc	=numdur9uc
+local 	numdur9c	=numdur9c
+local 	numbw9c 	=numbw9c
 
 drop countme1 countme2 countme3 numdur9uc numdur9c numbw9c
 
@@ -68,7 +71,7 @@ We can see that the proportion becoming a breadwinning mother is smaller in the 
 than in the first. This suggests that repeat breadwinning does lead to an overestimate of 
 lifetime breadwinning unless one censors on previous breadwinning. 
 
-In any event, Table 3 is presents the information we need to calculate the percentage of women 
+In any event, Table 3 presents the information we need to calculate the percentage of women 
 (n)ever breadwinning 10 years after becoming a mother. 
 
 ~~~~
