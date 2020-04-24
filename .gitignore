@@ -6,6 +6,7 @@ results/
 *.dta
 *.dat
 *.gz
+*.html
 
 renv/library
 .Rhistory
