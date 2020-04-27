@@ -48,7 +48,7 @@
 	 
 // Breadwinning estimates at the 60% threshold
 	 do "stata/05_nlsy97_bw_estimates_hh60.do"
-	 
+	  
 ********************************************************************************
 * C. Dynamic document with results & notes on logic
 ********************************************************************************
@@ -70,4 +70,4 @@ foreach f of local list {
 }
 
 // Create the new html document
-dyndoc "stata/bw_analysis_NLSY97.md", saving($results/bw_analysis_NLSY97_$time_string.html) replace
+dyndoc "bw_analysis_NLSY97.md", saving($results/bw_analysis_NLSY97_$time_string.html) replace

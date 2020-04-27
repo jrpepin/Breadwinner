@@ -57,5 +57,5 @@ is <<dd_di: "$notbwc50""%">>.
 The percentage breadwinning by the time their first child reaches age 9 is <<dd_di: "$bwc50_bydur9""%">>.
 
 Using a conservative 60% threshold of family income to determine primary earning status, 
-<<dd_di: "$bwc60_bydur9""%">> of American mothers can expect to be the  
+__<<dd_di: "$bwc60_bydur9""%">>__ of American mothers can expect to be the  
 primary earners in their household at some point during their first 10 years of motherhood.

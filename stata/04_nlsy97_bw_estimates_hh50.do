@@ -24,8 +24,7 @@ di "$S_DATE"
 ** The purpose of this analysis is to describe levels of breadwinning (bw)
 ** by 10 years after first birth. 
 
-* This data used in this file were once created from the R script nlsy97_04_hhearn,
-* located in the project directory, but now are created in stata.
+* This data used in this file were once created from the do file "02_nlsy97_time_varying".
 
 ********************************************************************************
 * Open and prep the data
@@ -253,6 +252,7 @@ forvalues d=1/9 {
 * in year 9.
 
 // Initialize cumulative measures
+cap drop notbwc50
 gen notbwc50 = 1
 
 forvalues d=1/9 {
@@ -274,5 +274,65 @@ forvalues d=1/9 {
 di	"$per_bw50_atbirth""%"	// 50% bw at 1st year of birth
 di	"$notbwc50""%"      	// % NEVER BW by time first child reaches age 10
 di	"$bwc50_bydur9""%"  	// % BW by time first child reaches age 10
+
+********************************************************************************
+* BY EDUCATION: Calculate the proportions not (not!) transitioning into bw.
+********************************************************************************
+
+merge m:1 PUBID_1997 using "$tempdir/nlsy97_sample.dta", keepusing(educ_t1)
+
+egen educ = max(educ_t1), by(PUBID_1997) 	// fill in education per person
+
+label define edlbl  1 "less than hs"		///
+					2 "high school"			///
+					3 "some college"		///
+					4 "college grad"
+		
+label values 	educ edlbl
+label var 		educ "Education at time of 1st birth"
+
+drop if _merge ==2	// data only in using
+drop educ_t1 _merge	
+
+// Create bw50wc estimates
+forvalues i = 1/4 {
+tab time hhe50 [fweight=wt1997] if educ == `i', matcell(bw50wc_`i') nofreq row // estimates saved in bw50wc
+}
+
+// Estimate censored on prior bw using estimates saved in bw50wc
+
+* Changed time to 8 instead of 9 because there are no cases of college degree at year 9.
+forvalues d=1/8 {
+   gen nbbwc50_lesshs_rate`d'	=bw50wc_1[`d',1]/(bw50wc_1[`d',1]+bw50wc_1[`d',2])
+   gen nbbwc50_hs_rate`d'   	=bw50wc_2[`d',1]/(bw50wc_2[`d',1]+bw50wc_2[`d',2])
+   gen nbbwc50_somecol_rate`d'	=bw50wc_3[`d',1]/(bw50wc_3[`d',1]+bw50wc_3[`d',2])
+   gen nbbwc50_univ_rate`d' 	=bw50wc_4[`d',1]/(bw50wc_4[`d',1]+bw50wc_4[`d',2])
+}
+
+// Initialize cumulative measures
+cap drop 	notbwc50_*
+gen     	notbwc50_lesshs 	= 1
+gen     	notbwc50_hs      	= 1
+gen     	notbwc50_somecol 	= 1
+gen     	notbwc50_univ   	= 1
+
+forvalues d=1/8 {
+  replace notbwc50_lesshs	=notbwc50_lesshs	*nbbwc50_lesshs_rate`d'
+  replace notbwc50_hs   	=notbwc50_hs		*nbbwc50_hs_rate`d'
+  replace notbwc50_somecol	=notbwc50_somecol	*nbbwc50_somecol_rate`d'
+  replace notbwc50_univ		=notbwc50_univ		*nbbwc50_univ_rate`d'
+}
+
+
+// % BW by time first child reaches age 9
+	global 	bwc50_bydur9_lesshs		= round(100*(1-notbwc50_lesshs), 	.02) // Take the inverse of the proportion not bw
+	global 	bwc50_bydur9_hs   		= round(100*(1-notbwc50_hs), 		.02) // Take the inverse of the proportion not bw
+	global 	bwc50_bydur9_somecol	= round(100*(1-notbwc50_somecol), 	.02) // Take the inverse of the proportion not bw
+	global 	bwc50_bydur9_univ		= round(100*(1-notbwc50_univ), 		.02) // Take the inverse of the proportion not bw
+
+di	"$bwc50_bydur9_lesshs""%"  		// Less than hs at time of first birth
+di	"$bwc50_bydur9_hs""%"  			// High school at time of first birth
+di	"$bwc50_bydur9_somecol""%"  	// Some College at time of first birth
+di	"$bwc50_bydur9_univ""%"  		// College at time of first birth
 
 log close
