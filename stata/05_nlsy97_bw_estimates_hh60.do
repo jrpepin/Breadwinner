@@ -24,8 +24,7 @@ di "$S_DATE"
 ** The purpose of this analysis is to describe levels of breadwinning (bw)
 ** by 10 years after first birth. 
 
-* This data used in this file were once created from the R script nlsy97_04_hhearn,
-* located in the project directory, but now are created in stata.
+* This data used in this file were once created from the do file "02_nlsy97_time_varying".
 
 ********************************************************************************
 * Open and prep the data
