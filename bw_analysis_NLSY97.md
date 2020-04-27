@@ -54,8 +54,30 @@ or earning more than 50% of the household income in the year mothers give birth 
 The percentage never breadwinning by the time their first child reaches age 10 
 is <<dd_di: "$notbwc50""%">>.
 
-The percentage breadwinning by the time their first child reaches age 9 is <<dd_di: "$bwc50_bydur9""%">>.
+The percentage breadwinning (50% threshold) by the time their first child reaches age 10 is __<<dd_di: "$bwc50_bydur9""%">>__.
+
+The percentage breadwinning by the time their first child reaches age **9** by education at first birth:
+
+|__Mothers' Education at First Birth__	| __% breadwinning at 50% threshold__	 |
+|:--------------------------------------|:-------------------------------------- |
+|Total									|  <<dd_di: "$bwc50_bydur9""%">>		 |
+|Less than high school					|  <<dd_di: "$bwc50_bydur9_lesshs""%" >> |
+|High school							|  <<dd_di: "$bwc50_bydur9_hs""%" >> 	 |
+|Some college							|  <<dd_di: "$bwc50_bydur9_somecol""%">> |
+|College degree							|  <<dd_di: "$bwc50_bydur9_univ""%" >> 	 |
+
 
 Using a conservative 60% threshold of family income to determine primary earning status, 
 __<<dd_di: "$bwc60_bydur9""%">>__ of American mothers can expect to be the  
 primary earners in their household at some point during their first 10 years of motherhood.
+
+
+The percentage breadwinning by the time their first child reaches age **9** by education at first birth:
+
+|__Mothers' Education at First Birth__	| __% breadwinning at 60% threshold__	 |
+|:--------------------------------------|:-------------------------------------- |
+|Total									|  <<dd_di: "$bwc60_bydur9""%">>		 |
+|Less than high school					|  <<dd_di: "$bwc60_bydur9_lesshs""%" >> |
+|High school							|  <<dd_di: "$bwc60_bydur9_hs""%" >> 	 |
+|Some college							|  <<dd_di: "$bwc60_bydur9_somecol""%">> |
+|College degree							|  <<dd_di: "$bwc60_bydur9_univ""%" >> 	 |
