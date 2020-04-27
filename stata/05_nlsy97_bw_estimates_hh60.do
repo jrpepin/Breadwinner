@@ -274,4 +274,69 @@ di	"$per_bw60_atbirth""%"	// 60% bw at 1st year of birth
 di	"$notbwc60""%"      	// % NEVER BW by time first child reaches age 10
 di	"$bwc60_bydur9""%"  	// % BW by time first child reaches age 10
 
+********************************************************************************
+* BY EDUCATION: Calculate the proportions not (not!) transitioning into bw.
+********************************************************************************
+
+// Merge and clean up the education variable
+merge m:1 PUBID_1997 using "$tempdir/nlsy97_sample.dta", keepusing(educ_t1)
+
+egen educ = max(educ_t1), by(PUBID_1997) 	// fill in education per person
+
+label define edlbl  1 "less than hs"		///
+					2 "high school"			///
+					3 "some college"		///
+					4 "college grad"
+		
+label values 	educ edlbl
+label var 		educ "Education at time of 1st birth"
+
+drop if _merge ==2	// data only in using
+drop educ_t1 _merge	
+
+// Create bw60wc estimates
+forvalues i = 1/4 {
+tab time hhe60 [fweight=wt1997] if educ == `i', matcell(bw60wc_`i') nofreq row // estimates saved in bw60wc
+}
+
+// Estimate censored on prior bw using estimates saved in bw60wc
+* Changed time to 8 instead of 9 because there are no cases of college degree at year 9.
+* There are cases, but they are missing on their household earnings at time 9.
+
+tab time 		if educ ==4
+tab time hhe60 	if educ ==4
+
+forvalues d=1/8 {
+   gen nbbwc60_lesshs_rate`d'	=bw60wc_1[`d',1]/(bw60wc_1[`d',1]+bw60wc_1[`d',2])
+   gen nbbwc60_hs_rate`d'   	=bw60wc_2[`d',1]/(bw60wc_2[`d',1]+bw60wc_2[`d',2])
+   gen nbbwc60_somecol_rate`d'	=bw60wc_3[`d',1]/(bw60wc_3[`d',1]+bw60wc_3[`d',2])
+   gen nbbwc60_univ_rate`d' 	=bw60wc_4[`d',1]/(bw60wc_4[`d',1]+bw60wc_4[`d',2])
+}
+
+// Initialize cumulative measures
+cap drop 	notbwc60_*
+gen     	notbwc60_lesshs 	= 1
+gen     	notbwc60_hs      	= 1
+gen     	notbwc60_somecol 	= 1
+gen     	notbwc60_univ   	= 1
+
+forvalues d=1/8 {
+  replace notbwc60_lesshs	=notbwc60_lesshs	*nbbwc60_lesshs_rate`d'
+  replace notbwc60_hs   	=notbwc60_hs		*nbbwc60_hs_rate`d'
+  replace notbwc60_somecol	=notbwc60_somecol	*nbbwc60_somecol_rate`d'
+  replace notbwc60_univ		=notbwc60_univ		*nbbwc60_univ_rate`d'
+}
+
+
+// % BW by time first child reaches age 9
+	global 	bwc60_bydur9_lesshs		= round(100*(1-notbwc60_lesshs), 	.02)
+	global 	bwc60_bydur9_hs   		= round(100*(1-notbwc60_hs), 		.02)
+	global 	bwc60_bydur9_somecol	= round(100*(1-notbwc60_somecol), 	.02)
+	global 	bwc60_bydur9_univ		= round(100*(1-notbwc60_univ), 		.02)
+
+di	"$bwc60_bydur9_lesshs""%"  		// Less than hs at time of first birth
+di	"$bwc60_bydur9_hs""%"  			// High school at time of first birth
+di	"$bwc60_bydur9_somecol""%"  	// Some College at time of first birth
+di	"$bwc60_bydur9_univ""%"  		// College at time of first birth
+
 log close

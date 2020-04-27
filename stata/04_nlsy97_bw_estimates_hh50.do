@@ -279,6 +279,7 @@ di	"$bwc50_bydur9""%"  	// % BW by time first child reaches age 10
 * BY EDUCATION: Calculate the proportions not (not!) transitioning into bw.
 ********************************************************************************
 
+// Merge and clean up the education variable
 merge m:1 PUBID_1997 using "$tempdir/nlsy97_sample.dta", keepusing(educ_t1)
 
 egen educ = max(educ_t1), by(PUBID_1997) 	// fill in education per person
@@ -300,8 +301,12 @@ tab time hhe50 [fweight=wt1997] if educ == `i', matcell(bw50wc_`i') nofreq row /
 }
 
 // Estimate censored on prior bw using estimates saved in bw50wc
-
 * Changed time to 8 instead of 9 because there are no cases of college degree at year 9.
+* There are cases, but they are missing on their household earnings at time 9.
+
+tab time 		if educ ==4
+tab time hhe50 	if educ ==4
+
 forvalues d=1/8 {
    gen nbbwc50_lesshs_rate`d'	=bw50wc_1[`d',1]/(bw50wc_1[`d',1]+bw50wc_1[`d',2])
    gen nbbwc50_hs_rate`d'   	=bw50wc_2[`d',1]/(bw50wc_2[`d',1]+bw50wc_2[`d',2])
@@ -325,10 +330,10 @@ forvalues d=1/8 {
 
 
 // % BW by time first child reaches age 9
-	global 	bwc50_bydur9_lesshs		= round(100*(1-notbwc50_lesshs), 	.02) // Take the inverse of the proportion not bw
-	global 	bwc50_bydur9_hs   		= round(100*(1-notbwc50_hs), 		.02) // Take the inverse of the proportion not bw
-	global 	bwc50_bydur9_somecol	= round(100*(1-notbwc50_somecol), 	.02) // Take the inverse of the proportion not bw
-	global 	bwc50_bydur9_univ		= round(100*(1-notbwc50_univ), 		.02) // Take the inverse of the proportion not bw
+	global 	bwc50_bydur9_lesshs		= round(100*(1-notbwc50_lesshs), 	.02)
+	global 	bwc50_bydur9_hs   		= round(100*(1-notbwc50_hs), 		.02)
+	global 	bwc50_bydur9_somecol	= round(100*(1-notbwc50_somecol), 	.02)
+	global 	bwc50_bydur9_univ		= round(100*(1-notbwc50_univ), 		.02)
 
 di	"$bwc50_bydur9_lesshs""%"  		// Less than hs at time of first birth
 di	"$bwc50_bydur9_hs""%"  			// High school at time of first birth
