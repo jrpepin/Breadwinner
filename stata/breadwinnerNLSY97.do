@@ -10,20 +10,22 @@
 * A. ENVIRONMENT
 ********************************************************************************
 * There are two scripts users need to run before importing the data. 
-* First, create a personal setup file using the setup_example.do script as a template
-* and save this file in the base project directory.
-* Second, run the setup_breadwinnerNLSY97_environment script to set the project filepaths and macros.
+	* First, create a personal setup file using the setup_example.do script as a 
+	* template and save this file in the base project directory.
+
+	* Second, run the setup_breadwinnerNLSY97_environment script to set the project 
+	* filepaths and macros.
 
 //------------------------------------------------------------------------------
 
-// The current directory is assumed to be the base project directory.
-// change to the directory before running breadwinnerNLSY97.do
+* The current directory is assumed to be the base project directory.
+* change to the directory before running breadwinnerNLSY97.do
 *	cd "C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning" 
 
 // Run the setup script
 	do "stata/00_nlsy97_setup_breadwinner_environment"
 	
-* The logs for these files are generated within each .do files.
+* The logs for these files are generated within each .do file.
 
 ********************************************************************************
 * A. Data Import and Measures Creation
@@ -50,8 +52,22 @@
 ********************************************************************************
 * C. Dynamic document with results & notes on logic
 ********************************************************************************
-cd stata
+* NOTE: This dynamic document will only work if the other do files were run in
+*		in the same stata session.
 
-dyndoc estimate_bw50_bydur9.md, replace
+// Generate global macros for the current date and time
+	local c_date = c(current_date)
+	local c_time = c(current_time)
+	local c_time_date = "`c_date'"+"_" +"`c_time'" 				// concatenate the two string variables
+	local time_string = subinstr("`c_time_date'", ":", "_", .) 	// clean up our string
+	global time_string = subinstr("`time_string'", " ", "_", .) // clean up our string
+	di "$time_string"
 
-cd ..
+// Delete earlier versions of the html output
+local list : dir . files "$results/bw_analysis_NLSY97_*.html"	
+foreach f of local list {
+    erase "`f'"
+}
+
+// Create the new html document
+dyndoc "stata/bw_analysis_NLSY97.md", saving($results/bw_analysis_NLSY97_$time_string.html) replace
