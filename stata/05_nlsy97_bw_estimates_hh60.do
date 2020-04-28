@@ -238,7 +238,7 @@ lifetime breadwinning unless one censors on previous bw.
 * Calculate the proportions not (not!) transitioning into bw.
 ********************************************************************************
 * Table 3 presents the information we need to calculate the % of women 
-* (n)ever bw 10 years after becoming a mother.
+* (n)ever bw 8 years after becoming a mother.
 
 // Estimate censored on prior bw using Table 3 estimates saved in bw60wc
 forvalues d=1/9 {
@@ -249,7 +249,7 @@ forvalues d=1/9 {
 * each duration of bw.
 * the proportion who do not become bw is the proportion not bw at birth times
 * the proportion who do not become bw in the first year times....who do not become bw
-* in year 9.
+* in year 8.
 
 // Initialize cumulative measures
 gen notbwc60 = 1
@@ -264,15 +264,15 @@ forvalues d=1/9 {
 	gen 	per_bw60_atbirth=100*(1-bw60wc[1,1]/(bw60wc[1,1]+bw60wc[1,2])) 
 	global	per_bw60_atbirth=round(per_bw60_atbirth, .02)
 	
-// % NEVER BY by time first child reaches age 10
+// % NEVER BY by time first child reaches age 9
 	global 	notbwc60 	= 	round(100*notbwc60, .02)
 
-// % BW by time first child reaches age 10
-	global 	bwc60_bydur9= round(100*(1-notbwc60), .02) // Take the inverse of the proportion not bw
+// % BW by time first child is age 8
+	global 	bwc60_bydur8= round(100*(1-notbwc60), .02) // Take the inverse of the proportion not bw
 
 di	"$per_bw60_atbirth""%"	// 60% bw at 1st year of birth
 di	"$notbwc60""%"      	// % NEVER BW by time first child reaches age 10
-di	"$bwc60_bydur9""%"  	// % BW by time first child reaches age 10
+di	"$bwc60_bydur8""%"  	// % BW by time first child is age 8
 
 ********************************************************************************
 * BY EDUCATION: Calculate the proportions not (not!) transitioning into bw.
@@ -328,15 +328,15 @@ forvalues d=1/8 {
 }
 
 
-// % BW by time first child reaches age 9
-	global 	bwc60_bydur9_lesshs		= round(100*(1-notbwc60_lesshs), 	.02)
-	global 	bwc60_bydur9_hs   		= round(100*(1-notbwc60_hs), 		.02)
-	global 	bwc60_bydur9_somecol	= round(100*(1-notbwc60_somecol), 	.02)
-	global 	bwc60_bydur9_univ		= round(100*(1-notbwc60_univ), 		.02)
+// % BW by time first child is age 7
+	global 	bwc60_bydur7_lesshs		= round(100*(1-notbwc60_lesshs), 	.02)
+	global 	bwc60_bydur7_hs   		= round(100*(1-notbwc60_hs), 		.02)
+	global 	bwc60_bydur7_somecol	= round(100*(1-notbwc60_somecol), 	.02)
+	global 	bwc60_bydur7_univ		= round(100*(1-notbwc60_univ), 		.02)
 
-di	"$bwc60_bydur9_lesshs""%"  		// Less than hs at time of first birth
-di	"$bwc60_bydur9_hs""%"  			// High school at time of first birth
-di	"$bwc60_bydur9_somecol""%"  	// Some College at time of first birth
-di	"$bwc60_bydur9_univ""%"  		// College at time of first birth
+di	"$bwc60_bydur7_lesshs""%"  		// Less than hs at time of first birth
+di	"$bwc60_bydur7_hs""%"  			// High school at time of first birth
+di	"$bwc60_bydur7_somecol""%"  	// Some College at time of first birth
+di	"$bwc60_bydur7_univ""%"  		// College at time of first birth
 
 log close

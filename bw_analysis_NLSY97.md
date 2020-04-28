@@ -14,7 +14,7 @@ Breadwinner Estimates (NLSY 1997)
 ~~~~
 
 The purpose of this analysis of the NLSY97 data is to describe mothers' odds of 
-breadwinning by 10 years after mothers' first birth. 
+having ever been a breadwinning mother by 9 years after first birth. 
 
 Sample
 --------------------------------------------------------------------------------
@@ -51,33 +51,31 @@ NLSY Results
 In the NLSY 1997, we observe <<dd_di: "$per_bw50_atbirth""%">> breadwining, 
 or earning more than 50% of the household income in the year mothers give birth for the fist time. 
 
-The percentage never breadwinning by the time their first child reaches age 10 
+The percentage that have never been a breadwinning mother when their first child is age 8 
 is <<dd_di: "$notbwc50""%">>.
 
-The percentage breadwinning (50% threshold) by the time their first child reaches age 10 is __<<dd_di: "$bwc50_bydur9""%">>__.
+The percentage breadwinning (50% threshold) by the time their first child is age 8 is __<<dd_di: "$bwc50_bydur8""%">>__.
 
-The percentage breadwinning by the time their first child reaches age **9** by education at first birth:
+The percentage breadwinning by the time their first child is age **7** by education at first birth:
 
 |__Mothers' Education at First Birth__	| __% breadwinning at 50% threshold__	 |
 |:--------------------------------------|:-------------------------------------- |
-|Total									|  <<dd_di: "$bwc50_bydur9""%">>		 |
-|Less than high school					|  <<dd_di: "$bwc50_bydur9_lesshs""%" >> |
-|High school							|  <<dd_di: "$bwc50_bydur9_hs""%" >> 	 |
-|Some college							|  <<dd_di: "$bwc50_bydur9_somecol""%">> |
-|College degree							|  <<dd_di: "$bwc50_bydur9_univ""%" >> 	 |
+|Less than high school					|  <<dd_di: "$bwc50_bydur7_lesshs""%" >> |
+|High school							|  <<dd_di: "$bwc50_bydur7_hs""%" >> 	 |
+|Some college							|  <<dd_di: "$bwc50_bydur7_somecol""%">> |
+|College degree							|  <<dd_di: "$bwc50_bydur7_univ""%" >> 	 |
 
 
 Using a conservative 60% threshold of family income to determine primary earning status, 
-__<<dd_di: "$bwc60_bydur9""%">>__ of American mothers can expect to be the  
-primary earners in their household at some point during their first 10 years of motherhood.
+__<<dd_di: "$bwc60_bydur8""%">>__ of American mothers can expect to be the  
+primary earners in their household at some point during their first 8 years of motherhood.
 
 
-The percentage breadwinning by the time their first child reaches age **9** by education at first birth:
+The percentage breadwinning by the time their first child reaches age **7** by education at first birth:
 
 |__Mothers' Education at First Birth__	| __% breadwinning at 60% threshold__	 |
-|:--------------------------------------|:-------------------------------------- |
-|Total									|  <<dd_di: "$bwc60_bydur9""%">>		 |
-|Less than high school					|  <<dd_di: "$bwc60_bydur9_lesshs""%" >> |
-|High school							|  <<dd_di: "$bwc60_bydur9_hs""%" >> 	 |
-|Some college							|  <<dd_di: "$bwc60_bydur9_somecol""%">> |
-|College degree							|  <<dd_di: "$bwc60_bydur9_univ""%" >> 	 |
+|:--------------------------------------|:-------------------------------------- |	
+|Less than high school					|  <<dd_di: "$bwc60_bydur7_lesshs""%" >> |
+|High school							|  <<dd_di: "$bwc60_bydur7_hs""%" >> 	 |
+|Some college							|  <<dd_di: "$bwc60_bydur7_somecol""%">> |
+|College degree							|  <<dd_di: "$bwc60_bydur7_univ""%" >> 	 |

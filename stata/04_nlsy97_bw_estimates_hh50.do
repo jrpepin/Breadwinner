@@ -238,7 +238,7 @@ lifetime breadwinning unless one censors on previous bw.
 * Calculate the proportions not (not!) transitioning into bw.
 ********************************************************************************
 * Table 3 presents the information we need to calculate the % of women 
-* (n)ever bw 10 years after becoming a mother.
+* (n)ever bw 8 years after becoming a mother.
 
 // Estimate censored on prior bw using Table 3 estimates saved in bw50wc
 forvalues d=1/9 {
@@ -249,7 +249,7 @@ forvalues d=1/9 {
 * each duration of bw.
 * the proportion who do not become bw is the proportion not bw at birth times
 * the proportion who do not become bw in the first year times....who do not become bw
-* in year 9.
+* in year 8.
 
 // Initialize cumulative measures
 cap drop notbwc50
@@ -265,15 +265,15 @@ forvalues d=1/9 {
 	gen 	per_bw50_atbirth=100*(1-bw50wc[1,1]/(bw50wc[1,1]+bw50wc[1,2])) 
 	global	per_bw50_atbirth=round(per_bw50_atbirth, .02)
 	
-// % NEVER BY by time first child reaches age 10
+// % NEVER BY by time first child reaches age 9
 	global 	notbwc50 	= 	round(100*notbwc50, .02)
 
 // % BW by time first child reaches age 10
-	global 	bwc50_bydur9= round(100*(1-notbwc50), .02) // Take the inverse of the proportion not bw
+	global 	bwc50_bydur8= round(100*(1-notbwc50), .02) // Take the inverse of the proportion not bw
 
 di	"$per_bw50_atbirth""%"	// 50% bw at 1st year of birth
-di	"$notbwc50""%"      	// % NEVER BW by time first child reaches age 10
-di	"$bwc50_bydur9""%"  	// % BW by time first child reaches age 10
+di	"$notbwc50""%"      	// % NEVER BW by time first child is age 8
+di	"$bwc50_bydur8""%"  	// % BW by time first child is age 8
 
 ********************************************************************************
 * BY EDUCATION: Calculate the proportions not (not!) transitioning into bw.
@@ -301,7 +301,7 @@ tab time hhe50 [fweight=wt1997] if educ == `i', matcell(bw50wc_`i') nofreq row /
 }
 
 // Estimate censored on prior bw using estimates saved in bw50wc
-* Changed time to 8 instead of 9 because there are no cases of college degree at year 9.
+* Changed time to 7 instead of 8 because there are no cases of college degree at year 8.
 * There are cases, but they are missing on their household earnings at time 9.
 
 tab time 		if educ ==4
@@ -329,15 +329,15 @@ forvalues d=1/8 {
 }
 
 
-// % BW by time first child reaches age 9
-	global 	bwc50_bydur9_lesshs		= round(100*(1-notbwc50_lesshs), 	.02)
-	global 	bwc50_bydur9_hs   		= round(100*(1-notbwc50_hs), 		.02)
-	global 	bwc50_bydur9_somecol	= round(100*(1-notbwc50_somecol), 	.02)
-	global 	bwc50_bydur9_univ		= round(100*(1-notbwc50_univ), 		.02)
+// % BW by time first child is age 8
+	global 	bwc50_bydur7_lesshs		= round(100*(1-notbwc50_lesshs), 	.02)
+	global 	bwc50_bydur7_hs   		= round(100*(1-notbwc50_hs), 		.02)
+	global 	bwc50_bydur7_somecol	= round(100*(1-notbwc50_somecol), 	.02)
+	global 	bwc50_bydur7_univ		= round(100*(1-notbwc50_univ), 		.02)
 
-di	"$bwc50_bydur9_lesshs""%"  		// Less than hs at time of first birth
-di	"$bwc50_bydur9_hs""%"  			// High school at time of first birth
-di	"$bwc50_bydur9_somecol""%"  	// Some College at time of first birth
-di	"$bwc50_bydur9_univ""%"  		// College at time of first birth
+di	"$bwc50_bydur7_lesshs""%"  		// Less than hs at time of first birth
+di	"$bwc50_bydur7_hs""%"  			// High school at time of first birth
+di	"$bwc50_bydur7_somecol""%"  	// Some College at time of first birth
+di	"$bwc50_bydur7_univ""%"  		// College at time of first birth
 
 log close
