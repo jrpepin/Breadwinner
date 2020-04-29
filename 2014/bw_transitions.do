@@ -11,6 +11,7 @@ di "$S_DATE"
 * Creates measures of transitions into breadwinning status
 
 * The data file used in this script was produced by annualize.do
+* It is restricted to mothers living with minor children.
 
 ********************************************************************************
 * Reshape data to make the file wide
@@ -51,20 +52,23 @@ gen bw60L1=.
        local v					=`w'-1
        gen bw50L`w'				=bw50`v' 
        gen bw60L`w'				=bw60`v' 
-	   gen monthsobservedL`w'	=monthsobserved`v'
-	   gen minorbiochildrenL`w'	=minorbiochildren`v'
+       gen monthsobservedL`w'	=monthsobserved`v'
+       gen minorbiochildrenL`w'	=minorbiochildren`v'
     }
 
-// Create an indicator for whether individual is observed breadwinning for the first time (1) 
-*  or has been observed breadwinning in the past (2)
+// Create an indicators for whether individual transitioned into breadwinning for the first time (1) 
+*  or has been observed breadwinning in the past (2). There is no measure for wave 1 because
+* we cant know whether those breadwinning at wave 1 transitioned or were continuing
+* in that status...except for women who became mothers in 2013, but there isn't a good
+* reason to adjust code just for duration 0.
 
 gen nprevbw50=0
 gen nprevbw60=0
 
 forvalues w=2/4{
    local v				=`w'-1
-   replace nprevbw50	=nprevbw50+1 	if bw50`v'==1 
-   replace nprevbw60	=nprevbw60+1 	if bw60`v'==1  
+   replace nprevbw50	=nprevbw50+1 	if bw50`v'==1 & durmom`v' > 0
+   replace nprevbw60	=nprevbw60+1 	if bw60`v'==1 & durmom`v' > 0
  
    gen trans_bw50`w'	=0 				if bw50`w'==0 & nprevbw50==0
    gen trans_bw60`w'	=0 				if bw60`w'==0 & nprevbw60==0
@@ -86,9 +90,7 @@ drop nprevbw50 nprevbw60
 // Reshape data back to long format
 reshape long `change_variables' trans_bw50 trans_bw60 bw50L bw60L monthsobservedL minorbiochildrenL, i(`i_vars') j(`j_vars')
 
-// for troubleshooting, delete 
-	gen transeligible`w'=1 if !missing(monthsobserved) & !missing(monthsobservedL) 
-	tab trans_bw50 transeligible, m
+
 
 ********************************************************************************
 * Address missing data
@@ -133,7 +135,5 @@ keep if !missing(monthsobservedL)
 	di "$obvsprev_n"
 
 	drop idnum obvsnow obvsprev
-
-tab trans_bw50 transeligible, m
 
 save "$SIPP14keep/bw_transitions.dta", replace
