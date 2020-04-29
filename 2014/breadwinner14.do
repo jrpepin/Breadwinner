@@ -96,7 +96,7 @@
 	local time_string = subinstr("`time_string'", " ", "_", .) 	// clean up our string
 	di "`time_string'"
 	
-	dyndoc "$results/bw_analysis_2014.md", saving($results/bw_analysis_2014__`time_string'.html) replace
+	dyndoc "$results/bw_analysis_2014.md", saving($output/bw_analysis_2014.html) replace
 
 ********************************************************************************
 * Multistate lifetable analysis
