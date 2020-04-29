@@ -141,8 +141,25 @@ drop if wave==1 // shouldn't actually drop anyone because bw_transitions drops w
 
 replace durmom=durmom-1
 
-// drop the observation at birth because it is covered by the status at birth
-// above. the record durmom = 0 is the risk of transitioning between year 0 and 1
+// Prior to substracting 1 we checked the distribution on durmom and found that 
+// we had only a small number of women breadwinning at durmom = 0. 
+// This is because some of the women whose first
+// children are still infants have durmom=1 because those births happened in
+// the previous calendar year (SIPP does not give us month of birth on the 
+// public-use data file). The estimate of breadwinning at durmom=0 is less
+// than half the estimate at durmom=1. We are concerned about using it because
+// a) it is based on a small sample size and this will get much worse when we 
+// do an analysis by maternal education and b) it's a lot lower than the estimate
+// that we get with the NLSY. It's easy to believe that the timing of the interview
+// relative to the timing of the birth is not random. 
+
+// Thus, after subtracting 1 from durmom we drop cases where durmom < 0
+
+// below we use the percentage breadwinning at durmom=0 (in the 
+// year prior to the interview, when first child was born) to estimate 
+// breadwinning at child's birth. 
+// We use this same year also to estimate transitions into breadwinning between
+// birth and child age 1. 
 
 drop if durmom < 0
 
@@ -176,6 +193,21 @@ An initial table describing transition rates at all durations using data:
 
 tab durmom trans_bw50 [aweight=wpfinwgt] if trans_bw50 !=2 , matcell(bw50w) nofreq row
 tab durmom trans_bw60 [aweight=wpfinwgt] if trans_bw60 !=2 , matcell(bw60w) nofreq row
+
+<</dd_do>>
+~~~~
+
+And some quick tables by education. The first is the percent breadwinning at birth by education.
+Following there are tables of transitions into breadwinning by duration where durmom=0 
+has the transition rate between birth year and age 1. 
+
+~~~~
+<<dd_do>>
+
+tab educ bw50 [aweight=wpfinwgt] , nofreq row
+
+sort educ 
+by educ: tab durmom trans_bw50 [aweight=wpfinwgt] if trans_bw50 !=2, nofreq row
 
 <</dd_do>>
 ~~~~
