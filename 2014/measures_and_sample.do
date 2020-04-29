@@ -78,6 +78,10 @@ clear
 
 // Create an indicator of how many years have elapsed since individual transitioned to parenthood
    gen durmom=year-yrfirstbirth if !missing(yrfirstbirth)
+* Note that durmom=0 when child was born in this year, but some of the children born in the previous calendar
+* year are still < 1. So if we want the percentage of mothers breadwinning in the year of the child's birth
+* we should check to see if breadwinning is much different between durmom=0 or durmom=1. We could use durmom=1
+* because many of those with durmom=0 will have spent much of the year not a mother. 
    
 // Create a flag if year of first birth is > respondents year of birth+9
    gen 		mybirthyear		= year-tage

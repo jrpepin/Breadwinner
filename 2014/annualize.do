@@ -12,7 +12,7 @@ di "$S_DATE"
 * Create annual measures of breadwinning.
 
 * The data file used in this script was produced by measures_and_sample.do
-
+* It is restricted to mothers living with minor children.
 ********************************************************************************
 * Create descrptive statistics to prep for annualized variables
 ********************************************************************************
