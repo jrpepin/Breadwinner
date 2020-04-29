@@ -67,8 +67,8 @@ gen nprevbw60=0
 
 forvalues w=2/4{
    local v				=`w'-1
-   replace nprevbw50	=nprevbw50+1 	if bw50`v'==1 & durmom`v' > 0
-   replace nprevbw60	=nprevbw60+1 	if bw60`v'==1 & durmom`v' > 0
+   replace nprevbw50	=nprevbw50+1 	if bw50`v'==1 
+   replace nprevbw60	=nprevbw60+1 	if bw60`v'==1 
  
    gen trans_bw50`w'	=0 				if bw50`w'==0 & nprevbw50==0
    gen trans_bw60`w'	=0 				if bw60`w'==0 & nprevbw60==0
