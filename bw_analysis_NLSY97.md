@@ -48,8 +48,51 @@ Sample Construction
 NLSY Results
 --------------------------------------------------------------------------------
 
+~~~~
+<<dd_do: quietly>>
+
+ 	 do "stata/04_nlsy97_bw_estimates_hh50.do"
+
+<</dd_do>>
+~~~~
+
 In the NLSY 1997, we observe <<dd_di: "$per_bw50_atbirth""%">> breadwining, 
 or earning more than 50% of the household income in the year mothers give birth for the fist time. 
+
+The percent breadwinning (50% threhold) in the first year, by education
+~~~~
+<<dd_do>>
+
+tab educ hhe50 if time	==0 [fweight=wt1997], matcell(bw50w) nofreq row
+
+<</dd_do>>
+~~~~
+
+The percent breadwinning (50% threhold) by motherhood duration & education (not censored)
+~~~~
+<<dd_do>>
+
+sort educ 
+preserve
+drop if educ==.
+by educ: tab time hhe50 [fweight=wt1997], nofreq row
+restore
+
+<</dd_do>>
+~~~~
+
+Censored: percent breadwinning (50% threhold) by motherhood duration & education
+
+| Time	| <  high school            | High school           | Some college               | College degree|
+|:------|:--------------------------|:----------------------|:---------------------------|:-----------------------|
+|	1	| <<dd_di: "$lesshs1""%" >>	| <<dd_di: "$hs1""%" >> | <<dd_di: "$somecol1""%" >> | <<dd_di: "$univ1""%" >>
+|	2	| <<dd_di: "$lesshs2""%" >> | <<dd_di: "$hs2""%" >> | <<dd_di: "$somecol2""%" >> | <<dd_di: "$univ2""%" >>
+|	3	| <<dd_di: "$lesshs3""%" >>	| <<dd_di: "$hs3""%" >> | <<dd_di: "$somecol3""%" >> | <<dd_di: "$univ3""%" >>
+|	4	| <<dd_di: "$lesshs4""%" >>	| <<dd_di: "$hs4""%" >>	| <<dd_di: "$somecol4""%" >> | <<dd_di: "$univ4""%" >>
+|	5	| <<dd_di: "$lesshs5""%" >>	| <<dd_di: "$hs5""%" >>	| <<dd_di: "$somecol5""%" >> | <<dd_di: "$univ5""%" >>
+|	6	| <<dd_di: "$lesshs6""%" >> | <<dd_di: "$hs6""%" >> | <<dd_di: "$somecol6""%" >> | <<dd_di: "$univ6""%" >>
+|	7	| <<dd_di: "$lesshs7""%" >> | <<dd_di: "$hs7""%" >> | <<dd_di: "$somecol7""%" >> | <<dd_di: "$univ7""%" >>
+|	8	| <<dd_di: "$lesshs8""%" >> | <<dd_di: "$hs8""%" >> | <<dd_di: "$somecol8""%" >> | <<dd_di: "$univ8""%" >>
 
 The percentage that have never been a breadwinning mother when their first child is age 8 
 is <<dd_di: "$notbwc50""%">>.

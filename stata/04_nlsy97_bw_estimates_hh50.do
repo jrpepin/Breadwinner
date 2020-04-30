@@ -303,16 +303,24 @@ tab time hhe50 [fweight=wt1997] if educ == `i', matcell(bw50wc_`i') nofreq row /
 // Estimate censored on prior bw using estimates saved in bw50wc
 * Changed time to 7 instead of 8 because there are no cases of college degree at year 8.
 * There are cases, but they are missing on their household earnings at time 9.
-
-tab time 		if educ ==4
-tab time hhe50 	if educ ==4
+	tab time 		if educ ==4
+	tab time hhe50 	if educ ==4
 
 forvalues d=1/8 {
-   gen nbbwc50_lesshs_rate`d'	=bw50wc_1[`d',1]/(bw50wc_1[`d',1]+bw50wc_1[`d',2])
-   gen nbbwc50_hs_rate`d'   	=bw50wc_2[`d',1]/(bw50wc_2[`d',1]+bw50wc_2[`d',2])
-   gen nbbwc50_somecol_rate`d'	=bw50wc_3[`d',1]/(bw50wc_3[`d',1]+bw50wc_3[`d',2])
-   gen nbbwc50_univ_rate`d' 	=bw50wc_4[`d',1]/(bw50wc_4[`d',1]+bw50wc_4[`d',2])
+   gen nbbwc50_lesshs_rate`d'	=round(bw50wc_1[`d',1]/(bw50wc_1[`d',1]+bw50wc_1[`d',2]), 	.02)
+   gen nbbwc50_hs_rate`d'   	=round(bw50wc_2[`d',1]/(bw50wc_2[`d',1]+bw50wc_2[`d',2]), 	.02)
+   gen nbbwc50_somecol_rate`d'	=round(bw50wc_3[`d',1]/(bw50wc_3[`d',1]+bw50wc_3[`d',2]), 	.02)
+   gen nbbwc50_univ_rate`d' 	=round(bw50wc_4[`d',1]/(bw50wc_4[`d',1]+bw50wc_4[`d',2]), 	.02)
 }
+
+// Create macros for a table
+	forvalues t=1/8 {
+		global lesshs`t' 	= round(100*(1-nbbwc50_lesshs_rate`t'), 	.02)
+		global hs`t' 		= round(100*(1-nbbwc50_hs_rate`t'), 		.02)
+		global somecol`t' 	= round(100*(1-nbbwc50_somecol_rate`t'), 	.02)
+		global univ`t' 		= round(100*(1-nbbwc50_univ_rate`t'), 		.02)
+	}	
+	
 
 // Initialize cumulative measures
 cap drop 	notbwc50_*
@@ -327,7 +335,6 @@ forvalues d=1/8 {
   replace notbwc50_somecol	=notbwc50_somecol	*nbbwc50_somecol_rate`d'
   replace notbwc50_univ		=notbwc50_univ		*nbbwc50_univ_rate`d'
 }
-
 
 // % BW by time first child is age 8
 	global 	bwc50_bydur7_lesshs		= round(100*(1-notbwc50_lesshs), 	.02)
