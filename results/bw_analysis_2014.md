@@ -122,6 +122,26 @@ use "$SIPP14keep/bw_transitions.dta", clear
 
 drop if wave==1 // shouldn't actually drop anyone because bw_transitions drops wave 1
 
+********************************************************************************
+* Describe percent breadwinning in the first birth year
+********************************************************************************
+* durmom == 0 is when mother had first birth in reference year
+// The percent breadwinning (50% threhold) in the first year. (~25%)
+	sum bw50 if durmom	==0 [aweight=wpfinwgt] // Breadwinning in the year of the birth
+
+	gen per_bw50_atbirth	=100*`r(mean)'
+	gen notbw50_atbirth		=1-`r(mean)'
+
+// The percent breadwinning (60% threhold) in the first year. (~17%)
+	sum bw60 if durmom	==0 [aweight=wpfinwgt] // Breadwinning in the year of the birth
+
+	gen per_bw60_atbirth	=100*`r(mean)'
+	gen notbw60_atbirth		=1-`r(mean)'
+
+tab durmom trans_bw50, matcell(bw50uw)
+
+tab durmom trans_bw60, matcell(bw60uw) // just to check n's
+
 // need to adjust durmom. Currently the transition variables describe transition
 // into breadwinning between the previous year and this one. For example:
 // 
@@ -139,50 +159,16 @@ drop if wave==1 // shouldn't actually drop anyone because bw_transitions drops w
 //
 // to make the file as expected subtract 1 from durmom
 
+
 replace durmom=durmom-1
 
-// Prior to substracting 1 we checked the distribution on durmom and found that 
-// we had only a small number of women breadwinning at durmom = 0. 
-// This is because some of the women whose first
-// children are still infants have durmom=1 because those births happened in
-// the previous calendar year (SIPP does not give us month of birth on the 
-// public-use data file). The estimate of breadwinning at durmom=0 is less
-// than half the estimate at durmom=1. We are concerned about using it because
-// a) it is based on a small sample size and this will get much worse when we 
-// do an analysis by maternal education and b) it's a lot lower than the estimate
-// that we get with the NLSY. It's easy to believe that the timing of the interview
-// relative to the timing of the birth is not random. 
-
-// Thus, after subtracting 1 from durmom we drop cases where durmom < 0
-
-// below we use the percentage breadwinning at durmom=0 (in the 
-// year prior to the interview, when first child was born) to estimate 
-// breadwinning at child's birth. 
-// We use this same year also to estimate transitions into breadwinning between
-// birth and child age 1. 
+* dropping first birth year observation, but it's ok because we have the percent
+* breadwinning at birth year above
 
 drop if durmom < 0
 
 gen intweight=int(wpfinwgt*10000)
-
-********************************************************************************
-* Describe percent breadwinning in the first year
-********************************************************************************
-// The percent breadwinning (50% threhold) in the first year. (~25%)
-	sum bw50 if durmom	==0 [aweight=wpfinwgt] // Breadwinning in the year of the birth
-
-	gen per_bw50_atbirth	=100*`r(mean)'
-	gen notbw50_atbirth		=1-`r(mean)'
-
-// The percent breadwinning (60% threhold) in the first year. (~17%)
-	sum bw60 if durmom	==0 [aweight=wpfinwgt] // Breadwinning in the year of the birth
-
-	gen per_bw60_atbirth	=100*`r(mean)'
-	gen notbw60_atbirth		=1-`r(mean)'
-
-tab durmom trans_bw50, matcell(bw50uw)
-
-tab durmom trans_bw60, matcell(bw60uw) // just to check n's 
+ 
 <</dd_do>>
 ~~~~
 
@@ -277,6 +263,56 @@ breadwinning in earlier waves.
 ~~~~
 <<dd_do: quietly>>
 
+putexcel set "$output/Descriptives.xlsx", modify
+
+// Create Shell
+putexcel A14 = "SIPP"
+putexcel D15:G15 = ("Education"), merge border(bottom)
+putexcel B16 = ("Total"), border(bottom)  
+putexcel D16=("< HS"), border(bottom) 
+putexcel E16=("HS"), border(bottom) 
+putexcel F16=("Some college"), border(bottom) 
+putexcel G16=("College Grad"), border(bottom)
+putexcel A17 = 0
+forvalues d=1/8 {
+	local prow=`d'+16
+	local row=`d'+17
+	putexcel A`row'=formula(+A`prow'+1)
+}
+
+// fill in table with values
+
+putexcel B5 = `per_bw50_atbirth', nformat(number_d2)
+
+/*
+local columns D E F G
+
+forvalues e=1/4 {
+	local col : word `e' of `columns'
+	putexcel `col'5 = peratbirth50_`e'[1,1], nformat(number_d2)
+}
+*/
+
+forvalues d=1/8 {
+	local row = `d'+17
+	gen proptransbw_`d' = matrix(bw50w[`d',2])/100
+	local proptransbw_`d' = proptransbw_`d'
+	putexcel B`row' = proptransbw_`d', nformat(number_d2)
+}
+/*
+	forvalues e=1/4 {
+		local col : word `e' of `columns'
+		putexcel `col'`row' = firstbw50`e'_`d'[1,1], nformat(number_d2)
+	}
+*/
+
+
+<</dd_do>>
+~~~~
+
+~~~~
+<<dd_do: quietly>>
+
 drop if wave < 3
 
 // need to adjust durmom (see above for full explanation)
@@ -313,7 +349,6 @@ tab durmom trans_bw50, matcell(bw50uw) // checking n's
 
 tab durmom trans_bw50 [aweight=wpfinwgt] if trans_bw50 !=2 , matcell(bw50w) nofreq row
 tab durmom trans_bw60 [aweight=wpfinwgt] if trans_bw60 !=2 , matcell(bw60w) nofreq row
-
 
 <</dd_do>>
 ~~~~
