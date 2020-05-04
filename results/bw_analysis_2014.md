@@ -172,7 +172,8 @@ gen intweight=int(wpfinwgt*10000)
 <</dd_do>>
 ~~~~
 
-An initial table describing transition rates at all durations using data: 
+An initial table describing transition rates at all durations. Duration 0 represents transitions
+between birth year and first child is age 1. 
 
 ~~~~
 <<dd_do>>
@@ -185,7 +186,8 @@ tab durmom trans_bw60 [aweight=wpfinwgt] if trans_bw60 !=2 , matcell(bw60w) nofr
 
 And some quick tables by education. The first is the percent breadwinning at birth by education.
 Following there are tables of transitions into breadwinning by duration where durmom=0 
-has the transition rate between birth year and age 1. 
+has the transition rate between birth year and age 1. (One needs to also look at breadwinning
+in year of birth to construct the lifetable). 
 
 ~~~~
 <<dd_do>>
@@ -282,7 +284,7 @@ forvalues d=1/8 {
 
 // fill in table with values
 
-putexcel B5 = `per_bw50_atbirth', nformat(number_d2)
+putexcel B17 = formula(`per_bw50_atbirth'/100), nformat(number_d2)
 
 /*
 local columns D E F G
