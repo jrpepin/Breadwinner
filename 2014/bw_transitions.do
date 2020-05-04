@@ -56,32 +56,36 @@ gen bw60L1=.
        gen minorbiochildrenL`w'	=minorbiochildren`v'
     }
 
+
+
 // Create an indicators for whether individual transitioned into breadwinning for the first time (1) 
 *  or has been observed breadwinning in the past (2). There is no measure for wave 1 because
 * we cant know whether those breadwinning at wave 1 transitioned or were continuing
 * in that status...except for women who became mothers in 2013, but there isn't a good
 * reason to adjust code just for duration 0.
 
-gen nprevbw50=0
-gen nprevbw60=0
+gen nprevbw501=0
+gen nprevbw601=0
 
 forvalues w=2/4{
    local v				=`w'-1
-   replace nprevbw50	=nprevbw50+1 	if bw50`v'==1 
-   replace nprevbw60	=nprevbw60+1 	if bw60`v'==1 
+   gen nprevbw50`w'=nprevbw50`v'
+   gen nprevbw60`w'=nprevbw60`v'
+   replace nprevbw50`w'=nprevbw50`w'+1 if bw50`v'==1
+   replace nprevbw60`w'=nprevbw50`w'+1 if bw60`v'==1
  
-   gen trans_bw50`w'	=0 				if bw50`w'==0 & nprevbw50==0
-   gen trans_bw60`w'	=0 				if bw60`w'==0 & nprevbw60==0
-   replace trans_bw50`w'=1 				if bw50`w'==1 & nprevbw50==0
-   replace trans_bw60`w'=1 				if bw60`w'==1 & nprevbw60==0
+   gen trans_bw50`w'	=0 				if bw50`w'==0 & nprevbw50`w'==0
+   gen trans_bw60`w'	=0 				if bw60`w'==0 & nprevbw60`w'==0
+   replace trans_bw50`w'=1 				if bw50`w'==1 & nprevbw50`w'==0
+   replace trans_bw60`w'=1 				if bw60`w'==1 & nprevbw60`w'==0
 
    // code those who previously transitioned into breadwinning
 
-   replace trans_bw50`w'=2 				if nprevbw50 > 0
-   replace trans_bw60`w'=2 				if nprevbw60 > 0
+   replace trans_bw50`w'=2 				if nprevbw50`w' > 0
+   replace trans_bw60`w'=2 				if nprevbw60`w' > 0
 }
 
-drop nprevbw50 nprevbw60
+drop nprevbw50* nprevbw60*
 	
 ********************************************************************************
 * Reshape data to back to long format
@@ -89,8 +93,6 @@ drop nprevbw50 nprevbw60
 
 // Reshape data back to long format
 reshape long `change_variables' trans_bw50 trans_bw60 bw50L bw60L monthsobservedL minorbiochildrenL, i(`i_vars') j(`j_vars')
-
-
 
 ********************************************************************************
 * Address missing data
@@ -123,12 +125,17 @@ reshape long `change_variables' trans_bw50 trans_bw60 bw50L bw60L monthsobserved
 // keep only observations with data in the current waves
 keep if !missing(monthsobserved)
 
+tab durmom
+
 	egen	obvsnow 	= nvals(idnum)
 	global 	obvsnow_n 	= obvsnow
 	di "$obvsnow_n"
 
 // and the previous wave, the only cases where we know about a *transition*
-keep if !missing(monthsobservedL)
+// except in year where woman becomes a mother. 
+keep if !missing(monthsobservedL) | durmom==0
+
+tab durmom
 
 	egen	obvsprev 	= nvals(idnum)
 	global 	obvsprev_n 	= obvsprev
