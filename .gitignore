@@ -12,4 +12,5 @@ gen_mslt_results.html
 .Rproj.user
 *.Rproj
 DemographySupplement/
+output/
 
