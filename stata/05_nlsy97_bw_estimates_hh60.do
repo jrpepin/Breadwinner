@@ -22,7 +22,7 @@ di "$S_DATE"
 * DESCRIPTION
 ********************************************************************************
 ** The purpose of this analysis is to describe levels of breadwinning (bw)
-** by 10 years after first birth. 
+** by 9 years after first birth. 
 
 * This data used in this file were once created from the do file "02_nlsy97_time_varying".
 
@@ -51,16 +51,20 @@ reshape wide year hhe60, i(PUBID_1997) j(time)
 gen hh60_minus1_0=0
 
 // Create the lagged measures
+
+* lagged one year
 forvalues t=1/9{
     local s=`t'-1
     gen hhe60_minus1_`t'=hhe60`s' 
 }
 
+* lagged two years
 forvalues t=2/9{
     local r=`t'-2
     gen hhe60_minus2_`t'=hhe60`r' 
 }
 
+*lagged three years
 forvalues t=3/9{
     local u=`t'-3
     gen hhe60_minus3_`t'=hhe60`u' 
@@ -119,56 +123,10 @@ label var prevbreadwon "R breadwon at any prior duration"
 * clean up observations created because reshape creates some number of observations for each (PUBID_1997)
 drop if missing(year)
 
-********************************************************************************
-* Estimates of transitions into breadwinning (at each duration of motherhood)
-********************************************************************************
-
-display "The proportion breadwinning in year of birth."
-tab hhe60 if time == 0 [fweight=wt1997]
-* Note that it is impossible to be a breadwinning mother prior to birth and
-* anyone breadwinning in this year is considered to have transitioned into
-* breadwinning.
-
-preserve
-forvalues t = 1/9 {
-	drop if hhe60_minus1_ == 1
-	display "Estimate of (weighted) proportion transitioning into breadwinning at duration `t' without censoring on previous breadwinning"
-	tab hhe60 if time == `t' & !missing(hhe60_minus1) [fweight=wt1997]
-	}
-restore
-
-********************************************************************************
-* Risk of entering breadwinning, censoring on previous breadwinning
-********************************************************************************
 // Create ever breadwinning prior to this duration variable
-
-bysort PUBID_1997 (time) : gen everbw = sum(hhe60_minus1_) // 
+bysort PUBID_1997 (time) : gen everbw = sum(hhe60_minus1_) 
 replace everbw = 1 if everbw >= 1
 label var everbw "Ever breadwon (not censored)"
-
-*save "bw60_analysis.dta", replace
-
-tab time everbw, row // note that this does not yet censor on previous breadwinning
-
-preserve
-forvalues t = 0/9 {
-	drop if prevbreadwon == 1 
-	tab hhe60 if time == `t' [fweight=wt1997] // this does censor on previous bw
-	}
-restore
-
-********************************************************************************
-* Proportion breadwinning at each duration of motherhood that have previously breadwon
-********************************************************************************
-// Create a lagged ever bw variable (so current bw doesn't count)
-*sort PUBID_1997 time 
-*by PUBID_1997: gen ebwlag = everbw[_n-1]
-
-forvalues t = 1/9 {
-	tab everbw hhe60 if time ==`t', col
-	}
-
-table time prevbreadwon [fweight=wt1997], contents(mean hhe60) col
 
 ********************************************************************************
 * Get frequency counts of transitions into breadwinning
@@ -194,20 +152,61 @@ egen 	numdur9uc	=count(countme1)
 egen 	numdur9c	=count(countme2)
 egen 	numbw9c 	=count(countme3)
 
-local 	numdur9uc	=numdur9uc
-local 	numdur9c	=numdur9c
-local 	numbw9c 	=numbw9c
+global 	numdur9uc	=numdur9uc
+global 	numdur9c	=numdur9c
+global 	numbw9c 	=numbw9c
 
 drop countme1 countme2 countme3 numdur9uc numdur9c numbw9c
 
 ********************************************************************************
-* Produce an initial table describing transition rates at all durations 
+* Describe transition rates at all durations 
 ********************************************************************************
+* First, estimates for breadwinning at birth
+display "The proportion breadwinning in year of birth."
+mean hhe60 if time == 0 [fweight=wt1997]
+matrix peratbirth60 = e(b)
+
+
+* Note that it is impossible to be a breadwinning mother prior to birth and
+* anyone breadwinning in this year is considered to have transitioned into
+* breadwinning.
+
 * The first table shows the risk of becoming a bw mother, among women who were 
 * not breadwinning mothers in the previous year, by year since first birth
 
-// Table 1
-tab time hhe60 [fweight=wt1997], matcell(bw60wnc) nofreq row
+* It is impossible to be a breadwinning mother prior to birth and
+* anyone breadwinning in this year is considered to have transitioned into
+* breadwinning.
+
+forvalues t = 1/9 {
+	drop if hhe60_minus1_ == 1 
+	display "Estimate of (weighted) proportion transitioning into breadwinning at duration `t' without censoring on previous breadwinning"
+	tab hhe60 if time == `t' & !missing(hhe60_minus1_) [fweight=wt1997]
+	* store table in a matrix
+	matrix transbw60_`t' = e(Prop)
+}
+
+********************************************************************************
+* Risk of entering breadwinning, censoring on previous breadwinning
+********************************************************************************
+
+preserve
+
+forvalues t = 1/8 {
+	drop if prevbreadwon == 1 
+	display "Estimate of (weighted) proportion transitioning into breadwinning at duration `t' censoring on previous breadwinning"
+	mean hhe60 if time == `t' & !missing(hhe60_minus1_) [fweight=wt1997] 
+	matrix firstbw60_`t' = e(b)
+}
+
+// capture sample size
+tab time if !missing(hhe60) & !missing(hhe60_minus1_), matcell(Ns60)
+
+restore
+
+*INTERPRETATION: The proportion becoming a bw mother is smaller in the this table 
+*than in the first. This suggests that repeat bw does lead to an overestimate of 
+*lifetime breadwinning unless one censors on previous bw. 
 
 ********************************************************************************
 * % of mothers ever previously bw by # years since becoming a bw.
@@ -216,62 +215,55 @@ tab time hhe60 [fweight=wt1997], matcell(bw60wnc) nofreq row
 * At duration 1 it is impossible to experience a repeat transition into breadwinning. 
 * After that, the proportion who have previously breadwon grows (a lot). 
 
-// Table 2
 tab time everbw [fweight=wt1997], nofreq row
-
-********************************************************************************
-* Risk of becoming a bw mother among women who had never previously been a bw mother.
-********************************************************************************
-// Drop moms who have previously been a breadwinner
-drop if everbw == 1
-
-// Table 3
-tab time hhe60 [fweight=wt1997], matcell(bw60wc) nofreq row // estimates saved in bw60wc
-
-/*
-INTERPRETATION: The proportion becoming a bw mother is smaller in the third table 
-than in the first. This suggests that repeat bw does lead to an overestimate of 
-lifetime breadwinning unless one censors on previous bw. 
-*/
 
 ********************************************************************************
 * Calculate the proportions not (not!) transitioning into bw.
 ********************************************************************************
-* Table 3 presents the information we need to calculate the % of women 
+* The censored analysis above has the information we need to calculate the % of women 
 * (n)ever bw 8 years after becoming a mother.
 
-// Estimate censored on prior bw using Table 3 estimates saved in bw60wc
-forvalues d=1/9 {
-   gen nbbwc60_rate`d'=bw60wc[`d',1]/(bw60wc[`d',1]+bw60wc[`d',2])
-}
-
 * Calculate a cumulative risk of breadwinning by multiplying rates of entry at 
-* each duration of bw.
+* each duration of bw, starting with breadwinning at birth.
 * the proportion who do not become bw is the proportion not bw at birth times
 * the proportion who do not become bw in the first year times....who do not become bw
 * in year 8.
 
-// Initialize cumulative measures
-gen notbwc60 = 1
+// Initialize cumulative measure
+cap drop notbw60
+gen notbw60dur8 = 1
 
-forvalues d=1/9 {
-  replace notbwc60=notbwc60*nbbwc60_rate`d'
+// discount the proprotion never breadwinning by using the proportion
+// not breadwinning at birth.
+
+replace notbw60dur8=notbw60dur8*(1-peratbirth60[1,1])
+
+tab notbw60dur8
+
+//  Take the proportion not transitioning into breadwinning at time/duration `d'
+// from the matrix stored above and multiply the cumulative proportion 
+// not breadwining at the previous duration by the proportion not transitioning
+// into breadwinning at this duration. Go up to duration 8, when first child is 
+// age 8 (child is in 9th year on the planet). 
+
+forvalues d=1/8 {
+  replace notbw60dur8=notbw60dur8*(1-firstbw60_`d'[1,1])
 }
+tab notbw60dur8
 
 // Format into nice percents & create macros -----------------------------------
 
 // 60% bw at 1st year of birth
-	gen 	per_bw60_atbirth=100*(1-bw60wc[1,1]/(bw60wc[1,1]+bw60wc[1,2])) 
-	global	per_bw60_atbirth=round(per_bw60_atbirth, .02)
+	global	per_bw60_atbirth=round(100*peratbirth60[1,1], .02)
 	
-// % NEVER BY by time first child reaches age 9
-	global 	notbwc60 	= 	round(100*notbwc60, .02)
+// % NEVER BY by time first child reaches age 8 
+	global notbw60dur8	= 	round(100*notbw60dur8, .02)
 
-// % BW by time first child is age 8
-	global 	bwc60_bydur8= round(100*(1-notbwc60), .02) // Take the inverse of the proportion not bw
+// % BW by time first child reaches age 10
+	global 	bwc60_bydur8= round(100*(1-notbw60dur8), .02) // Take the inverse of the proportion not bw
 
 di	"$per_bw60_atbirth""%"	// 60% bw at 1st year of birth
-di	"$notbwc60""%"      	// % NEVER BW by time first child reaches age 10
+di	"$notbw60dur8""%"      	// % NEVER BW by time first child is age 8
 di	"$bwc60_bydur8""%"  	// % BW by time first child is age 8
 
 ********************************************************************************
@@ -294,49 +286,125 @@ label var 		educ "Education at time of 1st birth"
 drop if _merge ==2	// data only in using
 drop educ_t1 _merge	
 
-// Create bw60wc estimates
-forvalues i = 1/4 {
-tab time hhe60 [fweight=wt1997] if educ == `i', matcell(bw60wc_`i') nofreq row // estimates saved in bw60wc
+********************************************************************************
+* Generate estimates of breadwinning using same logic as above, separately by educ
+********************************************************************************
+
+* Estimates for breadwinning at birth
+forvalues e=1/4 {
+	mean hhe60 if time == 0 & educ == `e' [fweight=wt1997]
+	matrix peratbirth60_`e' = e(b)
 }
 
-// Estimate censored on prior bw using estimates saved in bw60wc
-* Changed time to 8 instead of 9 because there are no cases of college degree at year 9.
-* There are cases, but they are missing on their household earnings at time 9.
-
-tab time 		if educ ==4
-tab time hhe60 	if educ ==4
-
-forvalues d=1/8 {
-   gen nbbwc60_lesshs_rate`d'	=bw60wc_1[`d',1]/(bw60wc_1[`d',1]+bw60wc_1[`d',2])
-   gen nbbwc60_hs_rate`d'   	=bw60wc_2[`d',1]/(bw60wc_2[`d',1]+bw60wc_2[`d',2])
-   gen nbbwc60_somecol_rate`d'	=bw60wc_3[`d',1]/(bw60wc_3[`d',1]+bw60wc_3[`d',2])
-   gen nbbwc60_univ_rate`d' 	=bw60wc_4[`d',1]/(bw60wc_4[`d',1]+bw60wc_4[`d',2])
+* estimates of transitions into breadwinning (not censored on previous breadwinning)
+forvalues e=1/4 {
+	forvalues t = 1/7 {
+		mean hhe60 if time == `t' & !missing(hhe60_minus1_) & educ==`e' [fweight=wt1997] 
+		matrix transbw60`e'_`t' = e(b)
+	}
 }
 
-// Initialize cumulative measures
-cap drop 	notbwc60_*
-gen     	notbwc60_lesshs 	= 1
-gen     	notbwc60_hs      	= 1
-gen     	notbwc60_somecol 	= 1
-gen     	notbwc60_univ   	= 1
-
-forvalues d=1/8 {
-  replace notbwc60_lesshs	=notbwc60_lesshs	*nbbwc60_lesshs_rate`d'
-  replace notbwc60_hs   	=notbwc60_hs		*nbbwc60_hs_rate`d'
-  replace notbwc60_somecol	=notbwc60_somecol	*nbbwc60_somecol_rate`d'
-  replace notbwc60_univ		=notbwc60_univ		*nbbwc60_univ_rate`d'
+* estimates of transitions into breadwinning (censored on previous breadwinning)
+forvalues e=1/4 {
+	forvalues t = 1/7 {
+		drop if prevbreadwon == 1 
+		mean hhe60 if time == `t' & !missing(hhe60_minus1_) & educ==`e' [fweight=wt1997] 
+		matrix firstbw60`e'_`t' = e(b)
+	}
 }
 
+// Initialize cumulative measures at percent not breadwinning at birth
+cap drop 	notbw60_*
+gen     	notbw60_lesshs 	= (1-peratbirth60_1[1,1])
+gen     	notbw60_hs      	= (1-peratbirth60_2[1,1])
+gen     	notbw60_somecol 	= (1-peratbirth60_3[1,1])
+gen     	notbw60_univ   	= (1-peratbirth60_4[1,1])
 
-// % BW by time first child is age 7
-	global 	bwc60_bydur7_lesshs		= round(100*(1-notbwc60_lesshs), 	.02)
-	global 	bwc60_bydur7_hs   		= round(100*(1-notbwc60_hs), 		.02)
-	global 	bwc60_bydur7_somecol	= round(100*(1-notbwc60_somecol), 	.02)
-	global 	bwc60_bydur7_univ		= round(100*(1-notbwc60_univ), 		.02)
+forvalues d=1/7 {
+  replace notbw60_lesshs	=notbw60_lesshs		*(1-firstbw601_`d'[1,1])
+  replace notbw60_hs   		=notbw60_hs		*(1-firstbw602_`d'[1,1])
+  replace notbw60_somecol	=notbw60_somecol	*(1-firstbw603_`d'[1,1])
+  replace notbw60_univ		=notbw60_univ		*(1-firstbw604_`d'[1,1])
+}
+
+// % BW by time first child is age 7 (in 8th year of life)
+	global 	bwc60_bydur7_lesshs		= round(100*(1-notbw60_lesshs), 	.02)
+	global 	bwc60_bydur7_hs   		= round(100*(1-notbw60_hs), 		.02)
+	global 	bwc60_bydur7_somecol	= round(100*(1-notbw60_somecol), 	.02)
+	global 	bwc60_bydur7_univ		= round(100*(1-notbw60_univ), 		.02)
 
 di	"$bwc60_bydur7_lesshs""%"  		// Less than hs at time of first birth
 di	"$bwc60_bydur7_hs""%"  			// High school at time of first birth
 di	"$bwc60_bydur7_somecol""%"  	// Some College at time of first birth
 di	"$bwc60_bydur7_univ""%"  		// College at time of first birth
+
+********************************************************************************
+* Put results in an excel file
+********************************************************************************
+
+* Initialize excel file
+
+putexcel set "$results/Descriptives60.xlsx", replace
+
+// Create Shell
+putexcel A1:I1 = "Describe breadwinning at birth and subsequent transitions into breadwinning by duration mother, total and by education", merge border(bottom) 
+putexcel A2 = "NLSY"
+putexcel B2:G2 = "Breadwinning > 60% threshold", merge border(bottom)
+putexcel D3:G3 = ("Education"), merge border(bottom)
+putexcel B4 = ("Total"), border(bottom)  
+putexcel D4=("< HS"), border(bottom) 
+putexcel E4=("HS"), border(bottom) 
+putexcel F4=("Some college"), border(bottom) 
+putexcel G4=("College Grad"), border(bottom)
+putexcel I4=("Unweighted N"), border(bottom)
+putexcel K4=("Proportion Survived"), border(bottom) 
+putexcel L4=("Cumulative Survival"), border(bottom) 
+putexcel A5 = 0
+forvalues d=1/7 {
+	local prow=`d'+4
+	local row=`d'+5
+	putexcel A`row'=formula(+A`prow'+1)
+}
+
+// fill in table with values
+
+putexcel B5 = .01*$per_bw60_atbirth, nformat(number_d2)
+
+local columns D E F G
+
+forvalues e=1/4 {
+	local col : word `e' of `columns'
+	putexcel `col'5 = peratbirth60_`e'[1,1], nformat(number_d2)
+}
+
+forvalues d=1/7  {
+        local row=`d'+5
+	putexcel B`row' = firstbw60_`d'[1,1], nformat(number_d2)
+	forvalues e=1/4 {
+		local col : word `e' of `columns'
+		putexcel `col'`row' = firstbw60`e'_`d'[1,1], nformat(number_d2)
+	}
+}
+
+// place sample size, which starts at birth rather
+putexcel I5 = matrix(Ns60)
+
+// Doing a lifetable analysis in the excel spreadsheet to make the calculation visible
+
+forvalues d=1/8 {
+	local row = `d'+4
+	putexcel K`row' = formula(+1-B`row')
+}
+
+// lifetable cumulates the probability never breadwinning by the produc of survival rates across 
+// previous durations. The inital value is simply the survival rate at duration 0 (birth)
+putexcel L5 = formula(+K5)
+*now calculate survival as product of survival to previous duration times survival at this duration
+forvalues d=1/7 {
+	local row = `d' +5
+	local prow = `d' + 4
+	putexcel L`row' = formula(+L`prow'*K`row')
+}
+
 
 log close
