@@ -197,6 +197,9 @@ forvalues t = 1/8 {
 	matrix firstbw50_`t' = e(b)
 }
 
+// capture sample size
+tab time if !missing(hhe50) & !missing(hhe50_minus1_), matcell(Ns50)
+
 *INTERPRETATION: The proportion becoming a bw mother is smaller in the this table 
 *than in the first. This suggests that repeat bw does lead to an overestimate of 
 *lifetime breadwinning unless one censors on previous bw. 
@@ -329,14 +332,18 @@ di	"$bwc50_bydur7_univ""%"  		// College at time of first birth
 putexcel set "$results/Descriptives.xlsx", replace
 
 // Create Shell
-putexcel A1:G1 = "Describe breadwinning at birth and subsequent transitions into breadwinning by duration mother, total and by education", merge border(bottom)
+putexcel A1:I1 = "Describe breadwinning at birth and subsequent transitions into breadwinning by duration mother, total and by education", merge border(bottom) 
 putexcel A2 = "NLSY"
+putexcel B2:G2 = "Breadwinning > 50% threshold", merge border(bottom)
 putexcel D3:G3 = ("Education"), merge border(bottom)
 putexcel B4 = ("Total"), border(bottom)  
 putexcel D4=("< HS"), border(bottom) 
 putexcel E4=("HS"), border(bottom) 
 putexcel F4=("Some college"), border(bottom) 
 putexcel G4=("College Grad"), border(bottom)
+putexcel I4=("Unweighted N"), border(bottom)
+putexcel K4=("Proportion Survived"), border(bottom) 
+putexcel L4=("Cumulative Survival"), border(bottom) 
 putexcel A5 = 0
 forvalues d=1/8 {
 	local prow=`d'+3
@@ -364,7 +371,25 @@ forvalues d=1/7  {
 	}
 }
 
+// place sample size, which starts at birth rather
+putexcel I5 = matrix(Ns50)
 
+// Doing a lifetable analysis in the excel spreadsheet to make the calculation visible
+
+forvalues d=1/8 {
+	local row = `d'+4
+	putexcel K`row' = formula(+1-B`row')
+}
+
+// lifetable cumulates the probability never breadwinning by the produc of survival rates across 
+// previous durations. The inital value is simply the survival rate at duration 0 (birth)
+putexcel L5 = formula(+K5)
+*now calculate survival as product of survival to previous duration times survival at this duration
+forvalues d=1/7 {
+	local row = `d' +5
+	local prow = `d' + 4
+	putexcel L`row' = formula(+L`prow'*K`row')
+}
 
 
 log close
