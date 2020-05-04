@@ -18,12 +18,11 @@
 
 //------------------------------------------------------------------------------
 
-* The current directory is assumed to be the base project directory.
-* change to the directory before running breadwinnerNLSY97.do
-*	cd "C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning" 
+* The current directory is assumed to be the stata directory within the repository.
+* cd "C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning\stata" 
 
 // Run the setup script
-	do "stata/00_nlsy97_setup_breadwinner_environment"
+	do "00_nlsy97_setup_breadwinner_environment"
 	
 * The logs for these files are generated within each .do file.
 
@@ -32,22 +31,24 @@
 ********************************************************************************
 
 // Create sample and demographic variables
-	do "stata/01_nlsy97_sample & demo.do"
+	do "01_nlsy97_sample & demo.do"
 	
 // Create time-varying variables
-	do "stata/02_nlsy97_time_varying.do"
+	do "02_nlsy97_time_varying.do"
 	
 // Look at descriptive statistics
-	do "stata/03_nlsy97_descriptives.do"
+	do "03_nlsy97_descriptives.do"
 
 ********************************************************************************
 * B. Risk of entering breadwinning for the first 10 years of motherhood
 ********************************************************************************
 // Breadwinning estimates at the 50% threshold
-	 do "stata/04_nlsy97_bw_estimates_hh50.do"
+	 do "04_nlsy97_bw_estimates_hh50.do"
+
+// output results into excel tables to give to Jennifer
 	 
 // Breadwinning estimates at the 60% threshold
-	 do "stata/05_nlsy97_bw_estimates_hh60.do"
+	 do "05_nlsy97_bw_estimates_hh60.do"
 	  
 ********************************************************************************
 * C. Dynamic document with results & notes on logic
@@ -69,5 +70,8 @@ foreach f of local list {
     erase "`f'"
 }
 
-// Create the new html document
+// Create the new html document describing sample and aspects of analysis
 dyndoc "bw_analysis_NLSY97.md", saving($results/bw_analysis_NLSY97_$time_string.html) replace
+
+
+
