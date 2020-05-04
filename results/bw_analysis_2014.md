@@ -118,8 +118,7 @@ measures. We consider mothers who earn more than 50% (or 60%) of the household e
 <<dd_do: quietly>>
 use "$SIPP14keep/bw_transitions.dta", clear
 
-// must first drop wave 1 because we only know status, not transitions into breadwinning
-
+// drop wave 1 because we only know status, not transitions into breadwinning
 drop if wave==1 // shouldn't actually drop anyone because bw_transitions drops wave 1
 
 ********************************************************************************
@@ -131,16 +130,26 @@ drop if wave==1 // shouldn't actually drop anyone because bw_transitions drops w
 
 	gen per_bw50_atbirth	=100*`r(mean)'
 	gen notbw50_atbirth		=1-`r(mean)'
+	
+	// by education
+	forvalues e=1/4 {
+		sum bw50 if durmom	==0 & educ==`e' [aweight=wpfinwgt] 
+		gen prop_bw50_atbirth`e'=`r(mean)'
+	}
+		
 
 // The percent breadwinning (60% threhold) in the first year. (~17%)
 	sum bw60 if durmom	==0 [aweight=wpfinwgt] // Breadwinning in the year of the birth
 
 	gen per_bw60_atbirth	=100*`r(mean)'
 	gen notbw60_atbirth		=1-`r(mean)'
-
-tab durmom trans_bw50, matcell(bw50uw)
-
-tab durmom trans_bw60, matcell(bw60uw) // just to check n's
+	
+// capture sample size
+tab durmom if inlist(trans_bw50,0,1), matcell(Ns50)
+	
+********************************************************************************
+* adjusting file to prepare for lifetable estimation
+********************************************************************************
 
 // need to adjust durmom. Currently the transition variables describe transition
 // into breadwinning between the previous year and this one. For example:
@@ -162,58 +171,33 @@ tab durmom trans_bw60, matcell(bw60uw) // just to check n's
 
 replace durmom=durmom-1
 
-* dropping first birth year observation, but it's ok because we have the percent
+* dropping first birth year observation, but it's ok because we have saved the percent
 * breadwinning at birth year above
 
 drop if durmom < 0
 
-gen intweight=int(wpfinwgt*10000)
- 
-<</dd_do>>
-~~~~
+*******************************************************************************
+* Estimating duration-specific transition rates overall and by education
+*******************************************************************************
 
-An initial table describing transition rates at all durations. Duration 0 represents transitions
-between birth year and first child is age 1. 
+forvalues d=1/18 {
+	mean durmom trans_bw50 [aweight=wpfinwgt] if trans_bw50 !=2 & durmom==`d'
+	matrix firstbw50_`d' = e(b)
+	mean durmom trans_bw60 [aweight=wpfinwgt] if trans_bw60 !=2 & durmom==`d'
+	matrix firstbw60_`d' = e(b)
+	forvalues e=1/4 {
+		mean durmom trans_bw50 [aweight=wpfinwgt] if trans_bw50 !=2 & durmom==`d' & educ==`e'
+		matrix firstbw50`e'_`d' = e(b)
+		mean durmom trans_bw60 [aweight=wpfinwgt] if trans_bw60 !=2 & durmom==`d' & educ==`e'
+		matrix firstbw60`e'_`d' = e(b)
+	}
+	
+}
 
-~~~~
-<<dd_do>>
 
-tab durmom trans_bw50 [aweight=wpfinwgt] if trans_bw50 !=2 , matcell(bw50w) nofreq row
-tab durmom trans_bw60 [aweight=wpfinwgt] if trans_bw60 !=2 , matcell(bw60w) nofreq row
 
-<</dd_do>>
-~~~~
-
-And some quick tables by education. The first is the percent breadwinning at birth by education.
-Following there are tables of transitions into breadwinning by duration where durmom=0 
-has the transition rate between birth year and age 1. (One needs to also look at breadwinning
-in year of birth to construct the lifetable). 
-
-~~~~
-<<dd_do>>
-
-tab educ bw50 [aweight=wpfinwgt] , nofreq row
-
-sort educ 
-by educ: tab durmom trans_bw50 [aweight=wpfinwgt] if trans_bw50 !=2, nofreq row
-
-<</dd_do>>
-~~~~
-
-~~~~
-<<dd_do: quietly>>
 // Now, calculating the proportions not (not!) transitioning into breadwining by hand.
 
-forvalues d=1/18 {
-   gen nbbw50_rate`d'=bw50w[`d',1]/(bw50w[`d',1]+bw50w[`d',2])
-}
-
-// note d=1 is the rate of transition between birth year and year first child
-// turns age 1. d=18 is the transition rate between year first child turned 17 and
-// year she turns 18.
-forvalues d=1/18 {
-   gen nbbw60_rate`d'=bw60w[`d',1]/(bw60w[`d',1]+bw60w[`d',2])
-}
 
 // calculating a cumulative risk of breadwinning by age 18 by multiplying rates
 * of entry at each duration of breadwinning
@@ -226,8 +210,8 @@ gen notbw60 = notbw60_atbirth
 * the proportion who do not become breadwinners in the first year times....who do not become breadwinners
 * in year 17.
 forvalues d=1/17 {
-  replace notbw50=notbw50*nbbw50_rate`d'
-  replace notbw60=notbw60*nbbw60_rate`d'
+  replace notbw50=notbw50*firstbw50_`d'[1,2]
+  replace notbw60=notbw60*firstbw50_`d'[1,2]
 }
 
 * make into nice percents
@@ -269,14 +253,18 @@ putexcel set "$output/Descriptives.xlsx", modify
 
 // Create Shell
 putexcel A14 = "SIPP"
+putexcel B14:G14 = "Breadwinning > 50% threshold", merge border(bottom)
 putexcel D15:G15 = ("Education"), merge border(bottom)
 putexcel B16 = ("Total"), border(bottom)  
 putexcel D16=("< HS"), border(bottom) 
 putexcel E16=("HS"), border(bottom) 
 putexcel F16=("Some college"), border(bottom) 
 putexcel G16=("College Grad"), border(bottom)
+putexcel I16=("Unweighted N"), border(bottom)
+putexcel K16=("Proportion Survived"), border(bottom) 
+putexcel L16=("Cumulative Survival"), border(bottom) 
 putexcel A17 = 0
-forvalues d=1/8 {
+forvalues d=1/18 {
 	local prow=`d'+16
 	local row=`d'+17
 	putexcel A`row'=formula(+A`prow'+1)
@@ -286,35 +274,50 @@ forvalues d=1/8 {
 
 putexcel B17 = formula(`per_bw50_atbirth'/100), nformat(number_d2)
 
-/*
 local columns D E F G
 
 forvalues e=1/4 {
 	local col : word `e' of `columns'
-	putexcel `col'5 = peratbirth50_`e'[1,1], nformat(number_d2)
+	putexcel `col'17 = prop_bw50_atbirth`e', nformat(number_d2)
 }
-*/
 
-forvalues d=1/8 {
+forvalues d=1/18 {
 	local row = `d'+17
-	gen proptransbw_`d' = matrix(bw50w[`d',2])/100
-	local proptransbw_`d' = proptransbw_`d'
-	putexcel B`row' = proptransbw_`d', nformat(number_d2)
-}
-/*
+	putexcel B`row' = matrix(firstbw50_`d'[1,2]), nformat(number_d2)
 	forvalues e=1/4 {
 		local col : word `e' of `columns'
-		putexcel `col'`row' = firstbw50`e'_`d'[1,1], nformat(number_d2)
+		putexcel `col'`row' = matrix(firstbw50`e'_`d'[1,2]), nformat(number_d2)
 	}
-*/
+}
 
+// sample size matrix runs from birth to age 18
+forvalues d=1/19 {
+        local row = `d'+16
+	putexcel I`row' = matrix(Ns50[`d',1])
+}
+
+// Doing a lifetable analysis in the excel spreadsheet to make the calculation visible
+
+forvalues d=1/18 {
+	local row = `d'+16
+	putexcel K`row' = formula(+1-B`row')
+}
+
+// lifetable cumulates the probability never breadwinning by the produc of survival rates across 
+// previous durations. The inital value is simply the survival rate at duration 0 (birth)
+putexcel L17 = formula(+K17)
+*now calculate survival as product of survival to previous duration times survival at this duration
+forvalues d=1/17 {
+	local row = `d' +17
+	local prow = `d' + 16
+	putexcel L`row' = formula(+L`prow'*K`row')
+}
 
 <</dd_do>>
 ~~~~
 
 ~~~~
-<<dd_do: quietly>>
-
+<<dd_do: quietly>>7
 drop if wave < 3
 
 // need to adjust durmom (see above for full explanation)
