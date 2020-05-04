@@ -82,7 +82,10 @@ clear
 * year are still < 1. So if we want the percentage of mothers breadwinning in the year of the child's birth
 * we should check to see if breadwinning is much different between durmom=0 or durmom=1. We could use durmom=1
 * because many of those with durmom=0 will have spent much of the year not a mother. 
-   
+
+* also, some women gave birth to their first child after the reference year. In this case durmom < 0, but
+* we don't have income information for this year in that wave of data. So, durmom < 0 is dropped below
+ 
 // Create a flag if year of first birth is > respondents year of birth+9
    gen 		mybirthyear		= year-tage
    gen 		birthyear_error	= 1 			if mybirthyear+9  > yrfirstbirth & !missing(yrfirstbirth)  // too young

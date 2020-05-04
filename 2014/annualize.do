@@ -22,6 +22,8 @@ use "$SIPP14keep/sipp14tpearn_all", clear
    egen startmonth=min(monthcode), by(SSUID PNUM year)
    egen lastmonth =max(monthcode), by(SSUID PNUM year)
    
+   * All months have the same number of observations (12) within year
+   * so this wasn't necessary.
    order 	SSUID PNUM year startmonth lastmonth
    list 	SSUID PNUM year startmonth lastmonth in 1/5, clean
 
