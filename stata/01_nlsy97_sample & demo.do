@@ -25,11 +25,11 @@ di "$S_DATE"
 clear
 set more off
 
-infile using 	"data/nlsy9717.dct"
+infile using 	"$datadir/nlsy9717.dct"
 
 * Before running the next script, remove the comment markers so that variables are renamed
 * Also had to delete all instances of "KEY!" so it will run.
-do 				"data/nlsy9717-value-labels"
+do 				"$datadir/nlsy9717-value-labels"
 
 // Count respondents and check for wide file format.
 duplicates report PUBID_1997

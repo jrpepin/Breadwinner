@@ -42,9 +42,9 @@ else {
 
 
 // Checks that the setup file exists and runs it.
-capture confirm file "stata/setup_`c(username)'.do"
+capture confirm file "setup_`c(username)'.do"
 if _rc==0 {
-    do stata/setup_`c(username)'
+    do setup_`c(username)'
       }
   else {
     display as error "The file setup_`c(username)'.do does not exist"

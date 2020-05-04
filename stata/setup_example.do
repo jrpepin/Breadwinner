@@ -3,7 +3,8 @@
 * etc to the location for these files on your computer
 
 global projcode 		"$homedir\Dropbox\Repositories\NLSY97_Breadwinning"
+global datadir			"$homedir\Dropbox\Repositories\NLSY97_Breadwinning\data"
 global logdir 			"$homedir\logs\breadwinner" 
 global tempdir 			"$homedir\Dropbox\Data\temp"
 global results 			"$projcode\results"
-global NLSYkeep			"$projcode/data"
+global NLSYkeep			"$projcode\data"

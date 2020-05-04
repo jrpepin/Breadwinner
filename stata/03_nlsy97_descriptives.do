@@ -27,7 +27,7 @@ di "$S_DATE"
 clear
 set more off
 
-use "stata/NLSY97_bw.dta", clear
+use "NLSY97_bw.dta", clear
 
 // Count number of respondents
 unique 	PUBID_1997

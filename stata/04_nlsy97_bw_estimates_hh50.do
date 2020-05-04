@@ -32,7 +32,7 @@ di "$S_DATE"
 clear
 set more off
 
-use 	"stata/NLSY97_bw.dta", clear
+use 	"NLSY97_bw.dta", clear
 fre year // Make sure the data includes all survey years (1997 - 2017)
 
 ********************************************************************************
