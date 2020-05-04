@@ -146,7 +146,7 @@ bysort PUBID_1997 (time) : gen everbw = sum(hhe60_minus1_) //
 replace everbw = 1 if everbw >= 1
 label var everbw "Ever breadwon (not censored)"
 
-save "stata/bw60_analysis.dta", replace
+*save "bw60_analysis.dta", replace
 
 tab time everbw, row // note that this does not yet censor on previous breadwinning
 

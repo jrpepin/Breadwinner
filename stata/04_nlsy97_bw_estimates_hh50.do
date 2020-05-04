@@ -303,10 +303,10 @@ gen     	notbw50_somecol 	= peratbirth50_3[1,1]
 gen     	notbw50_univ   	= peratbirth50_4[1,1]
 
 forvalues d=1/7 {
-  replace notbw50_lesshs	=notbw50_lesshs		*transbw501_`d'[1,1]
-  replace notbw50_hs   		=notbw50_hs		*transbw502_`d'[1,1]
-  replace notbw50_somecol	=notbw50_somecol	*transbw503_`d'[1,1]
-  replace notbw50_univ		=notbw50_univ		*transbw504_`d'[1,1]
+  replace notbw50_lesshs	=notbw50_lesshs		*firstbw501_`d'[1,1]
+  replace notbw50_hs   		=notbw50_hs		*firstbw502_`d'[1,1]
+  replace notbw50_somecol	=notbw50_somecol	*firstbw503_`d'[1,1]
+  replace notbw50_univ		=notbw50_univ		*firstbw504_`d'[1,1]
 }
 
 // % BW by time first child is age 7 (in 8th year of life)

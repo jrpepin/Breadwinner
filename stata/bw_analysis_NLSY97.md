@@ -51,7 +51,7 @@ NLSY Results
 ~~~~
 <<dd_do: quietly>>
 
- 	 do "stata/04_nlsy97_bw_estimates_hh50.do"
+ 	 do "04_nlsy97_bw_estimates_hh50.do"
 
 <</dd_do>>
 ~~~~
