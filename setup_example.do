@@ -17,7 +17,6 @@ global SIPP2008 		"/data/sipp/2008_Core"
 global SIPP2008TM 		"/data/sipp/2008_TM/StataData"
 global sipp2008_code 	"$projcode/2008"
 global SIPP08keep 		"$homedir/projects/breadwinner/data/keep"
-global childhh 			"$homedir/projects/childhh/data/keep/2008" 	// *?*?*Do we use this macros for SIPP2008 analysis?
 
 * NLSY
 
