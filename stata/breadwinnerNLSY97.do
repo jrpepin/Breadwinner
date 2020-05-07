@@ -7,7 +7,7 @@
 * better account for repeat breadwinning using the SIPP
 
 ********************************************************************************
-* A. ENVIRONMENT
+* A1. ENVIRONMENT
 ********************************************************************************
 * There are two scripts users need to run before importing the data. 
 	* First, create a personal setup file using the setup_example.do script as a 
@@ -27,7 +27,7 @@
 * The logs for these files are generated within each .do file.
 
 ********************************************************************************
-* A. Data Import and Measures Creation
+* A2. Data Import and Measures Creation
 ********************************************************************************
 
 // Create sample and demographic variables
@@ -40,7 +40,7 @@
 	do "03_nlsy97_descriptives.do"
 
 ********************************************************************************
-* B. Risk of entering breadwinning for the first 10 years of motherhood
+* B. Risk of entering breadwinning for the first 8 years of motherhood
 ********************************************************************************
 // Breadwinning estimates at the 50% threshold
 	 do "04_nlsy97_bw_estimates_hh50.do"

@@ -1,6 +1,6 @@
 *-------------------------------------------------------------------------------
 * BREADWINNER PROJECT - NLSY97 Component
-* nlsy97_bw_estimtaes_hh50.do
+* nlsy97_bw_estimates_hh50.do
 * Joanna Pepin and Kelly Raley
 *-------------------------------------------------------------------------------
 
@@ -230,8 +230,8 @@ tab time everbw [fweight=wt1997], nofreq row
 * in year 8.
 
 // Initialize cumulative measure
-cap drop notbw50
-gen notbw50dur7 = 1
+cap drop 	notbw50
+gen 		notbw50dur7 = 1
 
 // discount the proprotion never breadwinning by using the proportion
 // not breadwinning at birth.
@@ -251,7 +251,7 @@ forvalues d=1/7 {
 }
 tab notbw50dur7
 
-// Format into nice percents & create macros -----------------------------------
+* Format into nice percents & create macros -----------------------------------
 
 // 50% bw at 1st year of birth
 	global	per_bw50_atbirth=round(100*peratbirth50[1,1], .02)
@@ -344,9 +344,11 @@ di	"$bwc50_bydur7_univ""%"  		// College at time of first birth
 * Initialize excel file
 
 * BW transitions ---------------------------------------------------------------
-// Create Shell
+
+// Initialize excel file
 putexcel set "$output/Descriptives50.xlsx", sheet(transitions) replace
 
+// Create Shell
 putexcel A1:I1 = "Describe breadwinning at birth and subsequent transitions into breadwinning by duration mother, total and by education", merge border(bottom) 
 putexcel A2 = "NLSY"
 putexcel B2:G2 = "Breadwinning > 50% threshold", merge border(bottom)

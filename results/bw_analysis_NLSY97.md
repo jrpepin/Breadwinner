@@ -76,26 +76,26 @@ Not censored: percent breadwinning (50% threhold) by motherhood duration & educa
 | Time	| <  high school            | High school           | Some college               | College degree|
 |:------|:--------------------------|:----------------------|:---------------------------|:-----------------------|
 |	0	| <<dd_di: "`tbw1_0'""%" >>	| <<dd_di: "`tbw2_0'""%" >> | <<dd_di: "`tbw3_0'""%" >> | <<dd_di: "`tbw4_0'""%" >>
-|	1	| <<dd_di: "`tbw1_1'""%" >> 	| <<dd_di: "`tbw2_1'""%" >> | <<dd_di: "`tbw3_1'""%" >> | <<dd_di: "`tbw4_1'""%" >>
+|	1	| <<dd_di: "`tbw1_1'""%" >> | <<dd_di: "`tbw2_1'""%" >> | <<dd_di: "`tbw3_1'""%" >> | <<dd_di: "`tbw4_1'""%" >>
 |	2	| <<dd_di: "`tbw1_2'""%" >>	| <<dd_di: "`tbw2_2'""%" >> | <<dd_di: "`tbw3_2'""%" >> | <<dd_di: "`tbw4_2'""%" >>
 |	3	| <<dd_di: "`tbw1_3'""%" >>	| <<dd_di: "`tbw2_3'""%" >> | <<dd_di: "`tbw3_3'""%" >> | <<dd_di: "`tbw4_3'""%" >>
 |	4	| <<dd_di: "`tbw1_4'""%" >>	| <<dd_di: "`tbw2_4'""%" >> | <<dd_di: "`tbw3_4'""%" >> | <<dd_di: "`tbw4_4'""%" >>
-|	5	| <<dd_di: "`tbw1_5'""%" >> 	| <<dd_di: "`tbw2_5'""%" >> | <<dd_di: "`tbw3_5'""%" >> | <<dd_di: "`tbw4_5'""%" >>
-|	6	| <<dd_di: "`tbw1_6'""%" >> 	| <<dd_di: "`tbw2_6'""%" >> | <<dd_di: "`tbw3_6'""%" >> | <<dd_di: "`tbw4_6'""%" >>
-|	7	| <<dd_di: "`tbw1_7'""%" >> 	| <<dd_di: "`tbw2_7'""%" >> | <<dd_di: "`tbw3_7'""%" >> | <<dd_di: "`tbw4_7'""%" >>
+|	5	| <<dd_di: "`tbw1_5'""%" >> | <<dd_di: "`tbw2_5'""%" >> | <<dd_di: "`tbw3_5'""%" >> | <<dd_di: "`tbw4_5'""%" >>
+|	6	| <<dd_di: "`tbw1_6'""%" >> | <<dd_di: "`tbw2_6'""%" >> | <<dd_di: "`tbw3_6'""%" >> | <<dd_di: "`tbw4_6'""%" >>
+|	7	| <<dd_di: "`tbw1_7'""%" >> | <<dd_di: "`tbw2_7'""%" >> | <<dd_di: "`tbw3_7'""%" >> | <<dd_di: "`tbw4_7'""%" >>
 
 Censored: percent breadwinning (50% threhold) by motherhood duration & education
 
 | Time	| <  high school            | High school           | Some college               | College degree|
 |:------|:--------------------------|:----------------------|:---------------------------|:-----------------------|
 |	0	| <<dd_di: "`fbw1_0'""%" >>	| <<dd_di: "`fbw2_0'""%" >> | <<dd_di: "`fbw3_0'""%" >> | <<dd_di: "`fbw4_0'""%" >>
-|	1	| <<dd_di: "`fbw1_1'""%" >> 	| <<dd_di: "`fbw2_1'""%" >> | <<dd_di: "`fbw3_1'""%" >> | <<dd_di: "`fbw4_1'""%" >>
+|	1	| <<dd_di: "`fbw1_1'""%" >> | <<dd_di: "`fbw2_1'""%" >> | <<dd_di: "`fbw3_1'""%" >> | <<dd_di: "`fbw4_1'""%" >>
 |	2	| <<dd_di: "`fbw1_2'""%" >>	| <<dd_di: "`fbw2_2'""%" >> | <<dd_di: "`fbw3_2'""%" >> | <<dd_di: "`fbw4_2'""%" >>
 |	3	| <<dd_di: "`fbw1_3'""%" >>	| <<dd_di: "`fbw2_3'""%" >> | <<dd_di: "`fbw3_3'""%" >> | <<dd_di: "`fbw4_3'""%" >>
 |	4	| <<dd_di: "`fbw1_4'""%" >>	| <<dd_di: "`fbw2_4'""%" >> | <<dd_di: "`fbw3_4'""%" >> | <<dd_di: "`fbw4_4'""%" >>
-|	5	| <<dd_di: "`fbw1_5'""%" >> 	| <<dd_di: "`fbw2_5'""%" >> | <<dd_di: "`fbw3_5'""%" >> | <<dd_di: "`fbw4_5'""%" >>
-|	6	| <<dd_di: "`fbw1_6'""%" >> 	| <<dd_di: "`fbw2_6'""%" >> | <<dd_di: "`fbw3_6'""%" >> | <<dd_di: "`fbw4_6'""%" >>
-|	7	| <<dd_di: "`fbw1_7'""%" >> 	| <<dd_di: "`fbw2_7'""%" >> | <<dd_di: "`fbw3_7'""%" >> | <<dd_di: "`fbw4_7'""%" >>
+|	5	| <<dd_di: "`fbw1_5'""%" >> | <<dd_di: "`fbw2_5'""%" >> | <<dd_di: "`fbw3_5'""%" >> | <<dd_di: "`fbw4_5'""%" >>
+|	6	| <<dd_di: "`fbw1_6'""%" >> | <<dd_di: "`fbw2_6'""%" >> | <<dd_di: "`fbw3_6'""%" >> | <<dd_di: "`fbw4_6'""%" >>
+|	7	| <<dd_di: "`fbw1_7'""%" >> | <<dd_di: "`fbw2_7'""%" >> | <<dd_di: "`fbw3_7'""%" >> | <<dd_di: "`fbw4_7'""%" >>
 
 The percentage that have never been a breadwinning mother when their first child is age 8 
 is <<dd_di: "$notbw50dur8""%">>.

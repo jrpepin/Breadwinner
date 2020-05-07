@@ -1,6 +1,6 @@
 *-------------------------------------------------------------------------------
 * BREADWINNER PROJECT - NLSY97 Component
-* nlsy97_bw_estimtaes_hh60.do
+* nlsy97_bw_estimates_hh60.do
 * Joanna Pepin and Kelly Raley
 *-------------------------------------------------------------------------------
 
