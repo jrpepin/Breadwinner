@@ -77,7 +77,20 @@
 	log close
 
 ********************************************************************************
-* Create a file describing sample and initial "lifetime" estimates of breadwinning.
+* B3. Risk of entering breadwinning  - summary
+********************************************************************************
+// Breadwinning estimates at the 50% threshold
+	log using "$logdir/bw_estimates_hh50.log", replace
+	do "$SIPP2014_code/bw_estimates_hh50.do"
+	log close
+
+// Breadwinning estimates at the 60% threshold
+	log using "$logdir/bw_estimates_hh60.log", replace
+	do "$SIPP2014_code/bw_estimates_hh60.do"
+	log close
+	
+********************************************************************************
+* C. Create a file describing sample and initial "lifetime" estimates of breadwinning.
 ********************************************************************************
 * NOTE: This dynamic document will only work if the other do files were run in
 *		in the same stata session.
@@ -86,7 +99,7 @@
 	dyndoc "$results/bw_analysis_2014.md", saving($output/bw_analysis_SIPP14.html) replace
 
 ********************************************************************************
-* Multistate lifetable analysis
+* D. Multistate lifetable analysis
 ********************************************************************************
 
 // Set up data for lxpct2
