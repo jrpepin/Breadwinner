@@ -192,7 +192,7 @@ forvalues t = 1/9 {
 
 preserve
 
-forvalues t = 1/8 {
+forvalues t = 1/7 {
 	drop if prevbreadwon == 1 
 	display "Estimate of (weighted) proportion transitioning into breadwinning at duration `t' censoring on previous breadwinning"
 	mean hhe60 if time == `t' & !missing(hhe60_minus1_) [fweight=wt1997] 
@@ -231,14 +231,14 @@ tab time everbw [fweight=wt1997], nofreq row
 
 // Initialize cumulative measure
 cap drop notbw60
-gen notbw60dur8 = 1
+gen notbw60dur7 = 1
 
 // discount the proprotion never breadwinning by using the proportion
 // not breadwinning at birth.
 
-replace notbw60dur8=notbw60dur8*(1-peratbirth60[1,1])
+replace notbw60dur7=notbw60dur7*(1-peratbirth60[1,1])
 
-tab notbw60dur8
+tab notbw60dur7
 
 //  Take the proportion not transitioning into breadwinning at time/duration `d'
 // from the matrix stored above and multiply the cumulative proportion 
@@ -246,25 +246,25 @@ tab notbw60dur8
 // into breadwinning at this duration. Go up to duration 8, when first child is 
 // age 8 (child is in 9th year on the planet). 
 
-forvalues d=1/8 {
-  replace notbw60dur8=notbw60dur8*(1-firstbw60_`d'[1,1])
+forvalues d=1/7 {
+  replace notbw60dur7=notbw60dur7*(1-firstbw60_`d'[1,1])
 }
-tab notbw60dur8
+tab notbw60dur7
 
 // Format into nice percents & create macros -----------------------------------
 
 // 60% bw at 1st year of birth
 	global	per_bw60_atbirth=round(100*peratbirth60[1,1], .02)
 	
-// % NEVER BY by time first child reaches age 8 
-	global notbw60dur8	= 	round(100*notbw60dur8, .02)
+// % NEVER BY by time first child is age 7 (in 8th year of life) 
+	global notbw60dur7	= 	round(100*notbw60dur7, .02)
 
-// % BW by time first child reaches age 10
-	global 	bwc60_bydur8= round(100*(1-notbw60dur8), .02) // Take the inverse of the proportion not bw
+// % BW by time first child is age 7 (in 8th year of life)
+	global 	bwc60_bydur7= round(100*(1-notbw60dur7), .02) // Take the inverse of the proportion not bw
 
 di	"$per_bw60_atbirth""%"	// 60% bw at 1st year of birth
-di	"$notbw60dur8""%"      	// % NEVER BW by time first child is age 8
-di	"$bwc60_bydur8""%"  	// % BW by time first child is age 8
+di	"$notbw60dur7""%"      	// % NEVER BW by time first child is age 7 (in 8th year of life)
+di	"$bwc60_bydur7""%"  	// % BW by time first child is age 7 (in 8th year of life)
 
 ********************************************************************************
 * BY EDUCATION: Calculate the proportions not (not!) transitioning into bw.
@@ -315,14 +315,14 @@ forvalues e=1/4 {
 
 // Initialize cumulative measures at percent not breadwinning at birth
 cap drop 	notbw60_*
-gen     	notbw60_lesshs 	= (1-peratbirth60_1[1,1])
+gen     	notbw60_lesshs 		= (1-peratbirth60_1[1,1])
 gen     	notbw60_hs      	= (1-peratbirth60_2[1,1])
 gen     	notbw60_somecol 	= (1-peratbirth60_3[1,1])
-gen     	notbw60_univ   	= (1-peratbirth60_4[1,1])
+gen     	notbw60_univ   		= (1-peratbirth60_4[1,1])
 
 forvalues d=1/7 {
   replace notbw60_lesshs	=notbw60_lesshs		*(1-firstbw601_`d'[1,1])
-  replace notbw60_hs   		=notbw60_hs		*(1-firstbw602_`d'[1,1])
+  replace notbw60_hs   		=notbw60_hs			*(1-firstbw602_`d'[1,1])
   replace notbw60_somecol	=notbw60_somecol	*(1-firstbw603_`d'[1,1])
   replace notbw60_univ		=notbw60_univ		*(1-firstbw604_`d'[1,1])
 }
@@ -341,12 +341,12 @@ di	"$bwc60_bydur7_univ""%"  		// College at time of first birth
 ********************************************************************************
 * Put results in an excel file
 ********************************************************************************
-
 * Initialize excel file
 
-putexcel set "$output/Descriptives60.xlsx", replace
-
+* BW transitions ---------------------------------------------------------------
 // Create Shell
+putexcel set "$output/Descriptives60.xlsx", sheet(transitions) replace
+
 putexcel A1:I1 = "Describe breadwinning at birth and subsequent transitions into breadwinning by duration mother, total and by education", merge border(bottom) 
 putexcel A2 = "NLSY"
 putexcel B2:G2 = "Breadwinning > 60% threshold", merge border(bottom)
@@ -393,18 +393,42 @@ putexcel I5 = matrix(Ns60)
 
 forvalues d=1/8 {
 	local row = `d'+4
-	putexcel K`row' = formula(+1-B`row')
+	putexcel K`row' = formula(+1-B`row'), nformat(number_d2)
 }
 
 // lifetable cumulates the probability never breadwinning by the produc of survival rates across 
 // previous durations. The inital value is simply the survival rate at duration 0 (birth)
-putexcel L5 = formula(+K5)
+putexcel L5 = formula(+K5), nformat(number_d2)
+
 *now calculate survival as product of survival to previous duration times survival at this duration
 forvalues d=1/7 {
 	local row = `d' +5
 	local prow = `d' + 4
-	putexcel L`row' = formula(+L`prow'*K`row')
+	putexcel L`row' = formula(+L`prow'*K`row'), nformat(number_d2)
 }
 
+* Proportion BW ----------------------------------------------------------------
+// Create Shell
+putexcel set "$output/Descriptives60.xlsx", sheet(proportions, replace) modify
+
+putexcel A1:F1 = "Proportion Breadwinning (60% Threshold)"     		, merge border(bottom) 
+putexcel A2:F2 = "by 8th year after Transition into Motherhood"		, merge border(bottom) 
+putexcel B3:F3 = "Education (%)", merge border(bottom) 
+
+putexcel B4 = ("Total")      	, border(bottom)  
+putexcel C4 = ("< HS")       	, border(bottom) 
+putexcel D4 = ("HS")         	, border(bottom) 
+putexcel E4 = ("Some college")	, border(bottom) 
+putexcel F4 = ("College Grad")	, border(bottom)
+
+putexcel A5 = ("NLSY")
+putexcel A6 = ("SIPP")
+putexcel A8 = ("SIPP 18 years")
+
+putexcel B5 = (100*(1-notbw60dur7))  	, nformat(number_d2) // Total
+putexcel C5 = (100*(1-notbw60_lesshs)) 	, nformat(number_d2) // < HS
+putexcel D5 = (100*(1-notbw60_hs))     	, nformat(number_d2) // HS
+putexcel E5 = (100*(1-notbw60_somecol))	, nformat(number_d2) // Some col
+putexcel F5 = (100*(1-notbw60_univ))   	, nformat(number_d2) // College
 
 log close

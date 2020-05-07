@@ -44,9 +44,7 @@
 ********************************************************************************
 // Breadwinning estimates at the 50% threshold
 	 do "04_nlsy97_bw_estimates_hh50.do"
-
-// output results into excel tables to give to Jennifer
-	 
+ 
 // Breadwinning estimates at the 60% threshold
 	 do "05_nlsy97_bw_estimates_hh60.do"
 	  
