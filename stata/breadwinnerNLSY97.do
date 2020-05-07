@@ -56,22 +56,5 @@
 * NOTE: This dynamic document will only work if the other do files were run in
 *		in the same stata session.
 
-// Generate global macros for the current date and time
-	local c_date = c(current_date)
-	local c_time = c(current_time)
-	local c_time_date = "`c_date'"+"_" +"`c_time'" 				// concatenate the two string variables
-	local time_string = subinstr("`c_time_date'", ":", "_", .) 	// clean up our string
-	global time_string = subinstr("`time_string'", " ", "_", .) // clean up our string
-	di "$time_string"
-
-// Delete earlier versions of the html output
-local list : dir . files "$results/bw_analysis_NLSY97_*.html"	
-foreach f of local list {
-    erase "`f'"
-}
-
 // Create the new html document describing sample and aspects of analysis
-dyndoc "bw_analysis_NLSY97.md", saving($results/bw_analysis_NLSY97_$time_string.html) replace
-
-
-
+dyndoc "$results/bw_analysis_NLSY97.md", saving($output/bw_analysis_NLSY97.html) replace

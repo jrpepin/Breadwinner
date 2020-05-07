@@ -344,7 +344,7 @@ di	"$bwc60_bydur7_univ""%"  		// College at time of first birth
 
 * Initialize excel file
 
-putexcel set "$results/Descriptives60.xlsx", replace
+putexcel set "$output/Descriptives60.xlsx", replace
 
 // Create Shell
 putexcel A1:I1 = "Describe breadwinning at birth and subsequent transitions into breadwinning by duration mother, total and by education", merge border(bottom) 

@@ -344,7 +344,7 @@ di	"$bwc50_bydur7_univ""%"  		// College at time of first birth
 
 * Initialize excel file
 
-putexcel set "$results/Descriptives.xlsx", replace
+putexcel set "$output/Descriptives.xlsx", replace
 
 // Create Shell
 putexcel A1:I1 = "Describe breadwinning at birth and subsequent transitions into breadwinning by duration mother, total and by education", merge border(bottom) 
@@ -399,6 +399,7 @@ forvalues d=1/8 {
 // lifetable cumulates the probability never breadwinning by the produc of survival rates across 
 // previous durations. The inital value is simply the survival rate at duration 0 (birth)
 putexcel L5 = formula(+K5)
+
 *now calculate survival as product of survival to previous duration times survival at this duration
 forvalues d=1/7 {
 	local row = `d' +5

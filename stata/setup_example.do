@@ -2,9 +2,18 @@
 * setup_username.do that replaces the directories for project code, log files,
 * etc to the location for these files on your computer
 
-global projcode 		"$homedir\Dropbox\Repositories\NLSY97_Breadwinning"
-global datadir			"$homedir\Dropbox\Repositories\NLSY97_Breadwinning\data"
-global logdir 			"$homedir\logs\breadwinner" 
-global tempdir 			"$homedir\Dropbox\Data\temp"
-global results 			"$projcode\results"
-global NLSYkeep			"$projcode\data"
+* STANDARD PROJECT MACROS-------------------------------------------------------
+global projcode 		"$homedir/repositories/NLSY97_Breadwinning"
+global logdir 			"$homedir/logs/breadwinner" 
+global tempdir 			"$homedir/data/temp"
+
+// Where scripts and markdown documents analyze data goes
+global results 			"$projcode/results"
+
+// Where you want html or putdoc files to go (NOT SHARED)
+*  Make same as SIPP repository to compare
+global output			"$homedir/projects/breadwinner/results" 
+
+* PROJECT SPECIFIC MACROS-------------------------------------------------------
+global datadir			"$projcode/data"
+global NLSYkeep			"$projcode/data"
