@@ -79,30 +79,17 @@
 ********************************************************************************
 * Create a file describing sample and initial "lifetime" estimates of breadwinning.
 ********************************************************************************
+* NOTE: This dynamic document will only work if the other do files were run in
+*		in the same stata session.
 
-    * NOTE: I don't think it is a great idea to put the results in the repository. The markdown file, yes,
-    * but maybe not the results. It becomes hard to tell if I'm replicating or copying.
-	
-	* JP: Where do you want to save the file? Reason not saving in main repository folder is GitHub will
-		* interpret this repository as an html repo instead of Stata.
-		* How do you feel about it if we save the file with the date/time?
-		* Problem with this approach, I don't know how to automatically delete the earlier outputs.
-	
-// generate local macros for the current date and time
-	local c_date = c(current_date)
-	local c_time = c(current_time)
-	local c_time_date = "`c_date'"+"_" +"`c_time'" 				// concatenate the two string variables
-	local time_string = subinstr("`c_time_date'", ":", "_", .) 	// clean up our string
-	local time_string = subinstr("`time_string'", " ", "_", .) 	// clean up our string
-	di "`time_string'"
-	
-	dyndoc "$results/bw_analysis_2014.md", saving($output/bw_analysis_2014.html) replace
+// Create the new html document describing sample and aspects of analysis
+	dyndoc "$results/bw_analysis_2014.md", saving($output/bw_analysis_SIPP14.html) replace
 
 ********************************************************************************
 * Multistate lifetable analysis
 ********************************************************************************
 
-// Set up data for lxpct2 (JP: What is lxpct2?)
+// Set up data for lxpct2
 	log using "$logdir/msltprep.log", replace
 	do "$SIPP2014_code/msltprep.do"
 	log close
