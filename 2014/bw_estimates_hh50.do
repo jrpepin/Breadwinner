@@ -81,9 +81,9 @@ drop if durmom < 0
 forvalues d=1/18 {
 	mean durmom trans_bw50 [aweight=wpfinwgt] if trans_bw50 !=2 & durmom==`d'
 	matrix firstbw50_`d' = e(b)
-	forvalues e=1/4 {
-		mean durmom trans_bw50 [aweight=wpfinwgt] if trans_bw50 !=2 & durmom==`d' & educ==`e'
-		matrix firstbw50`e'_`d' = e(b)
+forvalues e=1/4 {
+	mean durmom trans_bw50 [aweight=wpfinwgt] if trans_bw50 !=2 & durmom==`d' & educ==`e'
+	matrix firstbw50`e'_`d' = e(b)
 	}
 }
 

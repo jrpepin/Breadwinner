@@ -56,7 +56,7 @@ forvalues wave=1/4 {
 // Create a panelmonth variable
 		gen panelmonth=MONTHCODE+(12*(`wave'-1))
 
-		save "$SIPP14keep/wave`wave'_extract", $replace
+		save "$SIPP14keep/wave`wave'_extract", replace
 }
 
 ********************************************************************************
@@ -94,5 +94,5 @@ forvalues wave=1/4 {
 // Create a panelmonth variable
 		gen panelmonth=MONTHCODE+(12*(`wave'-1))
 
-		save "$SIPP14keep/wave`wave'_type2_extract", $replace
+		save "$SIPP14keep/wave`wave'_type2_extract", replace
 }
