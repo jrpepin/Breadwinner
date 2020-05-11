@@ -413,9 +413,9 @@ forvalues d=1/7 {
 // Create Shell
 putexcel set "$output/Descriptives50.xlsx", sheet(proportions, replace) modify
 
-putexcel A1:F1 = "Proportion Breadwinning (50% Threshold)"     		, merge border(bottom) 
-putexcel A2:F2 = "by 8th year after Transition into Motherhood"		, merge border(bottom) 
-putexcel B3:F3 = "Education (%)", merge border(bottom) 
+putexcel A1:F1 = "Proportion Breadwinning (50% Threshold)"  , merge border(bottom) 
+putexcel A2:F2 = "(50% Threshold)"							, merge border(bottom) 
+putexcel B3:F3 = "Education (%)"							, merge border(bottom) 
 
 putexcel B4 = ("Total")      	, border(bottom)  
 putexcel C4 = ("< HS")       	, border(bottom) 
@@ -423,9 +423,7 @@ putexcel D4 = ("HS")         	, border(bottom)
 putexcel E4 = ("Some college")	, border(bottom) 
 putexcel F4 = ("College Grad")	, border(bottom)
 
-putexcel A5 = ("NLSY")
-putexcel A6 = ("SIPP")
-putexcel A8 = ("SIPP 18 years")
+putexcel A5 = ("NLSY (8 yrs)")
 
 putexcel B5 = (100*(1-notbw50dur7))  	, nformat(number_d2) // Total
 putexcel C5 = (100*(1-notbw50_lesshs)) 	, nformat(number_d2) // < HS

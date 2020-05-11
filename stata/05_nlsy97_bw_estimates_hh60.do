@@ -230,8 +230,8 @@ tab time everbw [fweight=wt1997], nofreq row
 * in year 8.
 
 // Initialize cumulative measure
-cap drop notbw60
-gen notbw60dur7 = 1
+cap drop 	notbw60
+gen 		notbw60dur7 = 1
 
 // discount the proprotion never breadwinning by using the proportion
 // not breadwinning at birth.
@@ -251,7 +251,7 @@ forvalues d=1/7 {
 }
 tab notbw60dur7
 
-// Format into nice percents & create macros -----------------------------------
+* Format into nice percents & create macros -----------------------------------
 
 // 60% bw at 1st year of birth
 	global	per_bw60_atbirth=round(100*peratbirth60[1,1], .02)
@@ -344,9 +344,11 @@ di	"$bwc60_bydur7_univ""%"  		// College at time of first birth
 * Initialize excel file
 
 * BW transitions ---------------------------------------------------------------
-// Create Shell
+
+// Initialize excel file
 putexcel set "$output/Descriptives60.xlsx", sheet(transitions) replace
 
+// Create Shell
 putexcel A1:I1 = "Describe breadwinning at birth and subsequent transitions into breadwinning by duration mother, total and by education", merge border(bottom) 
 putexcel A2 = "NLSY"
 putexcel B2:G2 = "Breadwinning > 60% threshold", merge border(bottom)
@@ -411,9 +413,9 @@ forvalues d=1/7 {
 // Create Shell
 putexcel set "$output/Descriptives60.xlsx", sheet(proportions, replace) modify
 
-putexcel A1:F1 = "Proportion Breadwinning (60% Threshold)"     		, merge border(bottom) 
-putexcel A2:F2 = "by 8th year after Transition into Motherhood"		, merge border(bottom) 
-putexcel B3:F3 = "Education (%)", merge border(bottom) 
+putexcel A1:F1 = "Proportion Breadwinning (60% Threshold)"  , merge border(bottom) 
+putexcel A2:F2 = "(60% Threshold)"							, merge border(bottom) 
+putexcel B3:F3 = "Education (%)"							, merge border(bottom) 
 
 putexcel B4 = ("Total")      	, border(bottom)  
 putexcel C4 = ("< HS")       	, border(bottom) 
@@ -421,9 +423,7 @@ putexcel D4 = ("HS")         	, border(bottom)
 putexcel E4 = ("Some college")	, border(bottom) 
 putexcel F4 = ("College Grad")	, border(bottom)
 
-putexcel A5 = ("NLSY")
-putexcel A6 = ("SIPP")
-putexcel A8 = ("SIPP 18 years")
+putexcel A5 = ("NLSY (8 yrs)")
 
 putexcel B5 = (100*(1-notbw60dur7))  	, nformat(number_d2) // Total
 putexcel C5 = (100*(1-notbw60_lesshs)) 	, nformat(number_d2) // < HS
