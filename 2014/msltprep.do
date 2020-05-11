@@ -118,4 +118,4 @@ sum wpfinwgt
 gen weight=wpfinwgt/`r(mean)'
 sum weight
 
-save "$tempdir/msltprep14.dta", $replace
+save "$tempdir/msltprep14.dta", replace

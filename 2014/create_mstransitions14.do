@@ -57,7 +57,7 @@ program define create_mstransitions
 
    rename durmom age
    
-   save "$SIPP14keep/transrates`cutoff'`suffix'.dta", $replace
+   save "$SIPP14keep/transrates`cutoff'`suffix'.dta", replace
 
 end
 

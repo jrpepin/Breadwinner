@@ -27,7 +27,7 @@ forvalues wave = 2/4 {
 }
 
 // allmonths14.dta is a long-form dataset including all the waves from SIPP2014
-save "$SIPP14keep/allmonths14.dta", $replace
+save "$SIPP14keep/allmonths14.dta", replace
 
 ********************************************************************************
 * Merge waves for type 2 (former household residents)
@@ -42,4 +42,4 @@ forvalues wave = 2/4 {
 }
 
 // allmonths14.dta is a long-form dataset including all the waves from SIPP2014
-save "$SIPP14keep/allmonths14_type2.dta", $replace
+save "$SIPP14keep/allmonths14_type2.dta", replace

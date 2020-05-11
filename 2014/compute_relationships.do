@@ -67,7 +67,7 @@ fre RREL
 rename PNUM from_num
 rename RREL_PNUM to_num
 
-save "$tempdir/rel_pairs_bymonth.dta", $replace
+save "$tempdir/rel_pairs_bymonth.dta", replace
 
 ********************************************************************************
 * Reshape data on type 1 individuals,
@@ -81,7 +81,7 @@ use "$SIPP14keep/allmonths14.dta", clear
 // Select only necessary variables
 keep SSUID ERESIDENCEID PNUM panelmonth TAGE ESEX ERACE
 
-save "$tempdir/onehalf.dta", $replace
+save "$tempdir/onehalf.dta", replace
 
 rename PNUM from_num
 rename TAGE from_age
@@ -105,7 +105,7 @@ order  SSUID ERESIDENCEID panelmonth from_num to_num from_age to_age from_sex to
 // Delete record of individual living with herself
 drop if from_num==to_num 
 
-save "$tempdir/allt1pairs.dta", $replace
+save "$tempdir/allt1pairs.dta", replace
 
 ********************************************************************************
 * Identify Type 1 people
@@ -124,7 +124,7 @@ drop 	_merge
 // Create a variable identifying these individuals as Type 1
 gen pairtype =1
 
-save "$tempdir/t1.dta", $replace
+save "$tempdir/t1.dta", replace
 
 ********************************************************************************
 * Reshape Type 2 data
@@ -148,7 +148,7 @@ rename TT2_AGE to_age
 ** delete variables no longer needed
 drop if missing(to_num)
 
-save "$tempdir/type2_pairs.dta", $replace
+save "$tempdir/type2_pairs.dta", replace
 
 ********************************************************************************
 * Add type 2 people's demographic information
@@ -217,4 +217,4 @@ label values relationship arel
 fre relationship
 fre relationship if to_num < 100
 
-save "$tempdir/relationship_pairs_bymonth.dta", $replace
+save "$tempdir/relationship_pairs_bymonth.dta", replace
