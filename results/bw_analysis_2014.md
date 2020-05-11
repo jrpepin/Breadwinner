@@ -235,9 +235,9 @@ Results
 We observe <<dd_di: %4.1f `per_bw50_atbirth'>>% breadwining, or earning more than 50% of the household income in the year of their first birth. 
 This estimate is lower (<<dd_di: %4.1f `per_bw60_atbirth'>> percent) using a 60% threshold.
 
-The percentage never breadwinning by the time their first child reaches age 18 is <<dd_di: %4.1f `notbw50'>>, or <<dd_di: %4.1f `notbw60'>> using the 60% threshold.
+The percentage never breadwinning by the time their first child reaches age 18 is <<dd_di: "$notbw50bydur18""%">>, or <<dd_di: %4.1f `notbw60'>> using the 60% threshold.
 
-The percentage breadwinning by the time their first child reaches age 18 is <<dd_di: %4.1f `bw50_bydur18'>>% or <<dd_di: %4.1f `bw60_bydur18'>>% using the 60% threshold.
+The percentage breadwinning by the time their first child reaches age 18 is <<dd_di: "$bw50bydur18""%">> or <<dd_di: %4.1f `bw60_bydur18'>>% using the 60% threshold.
 
 This is likely an overestimate because many women probably previously breadwon 
 prior to our initial observation and, as we explain in the paper, including 
