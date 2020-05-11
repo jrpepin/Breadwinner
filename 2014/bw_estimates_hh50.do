@@ -96,10 +96,11 @@ gen     	notbw50 = notbw50_atbirth
 
 * the proportion who do not become breadwinners is the proportion not breadwinning at birth times
 * the proportion who do not become breadwinners in the first year times....who do not become breadwinners
-* in year 17.
+* in year 18.
 
-forvalues d=1/17 {
-  replace notbw50=notbw50*firstbw50_`d'[1,2]
+forvalues d=1/18 {
+  gen notbw50_`d'=1-firstbw50_`d'[1,2]
+  replace notbw50=notbw50*notbw50_`d'
   }
 
 * Format into nice percents & create macros -----------------------------------
@@ -115,7 +116,7 @@ global notbw50bydur18		= round(100*(notbw50), .02)
 global bw50bydur18			= round(100*(1-notbw50), .02)
 
 di	"$per_bw50_atbirth""%"	// 50% bw at 1st year of birth
-di	"$notbw50bydur18""%"	// % NEVER BW by time first child is age 18 
+di	"$notbw50bydur18""%"	// % NEVER BW by time first child is age 18
 di	"$bw50bydur18""%"   	// % BW by time first child is age 18
 
 
