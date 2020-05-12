@@ -115,4 +115,4 @@
 // in each state from "birth"
 	log using "$logdir/gen_mslt_results.log", replace
 	do "$results/gen_mslt_results.do"
-	log close	
+	log close

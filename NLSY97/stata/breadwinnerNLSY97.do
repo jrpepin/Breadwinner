@@ -1,7 +1,7 @@
 *-------------------------------------------------------------------------------
 * BREADWINNER PROJECT - NLSY97 Component
 * breadwinnnerNLSY97.do
-* Joanna Pepin
+* Joanna Pepin and Kelly Raley
 *-------------------------------------------------------------------------------
 * The goal of these files is to create estimates of breadwinning in order to
 * better account for repeat breadwinning using the SIPP

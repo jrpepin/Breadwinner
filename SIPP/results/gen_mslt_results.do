@@ -61,15 +61,15 @@ matrix list estimates
 
 /* Current results (weighted)
 
-			Proportion			Years		
+			Proportion      Years		
 							
-			50%		60%		50%		60%				
+    		50% 	60% 	50% 	60%				
 							
-Total		32.7	25.5	5.9		4.6
-White		32.7	24.4	5.9		4.4
-Black		45.9	41.2	8.3		7.4
-Hispanic	27.4	22.2	4.9		4.0
-LTHS		22.2	19.4	4.0		3.5
-HS			28.8	23.7	5.2		4.3
-SCOL		37.0	31.9	6.7		5.7
-Colg		33.6	23.5	6.1		4.2
+Total		32.7	25.5	5.9 	4.6
+White		32.7	24.4	5.9 	4.4
+Black		45.9	41.2	8.3 	7.4
+Hispanic	27.4	22.2	4.9 	4.0
+LTHS		22.2	19.4	4.0 	3.5
+HS  	 	28.8	23.7	5.2 	4.3
+SCOL		37.0	31.9	6.7 	5.7
+Colg		33.6	23.5	6.1 	4.2
