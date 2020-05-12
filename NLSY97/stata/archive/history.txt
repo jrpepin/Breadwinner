@@ -1,4 +1,0 @@
-files nlsy97_hhX0_pred.do and nlsy97_hhX0_stata_pred.do are older versions of nlsy97_bw_estimates_hhX0.do
-They are in this archive so that they don't get completely deleted from the repository, 
-but it would have been better (maybe?) if we had used git mv to rename the file to
-keep the relationships among files clearer in there repository (without this note)
