@@ -13,7 +13,7 @@
 * Second, run the setup_breadwinner_environment script to set the project filepaths and macros.
 
 // The current directory is assumed to be the base project directory.
-*	cd "C:\Users\Joanna\Dropbox\Repositories\SIPP_Breadwinner" // change to the directory before running
+*	cd "C:/Users/Joanna/Dropbox/Repositories/Breadwinning/SIPP" // change to the directory before running
 *       breadwinner14.do
 
 // Run the setup script
@@ -26,7 +26,6 @@
 * https://www.census.gov/programs-surveys/sipp/data/datasets.html
 
 	*?*?* How did the Stata data files get compressed *?*?*
-	** JP: I cheated a copied the compressed files from the PRC stats server onto my personal computer.
 
 // Extract the variables for this project
     log using "$logdir/extract_and_format.log",	replace 
