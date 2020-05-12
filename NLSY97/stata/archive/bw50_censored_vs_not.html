@@ -1,0 +1,154 @@
+<pre><code></code></pre>
+<h2><a href="#nlsy-analysis" id="nlsy-analysis">NLSY analysis</a></h2>
+<p>The purpose of the NLSY analysis is to identify the degree to which repeat breadwinning leads to an over-estimate of lifetime breadwinning in the SIPP.</p>
+<p>To start, we produce an initial table describing transition rates at all durations using NLSY data. The first table shows by year since first birth the risk of becoming a breadwinning mother among women who were not breadwinning mothers in the previous year. The second table shows the percentage of mothers ever previously breadwinning by number of years since becoming a breadwinner. At year 0 it is impossible to have been a breadwinning mother previously. At duration 1 it is impossible to experience a repeat transition into breadwinning. After that, the proportion who have previously breadwon grows (a lot).</p>
+<p>The third table shows risk of becoming a breadwinning mother among women who had never previously been a breadwinning mother.</p>
+<pre><code>. 
+. tab time hhe50 [fweight=wt1997], matcell(bw50wnc) nofreq row
+
+           |         hhe50
+      time |         0          1 |     Total
+-----------+----------------------+----------
+         1 |     87.04      12.96 |    100.00 
+         2 |     88.74      11.26 |    100.00 
+         3 |     88.65      11.35 |    100.00 
+         4 |     87.15      12.85 |    100.00 
+         5 |     87.74      12.26 |    100.00 
+         6 |     89.63      10.37 |    100.00 
+         7 |     90.92       9.08 |    100.00 
+         8 |     91.65       8.35 |    100.00 
+-----------+----------------------+----------
+     Total |     88.50      11.50 |    100.00 
+
+. 
+. tab time everbw [fweight=wt1997], matcell(pbw) nofreq row
+
+           |        everbw
+      time |         0          1 |     Total
+-----------+----------------------+----------
+         1 |    100.00       0.00 |    100.00 
+         2 |     93.05       6.95 |    100.00 
+         3 |     86.28      13.72 |    100.00 
+         4 |     79.97      20.03 |    100.00 
+         5 |     76.02      23.98 |    100.00 
+         6 |     70.11      29.89 |    100.00 
+         7 |     66.74      33.26 |    100.00 
+         8 |     61.27      38.73 |    100.00 
+         9 |     59.88      40.12 |    100.00 
+-----------+----------------------+----------
+     Total |     79.58      20.42 |    100.00 
+
+. 
+. drop if everbw == 1 
+(1,877 observations deleted)
+
+. 
+. tab time hhe50 [fweight=wt1997], matcell(bw50wc) nofreq row
+
+           |         hhe50
+      time |         0          1 |     Total
+-----------+----------------------+----------
+         1 |     87.04      12.96 |    100.00 
+         2 |     89.84      10.16 |    100.00 
+         3 |     90.99       9.01 |    100.00 
+         4 |     89.47      10.53 |    100.00 
+         5 |     91.25       8.75 |    100.00 
+         6 |     92.97       7.03 |    100.00 
+         7 |     93.05       6.95 |    100.00 
+         8 |     94.28       5.72 |    100.00 
+-----------+----------------------+----------
+     Total |     90.10       9.90 |    100.00 
+
+. 
+</code></pre>
+<p>We can see that the proportion becoming a breadwinning mother is smaller in the second table than in the first. This suggests that repeat breadwinning does lead to an overestimate of lifetime breadwinning unless one censors on previous breadwinning.</p>
+<p>The next question is, how should we use the information in the comparison above to adjust the SIPP estimates? One approach might be to just take the average ratio of the censored and censored transition rates and apply that discount to the SIPP. That&rsquo;s OK, but the pattern of results suggest that the difference in the censored and uncensored estimates might grow over time. It might be that it just grows from duration 2 to 5 and is basically stable after that. That last observation in the NLSY 97 could be because a relately small number of women are observed 9 years after first childbirth (n= 638. The denominator gets substantially smaller (n= 368 when we censor on prior breadwinning. That is, the censored analysis, we see  133 mothers transition into breadwinning at duration 9. Although that&rsquo;s a small number, it&rsquo;s not crazy small. Do we think the dramatic decline in the risk of becoming a first time breadwinner at duration 9 is real?</p>
+<p>As an aside, you might be worred that the NLSY sample is selected for women who have children at younger ages and that this becomes more true as duration since becoming a mother increases. That is true, but it doesn&rsquo;t seem to distort the measurement of breadwinning much. I ran an estimate of the proportion lifetime breadwinning on SIPP data weighted to have the same ageatfirstbirth by duration distribution as the NLSY and it changed the SIPP estimate at the third decimal place. (See SIPP14agedist.do in the SIPP repository)</p>
+<pre><code></code></pre>
+<h2><a href="#nlsy-results" id="nlsy-results">NLSY Results</a></h2>
+<p>These results are out of date as the code above was written for an earlier version of the analysis file.</p>
+<p>In the NLSY 1997, we observe 13.0% breadwining, or earning more than 50% of the household income in the year of their first birth.</p>
+<p>The percentage never breadwinning by the time their first child reaches age 10 is    ..</p>
+<p>The percentage breadwinning by the time their first child reaches age 10 is    .%.</p>
+<p>This is an overestimate because many women probably previously breadwon at earlier duration and this upwardly biases the estimate of risk of transitioning into breadwinning at later durations. We can address this by limiting the estimate of transitions to later waves among women not observed breadwinning in earlier waves. Doing so does not alter the estimate of the percent breadwinning at birth, but the estimate of percentage never breadwinning by the time their first child reaches age 10 is    ..</p>
+<h2><a href="#extrapolating-to-sipp" id="extrapolating-to-sipp">Extrapolating to SIPP</a></h2>
+<p>Looking at the relationship of the censored and not censored estimates of transitions into breadwinning to discover a pattern that might be extrapolated beyond age 10</p>
+<p>We can think of the uncensored rate R as a function of the first time rate r, the rate among repeater breadwinners (rr), and the proportion who have previously breadwon (ppbw).</p>
+<p>R = ppbw*rr + (1-ppbw)*r. What we want is the pattern of relationship between r and rr as if varies by duration. Ideally we&rsquo;d get a constant deflation rate that we could apply across all durations. The results above don&rsquo;t provide strong support for a constant deflation rate. A conservative approach would be to increase the deflation rate a small amount at each duration, but how much?</p>
+<p>Note that the difference in the transition rates censored and uncensord is both a function of the bias (i.e. dfference in transition rates for never breadwinners and previous breadwinners) and of the proportion of the estimate based on the population producing the bias (previous breadwinners).</p>
+<pre><code></code></pre>
+<p>What we are looking for is the relationship between nbbwc50_rate and rr by duration. Is it a consistent relationship or do they become more different over time?</p>
+<pre><code>. // next solve for the rate of transition for previous breadwinners 
+. 
+. forvalues d=1/10{
+  2.         gen rr`d'=1-((1-nbbwnc50_rate`d') - (ppbw`d')*(1-nbbwc50_rate`d'))/
+&gt; (1-ppbw`d')
+  3.         sum nbbwnc50_rate`d' nbbwc50_rate`d' rr`d'
+  4. }
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+nbbwnc50_r~1 |      6,919    .8703837           0   .8703837   .8703837
+nbbwc50_ra~1 |      6,919    .8703837           0   .8703837   .8703837
+         rr1 |      6,919    .8703837           0   .8703837   .8703837
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+nbbwnc50_r~2 |      6,919    .8874129           0   .8874129   .8874129
+nbbwc50_ra~2 |      6,919    .8983728           0   .8983728   .8983728
+         rr2 |      6,919    .8865948           0   .8865948   .8865948
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+nbbwnc50_r~3 |      6,919    .8865367           0   .8865367   .8865367
+nbbwc50_ra~3 |      6,919    .9099256           0   .9099256   .9099256
+         rr3 |      6,919    .8828187           0   .8828187   .8828187
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+nbbwnc50_r~4 |      6,919    .8715389           0   .8715389   .8715389
+nbbwc50_ra~4 |      6,919     .894688           0    .894688    .894688
+         rr4 |      6,919    .8657414           0   .8657414   .8657414
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+nbbwnc50_r~5 |      6,919    .8774135           0   .8774135   .8774135
+nbbwc50_ra~5 |      6,919    .9125171           0   .9125171   .9125171
+         rr5 |      6,919    .8663399           0   .8663399   .8663399
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+nbbwnc50_r~6 |      6,919    .8963181           0   .8963181   .8963181
+nbbwc50_ra~6 |      6,919    .9297152           0   .9297152   .9297152
+         rr6 |      6,919    .8820788           0   .8820788   .8820788
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+nbbwnc50_r~7 |      6,919    .9091543           0   .9091543   .9091543
+nbbwc50_ra~7 |      6,919    .9305101           0   .9305101   .9305101
+         rr7 |      6,919    .8985102           0   .8985102   .8985102
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+nbbwnc50_r~8 |      6,919    .9164575           0   .9164575   .9164575
+nbbwc50_ra~8 |      6,919    .9428003           0   .9428003   .9428003
+         rr8 |      6,919    .8998023           0   .8998023   .8998023
+(6,919 missing values generated)
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+nbbwnc50_r~9 |          0
+nbbwc50_ra~9 |          0
+         rr9 |          0
+(6,919 missing values generated)
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+nbbwnc50_~10 |          0
+nbbwc50_r~10 |          0
+        rr10 |          0
+
+. 
+</code></pre>
+<p>In the first two durations all the rates are the same, by definition. (One can&rsquo;t have previously breadwon at birth). At duration 3 the rate of becoming a breadwinner for those who previously breadwon (1-rr) is larger than the rate for those who have not previously breadwon (1-nbbwc50_rate). I might see some increase in the difference over time.</p>
+<p>How much of a discount factor should we apply to account for repeat breadwinning? Should the discount vary by duration?</p>
