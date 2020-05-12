@@ -3,7 +3,7 @@
 * etc to the location for these files on your computer
 
 * STANDARD PROJECT MACROS-------------------------------------------------------
-global projcode 		"$homedir/github/breadwinner"
+global projcode 		"$homedir/github/breadwinning/SIPP"
 global logdir 			"$homedir/logs/breadwinner"
 global tempdir 			"$projcode/data/tmp"
 
@@ -19,12 +19,3 @@ global output 			"$homedir/projects/breadwinner/results"
 global SIPP2014 		"/data/sipp/2014"
 global sipp2014_code 	"$projcode/2014"
 global SIPP14keep 		"$homedir/projects/breadwinner/data/keep"
-
-// SIPP 2008
-global SIPP2008 		"/data/sipp/2008_Core"
-global SIPP2008TM 		"/data/sipp/2008_TM/StataData"
-global sipp2008_code 	"$projcode/2008"
-global SIPP08keep 		"$homedir/projects/breadwinner/data/keep"
-
-// NLSY
-global NLSYkeep			"T:/GitHub/NLSY_Breadwinning/data"

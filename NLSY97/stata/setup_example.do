@@ -12,7 +12,7 @@ global results 			"$projcode/results"
 
 // Where you want html or putdoc files to go (NOT SHARED)
 *  Make same as SIPP repository to compare
-global output			"$homedir/projects/breadwinner/results" 
+global output 			"$homedir/projects/breadwinner/results"
 
 * PROJECT SPECIFIC MACROS-------------------------------------------------------
 global datadir			"$projcode/data"
