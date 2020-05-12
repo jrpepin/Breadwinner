@@ -1,0 +1,15 @@
+setup_kraley.do
+setup_joanna.do
+DemographySupplement/
+output/
+
+*.dta
+*.dat
+*.gz
+*.html
+
+renv/library
+.Rhistory
+.Rproj.user
+.Rprofile
+.Rproj
