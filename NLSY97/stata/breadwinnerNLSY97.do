@@ -1,7 +1,7 @@
 *-------------------------------------------------------------------------------
 * BREADWINNER PROJECT - NLSY97 Component
 * breadwinnnerNLSY97.do
-* Joanna Pepin and Kelly Raley
+* Joanna Pepin
 *-------------------------------------------------------------------------------
 * The goal of these files is to create estimates of breadwinning in order to
 * better account for repeat breadwinning using the SIPP
@@ -18,8 +18,8 @@
 
 //------------------------------------------------------------------------------
 
-* The current directory is assumed to be the stata directory within the repository.
-* cd "C:\Users\Joanna\Dropbox\Repositories\NLSY97_Breadwinning\stata" 
+* The current directory is assumed to be the stata directory within the NLSY sub-directory.
+* cd ".../Breadwinning/NLSY97/stata" 
 
 // Run the setup script
 	do "00_nlsy97_setup_breadwinner_environment"
