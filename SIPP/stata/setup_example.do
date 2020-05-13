@@ -3,7 +3,7 @@
 * etc to the location for these files on your computer
 
 * STANDARD PROJECT MACROS-------------------------------------------------------
-global projcode 		"$homedir/github/breadwinning/SIPP"
+global projcode 		"$homedir/github/Breadwinner/SIPP"
 global logdir 			"$homedir/logs/breadwinner"
 global tempdir 			"$projcode/data/tmp"
 
@@ -17,5 +17,5 @@ global output 			"$homedir/projects/breadwinner/results"
 * PROJECT SPECIFIC MACROS-------------------------------------------------------
 // SIPP 2014
 global SIPP2014 		"/data/sipp/2014"
-global sipp2014_code 	"$projcode/stata"
+global SIPP2014_code 		"$projcode/stata"
 global SIPP14keep 		"$homedir/projects/breadwinner/SIPP/data/keep"

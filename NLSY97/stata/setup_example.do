@@ -3,7 +3,7 @@
 * etc to the location for these files on your computer
 
 * STANDARD PROJECT MACROS-------------------------------------------------------
-global projcode 		"$homedir/repositories/NLSY97_Breadwinning"
+global projcode 		"$homedir/github/Breadwinner/NLSY97"
 global logdir 			"$homedir/logs/breadwinner" 
 global tempdir 			"$homedir/data/temp"
 
