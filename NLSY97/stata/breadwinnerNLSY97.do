@@ -19,7 +19,7 @@
 //------------------------------------------------------------------------------
 
 * The current directory is assumed to be the stata directory within the NLSY sub-directory.
-* cd ".../Breadwinning/NLSY97/stata" 
+* cd ".../Breadwinner/NLSY97/stata" 
 
 // Run the setup script
 	do "00_nlsy97_setup_breadwinner_environment"

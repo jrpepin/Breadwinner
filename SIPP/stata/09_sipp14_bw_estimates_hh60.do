@@ -21,7 +21,7 @@ set more off
 use "$SIPP14keep/bw_transitions.dta", clear
 
 // drop wave 1 because we only know status, not transitions into breadwinning
-drop if wave==1 // shouldn't actually drop anyone because bw_transitions drops wave 1
+drop if wave==1
 
 ********************************************************************************
 * Describe percent breadwinning in the first birth year
@@ -92,8 +92,8 @@ forvalues e=1/4 {
 * of entry at each duration of breadwinning)
 
 // initialize cumulative measure at birth
-gen     	notbw60 = notbw60_atbirth
-gen			notbw60d8 = notbw60
+gen     	notbw60 			= notbw60_atbirth
+gen			notbw60d8 			= notbw60_atbirth
 
 cap drop 	notbw60_*
 gen     	notbw60_lesshs 		= (1-prop_bw60_atbirth1)
@@ -158,7 +158,7 @@ forvalues d=1/7 {
   replace 	notbw60d8_univ			=notbw60d8_univ*notbw60d8_univ_`d'  
   }
  
-* Format into nice percents & create macros -----------------------------------
+* Format into nice percents & create macros ------------------------------------
 
 // 60% BW at 1st year of birth
 global per_bw60_atbirth				= round(per_bw60_atbirth		, .02)
@@ -227,6 +227,15 @@ global bw60bydurd8_univ		    	= round(100*(1-notbw60d8_univ)		, .02)
 	di	"$bw60bydurd8_somecol""%"   // % BW by time first child is age 8
 	di	"$bw60bydurd8_univ""%"   	// % BW by time first child is age 8
 
+// Create macros of censored bw by duration
+forvalues d=1/17 {
+	global SIPP60_t`d' = firstbw60_`d'[1,2]
+}
+
+	di %9.2f $SIPP60_t5
+	di %9.2f $SIPP60_t6
+	di %9.2f $SIPP60_t7
+	
 ********************************************************************************
 * Put results in an excel file
 ********************************************************************************

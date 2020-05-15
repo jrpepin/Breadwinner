@@ -21,7 +21,7 @@ set more off
 use "$SIPP14keep/bw_transitions.dta", clear
 
 // drop wave 1 because we only know status, not transitions into breadwinning
-drop if wave==1 // shouldn't actually drop anyone because bw_transitions drops wave 1
+drop if wave==1
 
 ********************************************************************************
 * Describe percent breadwinning in the first birth year
@@ -74,9 +74,9 @@ replace durmom=durmom-1
 
 drop if durmom < 0
 
-*******************************************************************************
+********************************************************************************
 * Estimating duration-specific transition rates overall and by education
-*******************************************************************************
+********************************************************************************
 
 forvalues d=1/17 {
 	mean durmom trans_bw50 [aweight=wpfinwgt] if trans_bw50 !=2 & durmom==`d'
@@ -92,8 +92,8 @@ forvalues e=1/4 {
 * of entry at each duration of breadwinning)
 
 // initialize cumulative measure at birth
-gen     	notbw50 = notbw50_atbirth
-gen			notbw50d8 = notbw50
+gen     	notbw50 			= notbw50_atbirth
+gen			notbw50d8 			= notbw50_atbirth
 
 cap drop 	notbw50_*
 gen     	notbw50_lesshs 		= (1-prop_bw50_atbirth1)
@@ -158,7 +158,7 @@ forvalues d=1/7 {
   replace 	notbw50d8_univ			=notbw50d8_univ*notbw50d8_univ_`d'  
   }
  
-* Format into nice percents & create macros -----------------------------------
+* Format into nice percents & create macros ------------------------------------
 
 // 50% BW at 1st year of birth
 global per_bw50_atbirth				= round(per_bw50_atbirth		, .02)
@@ -227,6 +227,15 @@ global bw50bydurd8_univ		    	= round(100*(1-notbw50d8_univ)		, .02)
 	di	"$bw50bydurd8_somecol""%"   // % BW by time first child is age 8
 	di	"$bw50bydurd8_univ""%"   	// % BW by time first child is age 8
 
+// Create SIPP macros of censored bw by duration
+forvalues d=1/17 {
+	global SIPP50_t`d' = firstbw50_`d'[1,2]
+}
+
+	di %9.2f $SIPP50_t5
+	di %9.2f $SIPP50_t6
+	di %9.2f $SIPP50_t7
+	
 ********************************************************************************
 * Put results in an excel file
 ********************************************************************************
@@ -286,7 +295,7 @@ forvalues d=1/18 {
 	putexcel K`row' = formula(+1-B`row'), nformat(number_d2)
 }
 
-// lifetable cumulates the probability never breadwinning by the produc of survival rates across 
+// lifetable cumulates the probability never breadwinning by the product of survival rates across 
 // previous durations. The inital value is simply the survival rate at duration 0 (birth)
 putexcel L17 = formula(+K17), nformat(number_d2)
 

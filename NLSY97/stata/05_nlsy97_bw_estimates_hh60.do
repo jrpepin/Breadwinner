@@ -230,7 +230,7 @@ tab time everbw [fweight=wt1997], nofreq row
 * in year 8.
 
 // Initialize cumulative measure
-cap drop 	notbw60
+cap drop 	notbw60dur7
 gen 		notbw60dur7 = 1
 
 // discount the proprotion never breadwinning by using the proportion
@@ -246,10 +246,11 @@ tab notbw60dur7
 // into breadwinning at this duration. Go up to duration 8, when first child is 
 // age 8 (child is in 9th year on the planet). 
 
-forvalues d=1/7 {
-  replace notbw60dur7=notbw60dur7*(1-firstbw60_`d'[1,1])
+ forvalues d=1/7 {
+ replace notbw60dur7=notbw60dur7*(1-firstbw60_`d'[1,1])
 }
-tab notbw60dur7
+
+tab notbw60dur7                            
 
 * Format into nice percents & create macros -----------------------------------
 
@@ -265,6 +266,15 @@ tab notbw60dur7
 di	"$per_bw60_atbirth""%"	// 60% bw at 1st year of birth
 di	"$notbw60dur7""%"      	// % NEVER BW by time first child is age 7 (in 8th year of life)
 di	"$bwc60_bydur7""%"  	// % BW by time first child is age 7 (in 8th year of life)
+
+// Create macros of censored bw by duration
+forvalues d=1/7  {
+       global NLSY60_t`d' = firstbw60_`d'[1,1]
+}
+
+	di %9.2f $NLSY60_t5
+	di %9.2f $NLSY60_t6
+	di %9.2f $NLSY60_t7
 
 ********************************************************************************
 * BY EDUCATION: Calculate the proportions not (not!) transitioning into bw.

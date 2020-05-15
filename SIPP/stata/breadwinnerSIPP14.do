@@ -18,7 +18,7 @@
 //------------------------------------------------------------------------------
 
 * The current directory is assumed to be the stata directory within the NLSY sub-directory.
-* cd ".../Breadwinning/SIPP/stata" 
+* cd ".../Breadwinner/SIPP/stata" 
 
 // Run the setup script
 	do "00_sipp14_setup_breadwinner_environment"
@@ -92,6 +92,16 @@
 	do "$SIPP2014_code/09_sipp14_bw_estimates_hh60.do"
 	log close
 	
+// ADJUSTED Breadwinning estimates at the 50% threshold
+	log using "$logdir/repeatBW_hh50.log", replace
+	do "$SIPP2014_code/10_sipp14_repeatBW_hh50.do"
+	log close
+
+// ADJUSTED Breadwinning estimates at the 60% threshold
+	log using "$logdir/repeatBW_hh60.log", replace
+	do "$SIPP2014_code/11_sipp14_repeatBW_hh60.do"
+	log close
+	
 ********************************************************************************
 * C. Create a file describing sample and initial "lifetime" estimates of breadwinning.
 ********************************************************************************
@@ -107,12 +117,12 @@
 
 // Set up data for lxpct2
 	log using "$logdir/msltprep.log", replace
-	do "$SIPP2014_code/10_sipp14_msltprep.do"
+	do "$SIPP2014_code/12_sipp14_msltprep.do"
 	log close
 
 // Create small data files with transition rates pXX 
 	log using "$logdir/create_mstransitions14.log", replace
-	do "$SIPP2014_code/11_sipp14_create_mstransitions14.do"
+	do "$SIPP2014_code/13_sipp14_create_mstransitions14.do"
 	log close
 
 // Generate a matrix with estimates of expected number of years
