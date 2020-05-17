@@ -8,6 +8,8 @@
 *
 * NLSY analysis
 *
+set maxvar 5500
+
 cd NLSY97/stata
 do breadwinnerNLSY97
 
