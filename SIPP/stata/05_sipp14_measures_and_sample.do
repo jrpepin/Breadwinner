@@ -17,7 +17,7 @@ di "$S_DATE"
 * Read in each original, compressed, data set and extract the key variables
 ********************************************************************************
 clear
-set maxvar 5300
+
 
    forvalues w=1/4{
       use "$SIPP2014/pu2014w`w'_compressed.dta"
