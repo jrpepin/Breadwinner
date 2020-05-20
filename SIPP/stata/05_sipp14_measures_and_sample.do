@@ -17,7 +17,7 @@ di "$S_DATE"
 * Read in each original, compressed, data set and extract the key variables
 ********************************************************************************
 clear
-
+* set maxvar 5500 //set the maxvar if not starting from a master project file.
 
    forvalues w=1/4{
       use "$SIPP2014/pu2014w`w'_compressed.dta"
@@ -190,7 +190,7 @@ label values educ ed
 	global minus_afterref = afterref
 	di "$minus_afterref"
 	
-// Keep only if first birth occurred less than 19 years prior to reference period
+// Keep only if first birth occurred fewer than 19 years prior to reference period
  	tab 	durmom , m
 	unique 	idnum 	if durmom > 19	
 	drop 			if durmom > 19	// Drop "old" mothers
@@ -271,11 +271,15 @@ drop if _merge==2
 *Create macro just to get the n for later purposes (see msltprep.do).
 *	keep 			if minorbiochildren >= 1	// Keep only moms with kids in household
 	
-	// Creates a macro with the total number of mothers in the dataset.
-	egen	hhmoms 		= nvals(idnum) if minorbiochildren >= 1
-	global 	hhmoms_n 	= hhmoms
-	di "$hhmoms_n"
-	
-	drop idnum hhmoms
 
+// Creates a macro with the total number of mothers in the dataset.
+preserve
+	keep			if minorbiochildren >=1
+	cap drop 	hhmom
+	egen		hhmom	= nvals(idnum)
+	global 		hhmom_n = hhmom
+	di "$hhmom_n"
+	drop idnum hhmom
+restore
+	
 save "$SIPP14keep/sipp14tpearn_all", replace

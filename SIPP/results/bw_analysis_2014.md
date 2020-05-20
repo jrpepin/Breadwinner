@@ -84,8 +84,8 @@ We use the following variables for this analysis.
 
 Sample
 --------------------------------------------------------------------------------
-We restricted the sample to <<dd_di: %6.0fc "$minus_oldmoms">> women who first became mothers less than 19 years prior 
-to each interview.  
+We restricted the sample to <<dd_di: %6.0fc "$obvsprev_n" >> women who first became mothers less than 19 years prior 
+to each interview (and who had earnings data in the current and previous waves).  
 We use the birth history measures (year of each birth) to identify the sample eligble to be included in our analysis.
 
 ## Sample Construction
@@ -98,13 +98,14 @@ We use the birth history measures (year of each birth) to identify the sample el
 ~~~~
 
 |__Restiction__  						| __Cases left__ |
-|:--------------------------------------|:-------------------------------------- |
-|Raw sample								| <<dd_di: %10.0fc "$allindividuals" >> |
-|Women									| <<dd_di: %10.0fc "$women_n" >> |
-|Mothers								| <<dd_di: %10.0fc "$mothers_n" >> |
-|No earnings data during reference year	| <<dd_di: %10.0fc "$minus_afterref" >> |
-|Motherhood < 19 yrs from interview year| <<dd_di: %10.0fc "$minus_oldmoms" >> |
-* JP -- still need to update this with all of the sample restrictions.
+|:--------------------------------------|:--------------------------------------------|
+|Raw sample								     | <<dd_di: %10.0fc "$allindividuals" >>  |
+|Women									     | <<dd_di: %10.0fc "$women_n" >>         |
+|Mothers								     | <<dd_di: %10.0fc "$mothers_n" >>       |
+|No earnings data during reference year	     | <<dd_di: %10.0fc "$minus_afterref" >>  |
+|Motherhood < 19 yrs from interview year     | <<dd_di: %10.0fc "$minus_oldmoms" >>   |
+|Observations with data in the current waves | <<dd_di: %10.0fc "$obvsnow_n" >>       |
+|Observations with data in the previous waves | <<dd_di: %10.0fc "$obvsprev_n" >>     |
 
 Measures
 --------------------------------------------------------------------------------
