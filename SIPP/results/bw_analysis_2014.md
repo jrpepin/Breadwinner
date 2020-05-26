@@ -89,13 +89,6 @@ to each interview (and who had earnings data in the current and previous waves).
 We use the birth history measures (year of each birth) to identify the sample eligble to be included in our analysis.
 
 ## Sample Construction
-~~~~
-<<dd_do: quietly>>
-* The following macros were created in the extract_earnings script:
-	** $allindividuals $women_n $mothers_n $minus_newmoms $minus_oldmoms
-* The $mothers_cores_minor macro was created in the annualize script
-<</dd_do>>
-~~~~
 
 |__Restiction__  						| __Cases left__ |
 |:--------------------------------------|:--------------------------------------------|
@@ -115,176 +108,32 @@ then aggregating earnings across all months in each year to get an annual measur
 To create indicators of breadwinning we compare each mothers' annual earnings to the annual household earnings 
 measures. We consider mothers who earn more than 50% (or 60%) of the household earnings breadwinners.
 
-~~~~
-<<dd_do: quietly>>
-use "$SIPP14keep/bw_transitions.dta", clear
-
-// drop wave 1 because we only know status, not transitions into breadwinning
-drop if wave==1 // shouldn't actually drop anyone because bw_transitions drops wave 1
-
-********************************************************************************
-* Describe percent breadwinning in the first birth year
-********************************************************************************
-* durmom == 0 is when mother had first birth in reference year
-// The percent breadwinning (50% threhold) in the first year. (~25%)
-	sum bw50 if durmom	==0 [aweight=wpfinwgt] // Breadwinning in the year of the birth
-
-	gen per_bw50_atbirth	=100*`r(mean)'
-	gen notbw50_atbirth		=1-`r(mean)'
-	
-	// by education
-	forvalues e=1/4 {
-		sum bw50 if durmom	==0 & educ==`e' [aweight=wpfinwgt] 
-		gen prop_bw50_atbirth`e'=`r(mean)'
-	}
-		
-
-// The percent breadwinning (60% threhold) in the first year. (~17%)
-	sum bw60 if durmom	==0 [aweight=wpfinwgt] // Breadwinning in the year of the birth
-
-	gen per_bw60_atbirth	=100*`r(mean)'
-	gen notbw60_atbirth		=1-`r(mean)'
-	
-// capture sample size
-tab durmom if inlist(trans_bw50,0,1), matcell(Ns50)
-	
-********************************************************************************
-* adjusting file to prepare for lifetable estimation
-********************************************************************************
-
-// need to adjust durmom. Currently the transition variables describe transition
-// into breadwinning between the previous year and this one. For example:
-// 
-//  durmom   trans_bw
-//    4         0             
-//    5         0          <- this case transitions to breadwinning between year
-//    6         1              5 and year 6
-//
-// Lifetables usually would describe the risk of transition between this year and the next.
-// For example
-//  durmom   trans_bw
-//    4         0             
-//    5         1          <- this case transitions to breadwinning between year
-//    6         2              5 and year 6
-//
-// to make the file as expected subtract 1 from durmom
-
-
-replace durmom=durmom-1
-
-* dropping first birth year observation, but it's ok because we have saved the percent
-* breadwinning at birth year above
-
-drop if durmom < 0
-
-*******************************************************************************
-* Estimating duration-specific transition rates overall and by education
-*******************************************************************************
-
-forvalues d=1/18 {
-	mean durmom trans_bw50 [aweight=wpfinwgt] if trans_bw50 !=2 & durmom==`d'
-	matrix firstbw50_`d' = e(b)
-	mean durmom trans_bw60 [aweight=wpfinwgt] if trans_bw60 !=2 & durmom==`d'
-	matrix firstbw60_`d' = e(b)
-	forvalues e=1/4 {
-		mean durmom trans_bw50 [aweight=wpfinwgt] if trans_bw50 !=2 & durmom==`d' & educ==`e'
-		matrix firstbw50`e'_`d' = e(b)
-		mean durmom trans_bw60 [aweight=wpfinwgt] if trans_bw60 !=2 & durmom==`d' & educ==`e'
-		matrix firstbw60`e'_`d' = e(b)
-	}
-	
-}
-
-
-
-// Now, calculating the proportions not (not!) transitioning into breadwining by hand.
-
-
-// calculating a cumulative risk of breadwinning by age 18 by multiplying rates
-* of entry at each duration of breadwinning
-
-* initializing cumulative measure at birth
-gen notbw50 = notbw50_atbirth
-gen notbw60 = notbw60_atbirth
-
-* the proportion who do not become breadwinners is the proportion not breadwinning at birth times
-* the proportion who do not become breadwinners in the first year times....who do not become breadwinners
-* in year 17.
-forvalues d=1/17 {
-  replace notbw50=notbw50*firstbw50_`d'[1,2]
-  replace notbw60=notbw60*firstbw50_`d'[1,2]
-}
-
-* make into nice percents
-local notbw50 = 100*notbw50
-local notbw60 = 100*notbw60
-
-local per_bw50_atbirth=per_bw50_atbirth
-local per_bw60_atbirth=per_bw60_atbirth
-
-* Take the inverse of the proportion not breadwinning to get the proportion breadwinning.
-* Multiply by 100 to get a percent.
-local bw50_bydur18=100*(1-notbw50)
-local bw60_bydur18=100*(1-notbw60)
-
-<</dd_do>>
-~~~~
-
 Results
 --------------------------------------------------------------------------------
 
-We observe <<dd_di: %4.1f `per_bw50_atbirth'>>% breadwining, or earning more than 50% of the household income in the year of their first birth. 
-This estimate is lower (<<dd_di: %4.1f `per_bw60_atbirth'>> percent) using a 60% threshold.
+We observe <<dd_di: %4.1f $per_bw50_atbirth>>% breadwining, or earning more than 
+50% of the household income in the year of their first birth. This estimate is 
+lower (<<dd_di: %4.1f $per_bw60_atbirth>> percent) using a 60% threshold.
 
-The percentage never breadwinning by the time their first child reaches age 18 is <<dd_di: "$notbw50bydur18""%">>, or <<dd_di: %4.1f `notbw60'>> using the 60% threshold.
-
-The percentage breadwinning by the time their first child reaches age 18 is <<dd_di: "$bw50bydur18""%">> or <<dd_di: %4.1f `bw60_bydur18'>>% using the 60% threshold.
+Ignoring the possibility of breadwinning prior to first observation, we find that 
+the percentage never breadwinning by the time their first child reaches age 18 is 
+<<dd_di: %4.1f "$notbw50bydur18""%">>, or <<dd_di: %4.1f "$notbw60bydur18""%">> 
+using the 60% threshold. Or, put differently, the percentage breadwinning by the 
+time their first child reaches age 18 is <<dd_di: %4.1f "$bw50bydur18""%">> or 
+<<dd_di: %4.1f "$bw60bydur18""%">>% using the 60% threshold.
 
 This is likely an overestimate because many women probably previously breadwon 
 prior to our initial observation and, as we explain in the paper, including 
 those who breadwon at earlier duration upwardly biases the estimate of risk of 
-transitioning into breadwinning at later durations. We can address this by 
-limiting te estimate of transitions to later waves among women not observed 
-breadwinning in earlier waves.
+transitioning into breadwinning at later durations. We adjust the transition rates 
+at durations greater than 5 to account for this over estimate. We estimated the 
+discount rate by taking the average ratio of the rate of transition into breadwinning 
+in the NLSY to the rate in the SIPP for durations 5-7. The discount rate was estimated
+to be <<dd_di: %6.3g "$discount50" >> at the 50% threshold and <<dd_di: %6.3g "$discount60" >> at the 60% threshold. 
 
-~~~~
-<<dd_do: quietly>>7
-drop if wave < 3
+Refer to the excel tables to find the estimates of breadwinning after discounting for repeat breadwinning.
 
-// need to adjust durmom (see above for full explanation)
 
-drop if durmom < 1 // the estimate at durmom=0 above is unbiased
-
-<</dd_do>>
-~~~~
-
-Alternate rates based on data on waves (2), 3, and 4,, among those not previously
-observed breadwinning.
-
-~~~~
-<<dd_do>>
-
-tab durmom trans_bw50, matcell(bw50uw) // checking n's
-
-tab durmom trans_bw50 [aweight=wpfinwgt] if trans_bw50 !=2 , matcell(bw50w) nofreq row
-tab durmom trans_bw60 [aweight=wpfinwgt] if trans_bw60 !=2 , matcell(bw60w) nofreq row
-
-<</dd_do>>
-~~~~
-
-We see that on average the transition rates are a slight bit lower when we restrict to 
-transitions from wave 2-3 and 3-4. Does it shrink further if we restrict to just
-transitions from wave 3-4?
-
-~~~~
-<<dd_do>>
-
-drop if wave < 4
-
-tab durmom trans_bw50, matcell(bw50uw) // checking n's
-
-tab durmom trans_bw50 [aweight=wpfinwgt] if trans_bw50 !=2 , matcell(bw50w) nofreq row
-tab durmom trans_bw60 [aweight=wpfinwgt] if trans_bw60 !=2 , matcell(bw60w) nofreq row
-
-<</dd_do>>
-~~~~
+We also investigated the impact of repeat breadwinning by limiting te estimate of 
+transitions to later waves among women not observed breadwinning in earlier waves. 
+That investigation is in older versions of this file (i.e. prior to May 25, 2020). 
