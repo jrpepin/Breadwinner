@@ -7,7 +7,7 @@ Joanna R. Pepin
 
 DATA
 --------------------------------------------------------------------------------
-* This project uses Wave 1-4 of the 2014 SIPP data files. They can be downloaded [here](https://www.census.gov/programs-surveys/sipp/data/datasets.html).
+This project uses Wave 1-4 of the 2014 SIPP data files. They can be downloaded [here](https://www.census.gov/programs-surveys/sipp/data/datasets.html).
 
 Before running the first .do file (01_sipp14_extract_and_format.do), compress the
 downloaded data files.
