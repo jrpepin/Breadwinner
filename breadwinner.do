@@ -5,15 +5,13 @@
 * This is the main do file that runs all of the scripts in order to create the 
 * tables accompaning the publication. This scripts expects that you are in
 * its directory when you execute it. 
-*
-* NLSY analysis
-*
+
 set maxvar 5500
 
+// NLSY analysis
 cd NLSY97/stata
 do breadwinnerNLSY97
 
-* SIPP analysis
-
+// SIPP analysis
 cd ../../SIPP/stata
 do breadwinnerSIPP14.do
