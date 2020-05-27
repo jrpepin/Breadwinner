@@ -1,8 +1,12 @@
-# NLSY_Breadwinning
-Analysis of mothers' breadwinning using the NLSY
+NLSY Analysis
+================================================================================
+
+Jennifer L. Glass
+R. Kelly Raley
+Joanna R. Pepin
   
 The purpose of this analysis of the NLSY97 data is to describe mothers' odds of 
-breadwinning by 10 years after mothers' first birth.  
+breadwinning by 8 years after mothers' first birth.  
   
 DATA
 --------------------------------------------------------------------------------
@@ -22,3 +26,13 @@ Give your download a filename (e.g. "nlsy9717") and click download.
 Before running the first .do file (01_nlsy97_sample & demo), remove the comment 
 markers in the downloaded "value-labels" .do file so that variables are renamed.  
 We also had to delete all instances of "KEY!" so the file import will run properly.
+
+Environment
+--------------------------------------------------------------------------------
+Users need to create a personal setup file before running these scripts.
+Use the setup_example.do script located in the NLSY97 sub-folder as a template and 
+save the customized file in this sub-folder.
+
+Analysis
+--------------------------------------------------------------------------------
+To run all of the NLSY project code, run the breadwinnnerNLSY97.do file.

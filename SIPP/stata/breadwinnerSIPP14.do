@@ -8,7 +8,7 @@
 ********************************************************************************
 * A1. ENVIRONMENT
 ********************************************************************************
-* There are two scripts users need to run before importing the data. 
+* There are two scripts users need to run before running the first .do file. 
 	* First, create a personal setup file using the setup_example.do script as a 
 	* template and save this file in the base project directory.
 
@@ -28,8 +28,6 @@
 ********************************************************************************
 * This project uses Wave 1-4 of the 2014 SIPP data files. They can be downloaded here:
 * https://www.census.gov/programs-surveys/sipp/data/datasets.html
-
-	*?*?* How did the Stata data files get compressed *?*?*
 
 // Extract the variables for this project
     log using "$logdir/extract_and_format.log",	replace 
