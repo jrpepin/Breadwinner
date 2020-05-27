@@ -1,9 +1,9 @@
 NLSY Analysis
 ================================================================================
 
-Jennifer L. Glass
-R. Kelly Raley
-Joanna R. Pepin
+Jennifer L. Glass  
+R. Kelly Raley  
+Joanna R. Pepin  
   
 The purpose of this analysis of the NLSY97 data is to describe mothers' odds of 
 breadwinning by 8 years after mothers' first birth.  
@@ -24,7 +24,7 @@ Make sure "Tagset" and "STATA® dictionary file of selected variables" are selec
 Give your download a filename (e.g. "nlsy9717") and click download.  
 
 Before running the first .do file (01_nlsy97_sample & demo), remove the comment 
-markers in the downloaded "value-labels" .do file so that variables are renamed.  
+markers in the downloaded "value-labels" .do file so that variables are renamed.   
 We also had to delete all instances of "KEY!" so the file import will run properly.
 
 Environment

@@ -1,9 +1,9 @@
 SIPP Analysis
 ================================================================================
 
-Jennifer L. Glass
-R. Kelly Raley
-Joanna R. Pepin
+Jennifer L. Glass  
+R. Kelly Raley  
+Joanna R. Pepin  
 
 DATA
 --------------------------------------------------------------------------------
