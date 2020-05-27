@@ -104,14 +104,14 @@
 	log close
 	
 ********************************************************************************
-* C. Create a file describing sample and initial "lifetime" estimates of breadwinning.
+* C. Create a file describing sample and "lifetime" estimates of breadwinning.
 ********************************************************************************
 * NOTE: This dynamic document will only work if the other do files were run in
 *		in the same stata session.
 
 // Create the new html document describing sample and aspects of analysis
-	dyndoc "$results/bw_analysis_2014.md", saving($output/bw_analysis_SIPP14.html) replace
-
+	dyndoc "$results/bw_propensity_SIPP14.md", saving($output/bw_propensity_SIPP14.html) replace
+	
 ********************************************************************************
 * D. Multistate lifetable analysis
 ********************************************************************************
@@ -129,5 +129,14 @@
 // Generate a matrix with estimates of expected number of years
 // in each state from "birth"
 	log using "$logdir/gen_mslt_results.log", replace
-	do "$results/gen_mslt_results.do"
+	do "$SIPP2014_code/14_gen_mslt_results.do"
 	log close
+
+********************************************************************************
+* E. Create a file describing the duration of mothers' breadwinning.
+********************************************************************************
+* NOTE: This dynamic document will only work if the Multistate lifetable analysis
+* do files were run in the same stata session.
+
+// Create the new html document showing the duration of mothers' breadwinning
+	dyndoc "$results/bw_duration_SIPP14.md", saving($output/bw_duration_SIPP14.html) replace
