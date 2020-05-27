@@ -106,10 +106,10 @@ The percentage breadwinning by the time their first child is age **7** by educat
 
 |__Mothers' Education at First Birth__	| __% breadwinning at 50% threshold__	 |
 |:--------------------------------------|:-------------------------------------- |
-|Less than high school			|  <<dd_di: "$bwc50_bydur7_lesshs""%" >> |
-|High school				|  <<dd_di: "$bwc50_bydur7_hs""%" >> 	 |
-|Some college				|  <<dd_di: "$bwc50_bydur7_somecol""%">> |
-|College degree				|  <<dd_di: "$bwc50_bydur7_univ""%" >> 	 |
+|Less than high school			        |  <<dd_di: "$bwc50_bydur7_lesshs""%" >> |
+|High school				            |  <<dd_di: "$bwc50_bydur7_hs""%" >> 	 |
+|Some college				            |  <<dd_di: "$bwc50_bydur7_somecol""%">> |
+|College degree			            	|  <<dd_di: "$bwc50_bydur7_univ""%" >> 	 |
 
 
 Using a conservative 60% threshold of family income to determine primary earning status, 
