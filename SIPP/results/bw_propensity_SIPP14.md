@@ -92,10 +92,10 @@ We use the birth history measures (year of each birth) to identify the sample el
 
 |__Restiction__  						| __Cases left__ |
 |:--------------------------------------|:--------------------------------------------|
-|Raw sample								     | <<dd_di: %10.0fc "$allindividuals" >>  |
-|Women									     | <<dd_di: %10.0fc "$women_n" >>         |
-|Mothers								     | <<dd_di: %10.0fc "$mothers_n" >>       |
-|No earnings data during reference year	     | <<dd_di: %10.0fc "$minus_afterref" >>  |
+|Raw sample					| <<dd_di: %10.0fc "$allindividuals" >>  |
+|Women						| <<dd_di: %10.0fc "$women_n" >>         |
+|Mothers					| <<dd_di: %10.0fc "$mothers_n" >>       |
+|Became mother after reference year	     | <<dd_di: %10.0fc "$minus_afterref" >>  |
 |Motherhood < 19 yrs from interview year     | <<dd_di: %10.0fc "$minus_oldmoms" >>   |
 |Observations with data in the current waves | <<dd_di: %10.0fc "$obvsnow_n" >>       |
 |Observations with data in the previous waves | <<dd_di: %10.0fc "$obvsprev_n" >>     |
