@@ -326,3 +326,136 @@ putexcel C7 = (100*(1-notbw60_lesshs))  	, nformat(number_d2) // < HS
 putexcel D7 = (100*(1-notbw60_hs))  		, nformat(number_d2) // HS
 putexcel E7 = (100*(1-notbw60_somecol))  	, nformat(number_d2) // Some col
 putexcel F7 = (100*(1-notbw60_univ))  		, nformat(number_d2) // College
+
+* Description of personal and household earnings and their ratio
+putexcel set "$output/Descriptives60.xlsx", sheet(earningsdetail) modify
+
+gen trim_tpearn=tpearn
+replace trim_tpearn=-1 if tpearn < 0
+replace trim_tpearn=200000 if tpearn > 200000
+
+gen trim_thearn=thearn
+replace trim_thearn=-1 if thearn < 0
+replace trim_thearn=200000 if thearn > 200000
+
+gen trim_er=earnings_ratio if hh_noearnings==0
+replace trim_er=0 if tpearn < 0 & hh_noearnings==0
+replace trim_er=1 if thearn < 0 & hh_noearnings==0
+replace trim_er=1 if earnings_ratio > 1 & tpearn > 0
+
+gen catratio=0 if hh_noearnings==1
+replace catratio=1 if trim_er==0
+replace catratio=2 if trim_er > 0 & trim_er < .5
+replace catratio=3 if trim_er >=.5 & trim_er <.6
+replace catratio=4 if trim_er >= .6 & trim_er < 1
+replace catratio=5 if trim_er==1
+
+tab catratio [aweight=wpfinwgt], matcell(catratio)
+
+putexcel A1 = "Details of earnings measures"
+putexcel B2 = ("N") C2 = ("%")
+putexcel B3 = matrix(catratio)
+putexcel A3 = "No household earnings"
+putexcel A4 = "Mother no earnings"
+putexcel A5 = "Mother earns less than half of household income"
+putexcel A6 = "Mother earns more than half, less than .6 of household income"
+putexcel A7 = "Mother earnings more than .6 but less than all of household income"
+putexcel A8 = "Mother earns all of household income"
+putexcel A12 = "Plot of earnings ratio (trimmed)"
+putexcel H12 = "Plot of maternal earnings (trimmed)"
+putexcel R12 = "Plot of household earnings (trimmed)"
+
+putexcel A9 = "Total"
+putexcel B9 = formula(sum(B3:B8))
+
+forvalues r=3/8 {
+	putexcel C`r' = formula(100*B`r'/B9), nformat(##.#)
+}
+
+cdfplot(trim_er) [aweight=wpfinwgt], name(earningsratio, replace) 
+graph export earningsratio.png, name(earningsratio) replace
+putexcel A13 = picture(earningsratio.png)
+
+/*
+cdfplot(trim_thearn) [aweight=wpfinwgt], name(thearn, replace)
+graph export thearn.png, name(thearn.png) replace
+putexcel R13 = picture(thearn.png)
+
+cdfplot(trim_tpearn) [aweight=wpfinwgt], name(tpearn, replace) 
+graph export tpearn.png, name(tpearn.png) replace
+putexcel H13 = picture(tpearn.png)
+/*
+
+putexcel set "$output/Descriptives60.xlsx", sheet(earningsdetail) modify
+putexcel A1 = "Percentile distribution of mothers earnings, household earnings and ratio in 2014 (weighted)"
+*putexcel B2:D2 = ("2014") F2:H2 = ("2015") J2:l2 = ("2016"), merge border(bottom)
+
+local columns "B C D F G H J K L N O P"
+
+foreach setstart in 1 4 7 {
+	forvalues c=1/3 {
+		local column`c' = `setstart'+`c'-1
+		local col`c' : word `column`c'' of `columns'
+	}
+	putexcel `col1'3 = ("Mothers Earnings") `col2'3 = ("Household Earnings") `col3'3 = ("Ratio")
+}
+
+local per "5% 10 15 20 25 30 35 40 45 50 55 60 65 70 75 70 85 90 95%"
+
+xtile pern_p5 = tpearn [aw=wpfinwgt], n(20)
+
+
+egen pern_p5 = xtile(tpearn) if year==2014, percentiles(5 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95) weights(wpfinwgt)
+tab pern_p5, matcell(pern)
+putexcel B4 = matrix(pern)
+
+egen hern_p5 = xtile(thearn) if year==2014, percentiles(5 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95) weights(wpfinwgt)
+tab hern_p5, matcell(hern)
+putexcel C4 = matrix(hern)
+
+egen er_p5 = xtile(earnings_ratio) if year==2014, percentiles(5 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95) weights(wpfinwgt)
+tab hern_p5, matcell(er)
+putexcel D4 = matrix(er)
+
+
+/*
+forvalues p=1/19 {
+	local row=`p'+3
+	local percentage: word `p' of `per'
+	putexcel A`row' = "`percentage'"
+}
+
+putexcel A23 = "N"
+putexcel A24 = "proportion no earnings"
+putexcel A25 = "Total N"
+
+// Calculate descriptives and place into table
+
+local earnings "tpearn thearn earnings_ratio"
+
+local colstart = 1
+forvalues year=2014/2016 {
+  forvalues v=1/3 {
+	local coln=`colstart'+`v'-1
+	local col : word `coln' of `columns'
+	local var: word `v' of `earnings'
+	sum `var' if year==`year' [aweight=wpfinwgt], detail
+	* store the 10th, 25th, 50th, 75th, and 90th percentiles for each earnings variable in each year
+	local row = 3
+	foreach p in 5 10 15 20 25 30 35 40 45 50 55 60 65 70 75 80 85 90 95 {
+		local row = `row'+1
+		local p`p'`var'`year' = r(p`p')
+		display "col is `col' and row is `row'
+		putexcel `col'`row' = `p`p'`var'`year''
+	}
+	local N`var'`year'=`r(N)'
+	local row=`row'+1
+	display "col is `col' and row is `row'
+	putexcel `col'`row' = "`N`var''"
+  }
+  local colstart = `colstart' + 3
+*  sum hh_noearnings  if year=`year' [aweight=wpfinwgt] 
+*  putexcel `col'9 = `p(50)'
+*  putexcel `col'10="`r(N)'
+ }
+

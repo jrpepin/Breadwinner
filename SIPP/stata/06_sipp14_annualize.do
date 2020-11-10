@@ -77,6 +77,8 @@ collapse 	(count) monthsobserved=one  nmos_bw50=mbw50 nmos_bw60=mbw60 		///
 
 	// Create indicator for negative household earnings & no earnings. 
 	gen hh_noearnings= (thearn <= 0)
+	
+	gen earnings_ratio=tpearn/thearn if hh_noearnings !=1 & !missing(tpearn) 
 
 	// 50% breadwinning threshold
 	* Note that this measure was missing for no (or negative) earnings households, but that is now changed
