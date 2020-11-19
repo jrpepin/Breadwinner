@@ -99,6 +99,7 @@ reshape long `change_variables' trans_bw50 trans_bw60 bw50L bw60L monthsobserved
 ********************************************************************************
 // 	Create a tempory unique person id variable
 	sort SSUID PNUM
+	
 	egen id = concat (SSUID PNUM)
 	destring id, gen(idnum)
 	format idnum %20.0f
@@ -121,7 +122,83 @@ reshape long `change_variables' trans_bw50 trans_bw60 bw50L bw60L monthsobserved
 		display as error "The sample size is different than annualize."
 		exit
 		}
-	
+		
+* Create table describing full sample of mothers and analytical sample.
+
+putexcel set "$output/Descriptives60.xlsx", sheet(sample) replace
+putexcel A1:D1 = "Characteristics of full sample of mothers and analytical sample", merge border(bottom)
+putexcel B2 = ("All Mothers") D2 = ("Analytical sample"), border(bottom)
+putexcel B3 = ("percent") D3 = ("percent"), border(bottom)
+putexcel A4 = "Marital Status"
+putexcel A5 = " Spouse"
+putexcel A6 = " Partner"
+putexcel A7 = "Race/Ethnicity"
+putexcel A8 = " Non-Hispanic White"
+putexcel A9 = " Black"
+putexcel A10 = " Hispanic"
+putexcel A11 = " Asian"
+putexcel A12 = " multi-race"
+putexcel A13 = "Primary Earner (60%)"
+
+
+putexcel B16 = ("mean") D16 = ("mean"), border(bottom)
+putexcel A17 = "age"
+putexcel A18 = "Years since first birth"
+putexcel A19 = "personal earnings"
+putexcel A20 = "household earnings"
+putexcel A21 = "personal to household earnings ratio", border(bottom)
+
+putexcel A23 = "unweighted N (individuals)"
+// Fill in table for full sample
+
+recode spouse (0=0) (.001/1=1)
+recode partner (0=0) (.001/1=1)
+
+mean spouse [aweight=wpfinwgt] 
+matrix spouse = 100*e(b)
+local pspouse = spouse[1,1]
+
+mean partner [aweight=wpfinwgt] 
+matrix partner = 100*e(b)
+local ppartner = partner[1,1]
+
+putexcel B5 = `pspouse', nformat(##.#)
+putexcel B6 = `ppartner', nformat(##.#)
+
+** Full sample
+
+local raceth "white black hispanic asian multi"
+
+forvalues r=1/5 {
+   local re: word `r' of `raceth'
+   gen `re' = raceth==`r'
+   mean `re' [aweight=wpfinwgt] 
+   matrix m`re' = 100*e(b)
+   local p`re' = m`re'[1,1]
+   local row = 7+`r'
+   putexcel B`row' = `p`re'', nformat(##.#)
+}
+mean bw60 [aweight=wpfinwgt] 
+matrix mbw60 = 100*e(b)
+local pbw60 = mbw60[1,1]
+putexcel B13 = `pbw60', nformat(##.#)
+
+local means "age durmom tpearn thearn earnings_ratio"
+
+forvalues m=1/5{
+    local var: word `m' of `means'
+    mean `var' [aweight=wpfinwgt] 
+    matrix m`var' = e(b)
+    local v`m' = m`var'[1,1]
+    local row = `m'+16
+    putexcel B`row' = `v`m'', nformat(##.#)
+}
+
+egen	obvsfs 	= nvals(idnum)
+local fs = obvsfs
+
+putexcel B23 = `fs'
+
 // keep only observations with data in the current waves
 keep if !missing(monthsobserved)
 
@@ -142,5 +219,43 @@ tab durmom
 	di "$obvsprev_n"
 
 	drop idnum obvsnow obvsprev
+
+** Analytical sample
+
+mean spouse [aweight=wpfinwgt] 
+matrix sspouse = 100*e(b)
+local pspouse = sspouse[1,1]
+
+mean partner [aweight=wpfinwgt] 
+matrix spartner = 100*e(b)
+local ppartner = spartner[1,1]
+
+putexcel D5 = `pspouse', nformat(##.#)
+putexcel D6 = `ppartner', nformat(##.#)
+
+forvalues r=1/5 {
+   local re: word `r' of `raceth'
+   mean `re' [aweight=wpfinwgt] 
+   matrix sm`re' = 100*e(b)
+   local p`re' = sm`re'[1,1]
+   local row = 7+`r'
+   putexcel D`row' = `p`re'', nformat(##.#)
+}
+mean bw60 [aweight=wpfinwgt] 
+matrix mbw60 = 100*e(b)
+local pbw60 = mbw60[1,1]
+putexcel D13 = `pbw60'
+
+
+forvalues m=1/5{
+    local var: word `m' of `means'
+    mean `var' [aweight=wpfinwgt] 
+    matrix sm`var' = e(b)
+    local v`m' = sm`var'[1,1]
+    local row = `m'+16
+    putexcel D`row' = `v`m'', nformat(##.#)
+}
+
+putexcel D23 = $obvsprev_n
 
 save "$SIPP14keep/bw_transitions.dta", replace
