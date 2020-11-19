@@ -8,9 +8,39 @@ di "$S_DATE"
 ********************************************************************************
 * DESCRIPTION
 ********************************************************************************
-* This script runs the lifetable analysis for each group at each cutoff
+* This script outputs a descriptive table for total describing bw60 statuses and transition rates by age
+* and then runs the lifetable analysis for each group at each cutoff
 
 * The data file used in this script was produced by sipp14_create_mstransitions14.do
+
+********************************************************************************
+* Create descriptive table 
+********************************************************************************
+
+// Create shell
+putexcel set "$output/Descriptives60.xlsx", sheet(StatusbyDuration) modify
+putexcel A3:J3 = "Estimates of maternal primary earning transition rates by duration (60% cuttoff)", merge border("bottom")
+putexcel A4 = ("Age") 
+
+local columns "B C D E F G H I J"
+forvalues a=1/3{
+	forvalues b=1/3{
+		local c=(`a'-1)*3+`b'
+		local col: word `c' of `columns'
+		putexcel `col'4 = "p`a'`b'"
+	}
+}
+
+// Fill in shell
+
+* Transition rates
+use "$SIPP14keep/transrates60t.dta"
+
+export excel using "$output/Descriptives60.xlsx", sheet("StatusbyDuration") sheetmodify cell(A5)
+
+// add note
+putexcel A24:J24 = "pxy refers to the transition rate from status x at the previous duration to status y at this duration 1 = not living with children, 2 = living with children, not primary earner 3 = primary earning mother", merge
+
 
 ********************************************************************************
 * Run the lifetable analysis using lxpct_2

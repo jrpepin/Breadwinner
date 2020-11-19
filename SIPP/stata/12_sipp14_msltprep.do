@@ -79,7 +79,7 @@ tab bw50L, m
 
 tab mbw50L, m
 
-// Set state indicators to 0 if not a mom
+// Set state indicators to 1 if not a mom
 local nowvars "mbw50 mbw60"
 foreach var in `nowvars'{
 	replace `var'=1 if minorbiochildren==0 		// not residential mom -- different than in measures_and_sample.do
@@ -93,8 +93,7 @@ foreach var in `thenvars'{
 
 // Label the breadwinning state variable values
 #delimit ;
-label define bwstat 0 "non breadwinning mother"
-                    1 "not living with children or first child > 18"
+label define bwstat 1 "not living with children or first child > 18"
                     2 "non-breadwinning mother"
                     3 "breadwinning mother" ; 		
 # delimit cr

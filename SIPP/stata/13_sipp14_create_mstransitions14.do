@@ -13,6 +13,11 @@ di "$S_DATE"
 
 * The data file used in this script was produced by msltprep.do
 
+* The resulting data files have estimates of the proportions remaining or transitioning
+* between statuses by duration.
+* p11 is the proportion in status 1 in the previous year (L) that remained in 
+* status 1 at the end of that duration
+
 ********************************************************************************
 * Create a program to generate the transitions
 ********************************************************************************
@@ -84,3 +89,5 @@ create_mstransitions 60 "keep if educ==1" "e1"
 create_mstransitions 60 "keep if educ==2" "e2"
 create_mstransitions 60 "keep if educ==3" "e3"
 create_mstransitions 60 "keep if educ==4" "e4"
+
+
