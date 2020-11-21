@@ -10,8 +10,6 @@
 * The current directory is assumed to be the base project directory.
 **  cd "C:\Users\Joanna\Dropbox\Repositories\SIPP_Breadwinner"
 
-set maxvar 32000
-
 ********************************************************************************
 * Setup project macros
 ********************************************************************************
