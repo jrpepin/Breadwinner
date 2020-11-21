@@ -26,10 +26,12 @@ drop if durmom > 18
 	* per_bw50_atbirth notbw50_atbirth pper_bw60_atbirth notbw50_atbirth first_wave
 
 // List of variables that change over time
-local change_variables 	year monthsobserved nmos_bw50 nmos_bw60 tpearn thearn spouse partner	///
-						wpfinwgt minorchildren minorbiochildren tceb oldest_age start_spartner 	///
-						last_spartner durmom youngest_age anytype2 hh_noearnings bw50 bw60 		///
-						gain_partner lost_partner partial_year raceth educ tage ageb1
+local change_variables 	year monthsobserved nmos_bw50 nmos_bw60 tpearn thearn spouse ///
+			partner	wpfinwgt minorchildren minorbiochildren tceb ///
+			oldest_age start_spartner last_spartner durmom  ///
+			youngest_age anytype2 hh_noearnings bw50 bw60 	///
+			gain_partner lost_partner partial_year raceth   ///
+			educ tage ageb1 earnings_ratio
 
 // Create macros for reshape command
 local i_vars "SSUID PNUM"
