@@ -47,7 +47,7 @@ putexcel A24:J24 = "pxy refers to the transition rate from status x at the previ
 ********************************************************************************
 
 local cutoffs "50 60"
-local groups "t w b h e1 e2 e3 e4"
+local groups "t w b h e1 e2 e3 e4 we1 we2 we3 we4 be1 be2 be3 be4 he1 he2 he3 he4"
 
 foreach c of local cutoffs {
     foreach g of local groups {
@@ -100,13 +100,37 @@ putexcel A10 = "Some College"
 putexcel B10 = matrix(m50e3), nformat(number_d2)
 putexcel A11 = "College Grad"
 putexcel B11 = matrix(m50e4), nformat(number_d2)
+putexcel A12 = "White -Less than High School"
+putexcel B12 = matrix(m50we1), nformat(number_d2)
+putexcel A13 = "White -High School"
+putexcel B13 = matrix(m50we2), nformat(number_d2)
+putexcel A14 = "White- Some College"
+putexcel B14 = matrix(m50we3), nformat(number_d2)
+putexcel A15 = "Whiite- College Grad"
+putexcel B15 = matrix(m50we4), nformat(number_d2)
+putexcel A16 = "Black - Less than High School"
+putexcel B16 = matrix(m50be1), nformat(number_d2)
+putexcel A17 = "Black - High School"
+putexcel B17 = matrix(m50be2), nformat(number_d2)
+putexcel A18 = "Black - Some College"
+putexcel B18 = matrix(m50be3), nformat(number_d2)
+putexcel A19 = "Black - College Grad"
+putexcel B19 = matrix(m50be4), nformat(number_d2)
+putexcel A20 = "Hispanic - Less than High School"
+putexcel B20 = matrix(m50he1), nformat(number_d2)
+putexcel A21 = "Hispanic - High School"
+putexcel B21 = matrix(m50he2), nformat(number_d2)
+putexcel A22 = "Hispanic - Some College"
+putexcel B22 = matrix(m50he3), nformat(number_d2)
+putexcel A23 = "Hispanic - College Grad"
+putexcel B23 = matrix(m50he4), nformat(number_d2)
 
 local Ycolumns B C D
 local Pcolumns G H I
 local Qcolumns K L
 
 * Calculate sum and proportions for all years 
-forvalues r=4/11 {
+forvalues r=4/23 {
         putexcel E`r' = formula (+B`r' + C`r' + D`r'), nformat(number_d2) // sum of years
 	forvalues c=1/3 {
 		local col : word `c' of `Pcolumns'
@@ -116,7 +140,7 @@ forvalues r=4/11 {
 }
 
 * Calculate proportions for years living with minor children
-forvalues r=4/11 {
+forvalues r=4/23 {
 	forvalues c=1/2 {
 		local col : word `c' of `Qcolumns'
 		local d=`c'+ 1
@@ -151,13 +175,37 @@ putexcel A10 = "Some College"
 putexcel B10 = matrix(m60e3), nformat(number_d2)
 putexcel A11 = "College Grad"
 putexcel B11 = matrix(m60e4), nformat(number_d2)
+putexcel A12 = "White -Less than High School"
+putexcel B12 = matrix(m60we1), nformat(number_d2)
+putexcel A13 = "White -High School"
+putexcel B13 = matrix(m60we2), nformat(number_d2)
+putexcel A14 = "White- Some College"
+putexcel B14 = matrix(m60we3), nformat(number_d2)
+putexcel A15 = "Whiite- College Grad"
+putexcel B15 = matrix(m60we4), nformat(number_d2)
+putexcel A16 = "Black - Less than High School"
+putexcel B16 = matrix(m60be1), nformat(number_d2)
+putexcel A17 = "Black - High School"
+putexcel B17 = matrix(m60be2), nformat(number_d2)
+putexcel A18 = "Black - Some College"
+putexcel B18 = matrix(m60be3), nformat(number_d2)
+putexcel A19 = "Black - College Grad"
+putexcel B19 = matrix(m60be4), nformat(number_d2)
+putexcel A20 = "Less than High School"
+putexcel B20 = matrix(m60he1), nformat(number_d2)
+putexcel A21 = "High School"
+putexcel B21 = matrix(m60he2), nformat(number_d2)
+putexcel A22 = "Some College"
+putexcel B22 = matrix(m60he3), nformat(number_d2)
+putexcel A23 = "College Grad"
+putexcel B23 = matrix(m60he4), nformat(number_d2)
 
 local Ycolumns B C D
 local Pcolumns G H I
 local Qcolumns K L
 
 * Calculate sum and proportions for all years 
-forvalues r=4/11 {
+forvalues r=4/23 {
         putexcel E`r' = formula (+B`r' + C`r' + D`r'), nformat(number_d2) // sum of years
 	forvalues c=1/3 {
 		local col : word `c' of `Pcolumns'
@@ -167,7 +215,7 @@ forvalues r=4/11 {
 }
 
 * Calculate proportions for years living with minor children
-forvalues r=4/11 {
+forvalues r=4/23 {
 	forvalues c=1/2 {
 		local col : word `c' of `Qcolumns'
 		local d=`c'+ 1

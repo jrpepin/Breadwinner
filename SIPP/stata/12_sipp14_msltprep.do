@@ -93,6 +93,15 @@ foreach var in `thenvars'{
 	replace `var'=1 if durmom==0 & year > 2013 	// forcing not mom in year prior to first birth
 }
 
+************************
+* create a variable combining race and education
+************************
+
+gen raceduc=educ if raceth==1
+replace raceduc=educ+4 if raceth==2
+replace raceduc=educ+8 if raceth==5
+
+
 // Label the breadwinning state variable values
 #delimit ;
 label define bwstat 1 "not living with children or first child > 18"

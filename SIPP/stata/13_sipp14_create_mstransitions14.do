@@ -72,22 +72,52 @@ end
 *******************************************************************************
 // Transition rate at the 50% threshold
 create_mstransitions 50 "keep if 1==1" "t"
-create_mstransitions 50 "keep if race==1" "w"
-create_mstransitions 50 "keep if race==2" "b"
-create_mstransitions 50 "keep if race==5" "h"
+create_mstransitions 50 "keep if raceth==1" "w"
+create_mstransitions 50 "keep if raceth==2" "b"
+create_mstransitions 50 "keep if raceth==5" "h"
 create_mstransitions 50 "keep if educ==1" "e1"
 create_mstransitions 50 "keep if educ==2" "e2"
 create_mstransitions 50 "keep if educ==3" "e3"
 create_mstransitions 50 "keep if educ==4" "e4"
+create_mstransitions 50 "keep if raceduc==1" "we1"
+create_mstransitions 50 "keep if raceduc==2" "we2"
+create_mstransitions 50 "keep if raceduc==3" "we3"
+create_mstransitions 50 "keep if raceduc==4" "we4"
+create_mstransitions 50 "keep if raceduc==5" "be1"
+create_mstransitions 50 "keep if raceduc==6" "be2"
+create_mstransitions 50 "keep if raceduc==7" "be3"
+create_mstransitions 50 "keep if raceduc==8" "be4"
+create_mstransitions 50 "keep if raceduc==9" "he1"
+create_mstransitions 50 "keep if raceduc==10" "he2"
+create_mstransitions 50 "keep if raceduc==11" "he3"
+create_mstransitions 50 "keep if raceduc==12" "he4"
 
 // Transition rate at the 60% threshold
 create_mstransitions 60 "keep if 1==1" "t"
-create_mstransitions 60 "keep if race==1" "w"
-create_mstransitions 60 "keep if race==2" "b"
-create_mstransitions 60 "keep if race==5" "h"
+create_mstransitions 60 "keep if raceth==1" "w"
+create_mstransitions 60 "keep if raceth==2" "b"
+create_mstransitions 60 "keep if raceth==5" "h"
 create_mstransitions 60 "keep if educ==1" "e1"
 create_mstransitions 60 "keep if educ==2" "e2"
 create_mstransitions 60 "keep if educ==3" "e3"
 create_mstransitions 60 "keep if educ==4" "e4"
+create_mstransitions 60 "keep if raceduc==1" "we1"
+create_mstransitions 60 "keep if raceduc==2" "we2"
+create_mstransitions 60 "keep if raceduc==3" "we3"
+create_mstransitions 60 "keep if raceduc==4" "we4"
+create_mstransitions 60 "keep if raceduc==5" "be1"
+create_mstransitions 60 "keep if raceduc==6" "be2"
+create_mstransitions 60 "keep if raceduc==7" "be3"
+create_mstransitions 60 "keep if raceduc==8" "be4"
+create_mstransitions 60 "keep if raceduc==9" "he1"
+create_mstransitions 60 "keep if raceduc==10" "he2"
+create_mstransitions 60 "keep if raceduc==11" "he3"
+create_mstransitions 60 "keep if raceduc==12" "he4"
 
+* a hack to get the code to work 
+use "$SIPP14keep/transrates50be1.dta", clear
 
+gen p31=0 if age < 18
+replace p31=1 if age == 18
+
+save "$SIPP14keep/transrates50be1.dta", replace
