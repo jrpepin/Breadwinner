@@ -51,6 +51,8 @@ local groups "t w b h e1 e2 e3 e4 we1 we2 we3 we4 be1 be2 be3 be4 he1 he2 he3 he
 
 foreach c of local cutoffs {
     foreach g of local groups {
+    
+    display "reading in transrates`c'`g'.dta"
        use "$SIPP14keep/transrates`c'`g'.dta", clear
 
        lxpct_2, i(3) d(0)
@@ -58,6 +60,7 @@ foreach c of local cutoffs {
 	   // take the first row and column 2 to the end  
 	   matrix first=e_x[1,2...]
 
+       cap matrix drop m`c'`g'
        matrix rename first m`c'`g'
 	   matrix rowname m`c'`g' = `c'`g'
     }
@@ -191,13 +194,13 @@ putexcel A18 = "Black - Some College"
 putexcel B18 = matrix(m60be3), nformat(number_d2)
 putexcel A19 = "Black - College Grad"
 putexcel B19 = matrix(m60be4), nformat(number_d2)
-putexcel A20 = "Less than High School"
+putexcel A20 = "Hispanic - Less than High School"
 putexcel B20 = matrix(m60he1), nformat(number_d2)
-putexcel A21 = "High School"
+putexcel A21 = "Hispanic - High School"
 putexcel B21 = matrix(m60he2), nformat(number_d2)
-putexcel A22 = "Some College"
+putexcel A22 = "Hispanic - Some College"
 putexcel B22 = matrix(m60he3), nformat(number_d2)
-putexcel A23 = "College Grad"
+putexcel A23 = "Hispanic - College Grad"
 putexcel B23 = matrix(m60he4), nformat(number_d2)
 
 local Ycolumns B C D

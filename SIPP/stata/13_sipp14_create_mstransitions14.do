@@ -114,10 +114,13 @@ create_mstransitions 60 "keep if raceduc==10" "he2"
 create_mstransitions 60 "keep if raceduc==11" "he3"
 create_mstransitions 60 "keep if raceduc==12" "he4"
 
+
 * a hack to get the code to work 
-use "$SIPP14keep/transrates50be1.dta", clear
+use "$SIPP14keep/transrates60be1.dta", clear
 
 gen p31=0 if age < 18
 replace p31=1 if age == 18
 
-save "$SIPP14keep/transrates50be1.dta", replace
+save "$SIPP14keep/transrates60be1.dta", replace
+
+

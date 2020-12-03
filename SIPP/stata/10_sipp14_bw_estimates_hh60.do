@@ -58,6 +58,12 @@ foreach re in 1 2 5 {
 
 // Capture sample size
 tab durmom if inlist(trans_bw60,0,1), matcell(Ns60)
+forvalues e=1/4 {
+	tab durmom if inlist(trans_bw60,0,1) & educ==`e', matcell(Ns60e`e')
+	foreach re in 1 2 5 {
+		tab durmom if inlist(trans_bw60,0,1) & educ==`e' & raceth==`re', matcell(Ns60e`e're`re')
+	}
+}
 
 ********************************************************************************
 * adjusting file to prepare for lifetable estimation
@@ -224,6 +230,10 @@ forvalues d=1/7 {
 *******************************************************************************
 * Format into nice percents & create macros ------------------------------------
 *******************************************************************************
+*  NOTE: This analysis is without any adjustment for repeat breadwinning, which
+*  is handled in the next file (11_)
+**
+
 
 // 60% BW at 1st year of birth
 global per_bw60_atbirth				= round(per_bw60_atbirth		, .02)
@@ -326,10 +336,10 @@ forvalues d=1/17 {
 
 // Initialize excel file
 putexcel set "$output/Descriptives60.xlsx", sheet(transitions) modify
-
+putexcel A1 = "These are the estimates of primary earning not adjusted for repeat breadwinning. See the proportions sheet for adjusted estimates"
 // Create Shell
 putexcel A14 = "SIPP"
-putexcel B14:G14 = "Breadwinning > 60% threshold", merge border(bottom)
+putexcel B14:G14 = "Breadwinning > 60% threshold unadjusted for repeat breadwinning", merge border(bottom)
 
 foreach row in 15 36 57 {
 	local nrow = `row'+1 
@@ -355,7 +365,7 @@ foreach row in 15 36 57 {
 	putexcel U`nrow'=("Unweighted N"), border(bottom)
 }
 
-putexcel A37 = "Proportion no primary earning"
+putexcel A37 = "Proportion not primary earning"
 putexcel A58 = "Cumulative proportion never primary earning"
 
 local columns "D E F G "
@@ -412,10 +422,31 @@ forvalues d=1/17 {
 
 }
 
+putexcel A79 = "unweighted sample sizes"
+
+
 // sample size matrix runs from birth to age 17
 forvalues d=1/18 {
-        local row = `d'+16
-	putexcel U`row' = matrix(Ns60[`d',1])
+        local row = `d'+79
+	putexcel A`row' = `d'
+	putexcel B`row' = matrix(Ns60[`d',1])
+	putexcel D`row' = matrix(Ns60e1[`d',1])
+	putexcel E`row' = matrix(Ns60e2[`d',1])
+	putexcel F`row' = matrix(Ns60e3[`d',1])
+	putexcel G`row' = matrix(Ns60e4[`d',1])
+	putexcel H`row' = matrix(Ns60e1re1[`d',1])
+	putexcel I`row' = matrix(Ns60e2re1[`d',1])
+	putexcel J`row' = matrix(Ns60e3re1[`d',1])
+	putexcel K`row' = matrix(Ns60e4re1[`d',1])
+	putexcel L`row' = matrix(Ns60e1re2[`d',1])
+	putexcel M`row' = matrix(Ns60e2re2[`d',1])
+	putexcel N`row' = matrix(Ns60e3re2[`d',1])
+	putexcel O`row' = matrix(Ns60e4re2[`d',1])
+	putexcel P`row' = matrix(Ns60e1re5[`d',1])
+	putexcel Q`row' = matrix(Ns60e2re5[`d',1])
+	putexcel R`row' = matrix(Ns60e3re5[`d',1])
+	putexcel S`row' = matrix(Ns60e4re5[`d',1])
+	
 }
 
 // Doing a lifetable analysis in the excel spreadsheet to make the calculation visible
@@ -447,8 +478,18 @@ foreach col in B D E F G H I J K L M N  P Q R S {
 
 // Create Shell
 putexcel set "$output/Descriptives60.xlsx", sheet(proportions) modify
+putexcel A3:Q3 = "Estimated percentage primary earner by 8 and 18 years, unadjusted and adjusted for repeat breadwinning", merge border(bottom)
+putexcel C4:F4 = "By Education", merge border(bottom)
+putexcel B5 = ("Total") C5= ("< HS") D5 = ("HS") E5 = ("Some College") F5 = ("College Grad+")
+putexcel G4:J4 = "White by education", merge border(bottom)
+putexcel G5= ("< HS") H5 = ("HS") I5 = ("Some College") J5 = ("College Grad+")
+putexcel K4:N4 = "Black by education", merge border(bottom)
+putexcel K5= ("< HS") L5 = ("HS") M5 = ("Some College") N5 = ("College Grad+")
+putexcel O4:R4 = "Hispanic by education", merge border(bottom)
+putexcel O5= ("< HS") P5 = ("HS") Q5 = ("Some College") R5 = ("College Grad+")
 putexcel A6 = ("SIPP (8 yrs)")
 putexcel A7 = ("SIPP (18 yrs)")
+* Note that the adjusted estimates come from the next file (11_sipp14_reeatBW_hh60.do
 
 // BW by age 8
 putexcel B6 = (100*(1-notbw60d8))  			, nformat(number_d2) // Total
@@ -463,6 +504,22 @@ putexcel C7 = (100*(1-notbw60_lesshs))  	, nformat(number_d2) // < HS
 putexcel D7 = (100*(1-notbw60_hs))  		, nformat(number_d2) // HS
 putexcel E7 = (100*(1-notbw60_somecol))  	, nformat(number_d2) // Some col
 putexcel F7 = (100*(1-notbw60_univ))  		, nformat(number_d2) // College
+
+
+local columns "G H I J K L M N O P Q R"
+
+local c = 1
+
+foreach re in 1 2 5{
+	local race : word `re' of `raceth'
+	forvalues e=1/4 {
+		local col : word `c' of `columns'
+		local educ : word `e' of `ed'
+		putexcel `col'7 = (100*(1-notbw60_`educ'_`race')), nformat(number_d2)
+		local c = `c' + 1
+	}
+	
+}
 
 * Description of personal and household earnings and their ratio
 putexcel set "$output/Descriptives60.xlsx", sheet(earningsdetail) modify

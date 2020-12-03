@@ -135,20 +135,25 @@ putexcel A6 = " Partner"
 putexcel A7 = "Race/Ethnicity"
 putexcel A8 = " Non-Hispanic White"
 putexcel A9 = " Black"
-putexcel A10 = " Hispanic"
-putexcel A11 = " Asian"
-putexcel A12 = " multi-race"
-putexcel A13 = "Primary Earner (60%)"
+putexcel A10 = " Asian"
+putexcel A11 = " Other"
+putexcel A12 = " Hispanic"
+putexcel A13 = "Education"
+putexcel A14 = "Less than High School"
+putexcel A15 = "Diploma/GED"
+putexcel A16 = "Some College"
+putexcel A17 = "College Grad+"
+putexcel A18 = "Primary Earner (60%)"
 
 
-putexcel B16 = ("mean") D16 = ("mean"), border(bottom)
-putexcel A17 = "age"
-putexcel A18 = "Years since first birth"
-putexcel A19 = "personal earnings"
-putexcel A20 = "household earnings"
-putexcel A21 = "personal to household earnings ratio", border(bottom)
+putexcel B19 = ("mean") D19 = ("mean"), border(bottom)
+putexcel A20 = "age"
+putexcel A21 = "Years since first birth"
+putexcel A22 = "personal earnings"
+putexcel A23 = "household earnings"
+putexcel A24 = "personal to household earnings ratio", border(bottom)
 
-putexcel A23 = "unweighted N (individuals)"
+putexcel A25 = "unweighted N (individuals)"
 // Fill in table for full sample
 
 recode spouse (0=0) (.001/1=1)
@@ -167,7 +172,7 @@ putexcel B6 = `ppartner', nformat(##.#)
 
 ** Full sample
 
-local raceth "white black hispanic asian multi"
+local raceth "white black asian other hispanic"
 
 forvalues r=1/5 {
    local re: word `r' of `raceth'
@@ -178,10 +183,23 @@ forvalues r=1/5 {
    local row = 7+`r'
    putexcel B`row' = `p`re'', nformat(##.#)
 }
+
+local ed "lesshs hs somecol univ"
+
+forvalues e=1/4 {
+   local educ : word `e' of `ed'
+   gen `educ' = educ==`e'
+   mean `educ' [aweight=wpfinwgt] 
+   matrix m`educ' = 100*e(b)
+   local p`educ' = m`educ'[1,1]
+   local row = 14+`e'
+   putexcel B`row' = `p`educ'', nformat(##.#)
+}
+
 mean bw60 [aweight=wpfinwgt] 
 matrix mbw60 = 100*e(b)
 local pbw60 = mbw60[1,1]
-putexcel B13 = `pbw60', nformat(##.#)
+putexcel B18 = `pbw60', nformat(##.#)
 
 local means "age durmom tpearn thearn earnings_ratio"
 
@@ -190,14 +208,14 @@ forvalues m=1/5{
     mean `var' [aweight=wpfinwgt] 
     matrix m`var' = e(b)
     local v`m' = m`var'[1,1]
-    local row = `m'+16
+    local row = `m'+19
     putexcel B`row' = `v`m'', nformat(##.#)
 }
 
 egen	obvsfs 	= nvals(idnum)
 local fs = obvsfs
 
-putexcel B23 = `fs'
+putexcel B25 = `fs'
 
 // keep only observations with data in the current waves
 keep if !missing(monthsobserved)
@@ -241,10 +259,20 @@ forvalues r=1/5 {
    local row = 7+`r'
    putexcel D`row' = `p`re'', nformat(##.#)
 }
+
+forvalues e=1/4 {
+   local educ : word `e' of `ed'
+   mean `educ' [aweight=wpfinwgt] 
+   matrix m`educ' = 100*e(b)
+   local p`educ' = m`educ'[1,1]
+   local row = 14+`e'
+   putexcel D`row' = `p`educ'', nformat(##.#)
+}
+
 mean bw60 [aweight=wpfinwgt] 
 matrix mbw60 = 100*e(b)
 local pbw60 = mbw60[1,1]
-putexcel D13 = `pbw60'
+putexcel D18 = `pbw60'
 
 
 forvalues m=1/5{
@@ -252,10 +280,10 @@ forvalues m=1/5{
     mean `var' [aweight=wpfinwgt] 
     matrix sm`var' = e(b)
     local v`m' = sm`var'[1,1]
-    local row = `m'+16
+    local row = `m'+19
     putexcel D`row' = `v`m'', nformat(##.#)
 }
 
-putexcel D23 = $obvsprev_n
+putexcel D25 = $obvsprev_n
 
 save "$SIPP14keep/bw_transitions.dta", replace

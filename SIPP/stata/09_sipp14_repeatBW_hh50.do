@@ -78,9 +78,9 @@ cap drop		notbw50adj_*
 
 	forvalues d=1/4 {
 		global adj50_`d' = firstbw50_`d'[1,2]
-	forvalues d=5/17 {
-		global adj50_`d' = firstbw50_`d'[1,2] * $discount50
-	}
+		forvalues d=5/17 {
+			global adj50_`d' = firstbw50_`d'[1,2] * $discount50
+		}
 	}
 	
 * Calculate adjusted survival rates --------------------------------------------
