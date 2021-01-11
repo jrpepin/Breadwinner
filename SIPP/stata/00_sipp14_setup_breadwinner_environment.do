@@ -100,3 +100,13 @@ if (_rc) {
 
     exit 199
 }
+
+
+// https://ideas.repec.org/c/boc/bocode/s456409.html
+capture : which cdfplot
+if (_rc) {
+    display as error in smcl `"Please install package {it:cdfplot} from SSC in order to run these do-files;"' _newline ///
+        `"you can do so by clicking this link: {stata "ssc install cdfplot":auto-install cdfplot}"'
+
+    exit 199
+}
