@@ -22,7 +22,7 @@ use "$SIPP14keep/bwstatus.dta", clear
 tab first_wave wave 
 
 // Look at percent breadwinning (50%) by wave and years of motherhood
-table durmom wave, contents(mean bw50) format(%3.2g)
+table durmom wave, statistic(mean bw50) nformat(%3.2g)
 
 * List of variables that should be constants:
 	* notbw50_atbirth first_wave
@@ -125,7 +125,7 @@ reshape long `change_variables' trans_bw50 trans_bw60 bw50L bw60L monthsobserved
 		
 * Create table describing full sample of mothers and analytical sample.
 
-putexcel set "$output/Descriptives60.xlsx", sheet(sample) replace
+putexcel set "$output/Descriptives60.xlsx", sheet(sample) modify
 putexcel A1:D1 = "Characteristics of full sample of mothers and analytical sample", merge border(bottom)
 putexcel B2 = ("All Mothers") D2 = ("Analytical sample"), border(bottom)
 putexcel B3 = ("percent") D3 = ("percent"), border(bottom)
