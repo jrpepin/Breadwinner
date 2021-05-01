@@ -1,4 +1,4 @@
-*-------------------------------------------------------------------------------
+emacs*-------------------------------------------------------------------------------
 * BREADWINNER PROJECT - SIPP14 Component
 * bw_estimates_hh60.do
 * Kelly Raley and Joanna Pepin
@@ -22,6 +22,9 @@ use "$SIPP14keep/bw_transitions.dta", clear
 
 // drop wave 1 because we only know status, not transitions into breadwinning
 drop if wave==1
+
+// make it impossible to be a primary earning mom if not living with children
+replace bw60=0 if minorchildren==0
 
 ********************************************************************************
 * Describe percent breadwinning in the first birth year
