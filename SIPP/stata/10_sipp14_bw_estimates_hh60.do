@@ -122,8 +122,8 @@ forvalues d=1/17 {
 // initialize cumulative measures at birth. The main measure will be cumulative by age 18, but
 // we also create a cumulative measure by age 8 which has the d8 in the name.
 
-gen     	notbw60 			= notbw60_atbirth // evenutally cumulative measure at 18 initialized at birth
-gen		notbw60d8 			= notbw60_atbirth // measure at 8 initialized at birth
+gen     notbw60             = notbw60_atbirth // evenutally cumulative measure at 18 initialized at birth
+gen     notbw60d8           = notbw60_atbirth // measure at 8 initialized at birth
 
 cap drop 	notbw60_*
 cap drop 	notbw60d8_*
@@ -239,19 +239,19 @@ forvalues d=1/7 {
 global per_bw60_atbirth				= round(per_bw60_atbirth		, .02)
 
 // % NEVER BW by time first child is age 18
-global notbw60bydur18			= round(100*(notbw60), .02)
+global notbw60bydur18               = round(100*(notbw60), .02)
 global notbw60bydur18_lesshs		= round(100*(notbw60_lesshs), .02)
-global notbw60bydur18_hs		= round(100*(notbw60_hs), .02)
+global notbw60bydur18_hs            = round(100*(notbw60_hs), .02)
 global notbw60bydur18_somecol		= round(100*(notbw60_somecol), .02)
 global notbw60bydur18_univ	    	= round(100*(notbw60_univ), .02)
 
 // % BW by time first child is age 18
 * Take the inverse of the proportion not breadwinning to get the proportion breadwinning.
 * Multiply by 100 to get a percent.
-global bw60bydur18			= round(100*(1-notbw60)	        , .02)
-global bw60bydur18_lesshs		= round(100*(1-notbw60_lesshs)	, .02)
-global bw60bydur18_hs	     		= round(100*(1-notbw60_hs)	, .02)
-global bw60bydur18_somecol		= round(100*(1-notbw60_somecol)	, .02)
+global bw60bydur18                  = round(100*(1-notbw60)	        , .02)
+global bw60bydur18_lesshs           = round(100*(1-notbw60_lesshs)	, .02)
+global bw60bydur18_hs	     	    = round(100*(1-notbw60_hs)	, .02)
+global bw60bydur18_somecol          = round(100*(1-notbw60_somecol)	, .02)
 global bw60bydur18_univ		    	= round(100*(1-notbw60_univ)	, .02)
 
 global bw60bydur18_lesshs_white		= round(100*(1-notbw60_lesshs_white)	, .02)
@@ -265,14 +265,14 @@ global bw60bydur18_somecol_black	= round(100*(1-notbw60_somecol_black)	, .02)
 global bw60bydur18_univ_black		= round(100*(1-notbw60_univ_black)	, .02)
 
 global bw60bydur18_lesshs_hispanic	= round(100*(1-notbw60_lesshs_hispanic)	, .02)
-global bw60bydur18_hs_hispanic	     	= round(100*(1-notbw60_hs_hispanic)	, .02)
+global bw60bydur18_hs_hispanic      = round(100*(1-notbw60_hs_hispanic)	, .02)
 global bw60bydur18_somecol_hispanic	= round(100*(1-notbw60_somecol_hispanic) , .02)
 global bw60bydur18_univ_hispanic	= round(100*(1-notbw60_univ_hispanic)	, .02)
 
 
 // % NEVER BW by time first child is age 8
-global notbw60d8			= round(100*(notbw60d8)	, .02)
-global notbw60bydur8_lesshs		= round(100*(notbw60_lesshs), .02)
+global notbw60d8                    = round(100*(notbw60d8)	, .02)
+global notbw60bydur8_lesshs         = round(100*(notbw60_lesshs), .02)
 global notbw60bydur8_hs		    	= round(100*(notbw60_hs), .02)
 global notbw60bydur8_somecol		= round(100*(notbw60_somecol), .02)
 global notbw60bydur8_univ	    	= round(100*(notbw60_univ), .02)
@@ -280,46 +280,46 @@ global notbw60bydur8_univ	    	= round(100*(notbw60_univ), .02)
 // % BW by time first child is age 8
 * Take the inverse of the proportion not breadwinning to get the proportion breadwinning.
 * Multiply by 100 to get a percent.
-global notbw60d8			= round(100*(1-notbw60d8), .02)
-global bw60bydurd8_lesshs		= round(100*(1-notbw60d8_lesshs), .02)
-global bw60bydurd8_hs	     		= round(100*(1-notbw60d8_hs), .02)
-global bw60bydurd8_somecol		= round(100*(1-notbw60d8_somecol), .02)
+global notbw60d8                    = round(100*(1-notbw60d8), .02)
+global bw60bydurd8_lesshs           = round(100*(1-notbw60d8_lesshs), .02)
+global bw60bydurd8_hs               = round(100*(1-notbw60d8_hs), .02)
+global bw60bydurd8_somecol          = round(100*(1-notbw60d8_somecol), .02)
 global bw60bydurd8_univ		    	= round(100*(1-notbw60d8_univ), .02)
 
 // Totals (age 18)
-	di	"$per_bw60_atbirth""%"		// 60% bw at 1st year of birth
-	di	"$notbw60bydur18""%"		// % NEVER BW by time first child is age 18
-	di	"$bw60bydur18""%"   		// % BW by time first child is age 18
+	di	"$per_bw60_atbirth""%"		        // 60% bw at 1st year of birth
+	di	"$notbw60bydur18""%"		        // % NEVER BW by time first child is age 18
+	di	"$bw60bydur18""%"   		        // % BW by time first child is age 18
 
 // By education (age 18)
-	di	"$bw60bydur18_lesshs""%"   	// % BW by time first child is age 18
-	di	"$bw60bydur18_hs""%"   		// % BW by time first child is age 18
-	di	"$bw60bydur18_somecol""%"   // % BW by time first child is age 18
-	di	"$bw60bydur18_univ""%"   	// % BW by time first child is age 18
+	di	"$bw60bydur18_lesshs""%"   	        // % BW by time first child is age 18
+	di	"$bw60bydur18_hs""%"   		        // % BW by time first child is age 18
+	di	"$bw60bydur18_somecol""%"           // % BW by time first child is age 18
+	di	"$bw60bydur18_univ""%"   	        // % BW by time first child is age 18
 	
 // by education by race/ethnicity (age 18)
 
 	di	"$bw60bydur18_lesshs_white""%"   	// % BW by time first child is age 18
 	di	"$bw60bydur18_hs_white""%"   		// % BW by time first child is age 18
-	di	"$bw60bydur18_somecol_white""%"   // % BW by time first child is age 18
-	di	"$bw60bydur18_univ_white""%"   	// % BW by time first child is age 18
+	di	"$bw60bydur18_somecol_white""%"     // % BW by time first child is age 18
+	di	"$bw60bydur18_univ_white""%"        // % BW by time first child is age 18
 	
 	di	"$bw60bydur18_lesshs_black""%"   	// % BW by time first child is age 18
 	di	"$bw60bydur18_hs_black""%"   		// % BW by time first child is age 18
-	di	"$bw60bydur18_somecol_black""%"   // % BW by time first child is age 18
-	di	"$bw60bydur18_univ_black""%"   	// % BW by time first child is age 18
+	di	"$bw60bydur18_somecol_black""%"     // % BW by time first child is age 18
+	di	"$bw60bydur18_univ_black""%"        // % BW by time first child is age 18
 
-	di	"$bw60bydur18_lesshs_hispanic""%"   	// % BW by time first child is age 18
-	di	"$bw60bydur18_hs_hispanic""%"   		// % BW by time first child is age 18
-	di	"$bw60bydur18_somecol_hispanic""%"   // % BW by time first child is age 18
-	di	"$bw60bydur18_univ_hispanic""%"   	// % BW by time first child is age 18
+	di	"$bw60bydur18_lesshs_hispanic""%"   // % BW by time first child is age 18
+	di	"$bw60bydur18_hs_hispanic""%"   	// % BW by time first child is age 18
+	di	"$bw60bydur18_somecol_hispanic""%"  // % BW by time first child is age 18
+	di	"$bw60bydur18_univ_hispanic""%"     // % BW by time first child is age 18
 	
 // Totals & by education (age 8)
-	di	"$bw60bydurd8""%"   		// % BW by time first child is age 8
-	di	"$bw60bydurd8_lesshs""%"   	// % BW by time first child is age 8
-	di	"$bw60bydurd8_hs""%"   		// % BW by time first child is age 8
-	di	"$bw60bydurd8_somecol""%"   // % BW by time first child is age 8
-	di	"$bw60bydurd8_univ""%"   	// % BW by time first child is age 8
+	di	"$bw60bydurd8""%"   		        // % BW by time first child is age 8
+	di	"$bw60bydurd8_lesshs""%"            // % BW by time first child is age 8
+	di	"$bw60bydurd8_hs""%"   	            // % BW by time first child is age 8
+	di	"$bw60bydurd8_somecol""%"           // % BW by time first child is age 8
+	di	"$bw60bydurd8_univ""%"   	        // % BW by time first child is age 8
 
 // Create macros of censored bw by duration
 forvalues d=1/17 {
@@ -567,16 +567,16 @@ forvalues r=3/8 {
 }
 
 cdfplot(trim_er) [aweight=wpfinwgt], name(earningsratio, replace) 
-graph export earningsratio.png, name(earningsratio) replace
-putexcel A13 = picture(earningsratio.png)
+graph export $output/earningsratio.png, name(earningsratio) replace
+putexcel A13 = picture($output/earningsratio.png)
 
 /*
 cdfplot(trim_thearn) [aweight=wpfinwgt], name(thearn, replace)
-graph export thearn.png, name(thearn.png) replace
-putexcel R13 = picture(thearn.png)
+graph export $output/thearn.png, name(thearn.png) replace
+putexcel R13 = picture($output/thearn.png)
 
 cdfplot(trim_tpearn) [aweight=wpfinwgt], name(tpearn, replace) 
-graph export tpearn.png, name(tpearn.png) replace
-putexcel H13 = picture(tpearn.png)
+graph export $output/tpearn.png, name(tpearn.png) replace
+putexcel H13 = picture($output/tpearn.png)
 
 
