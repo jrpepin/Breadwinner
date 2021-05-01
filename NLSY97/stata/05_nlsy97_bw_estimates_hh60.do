@@ -24,7 +24,8 @@ di "$S_DATE"
 ** The purpose of this analysis is to describe levels of breadwinning (bw)
 ** by 9 years after first birth. 
 
-* This data used in this file were once created from the do file "02_nlsy97_time_varying".
+* The top part of the script evaluates whether repeat 
+* breadwinning is common
 
 ********************************************************************************
 * Open and prep the data
@@ -33,7 +34,13 @@ clear
 set more off
 
 use 	"NLSY97_bw.dta", clear
-fre year // Make sure the data includes all survey years (1997 - 2017)
+// Make sure the data includes survey years 1998 - 2017
+* note we start in 1998 because sample is limited to women who became
+* mothers during the panel in 01 step.
+egen maxyear = max(year)
+egen minyear = min(year)
+assert maxyear >= 2017
+assert minyear == 1998
 
 ********************************************************************************
 * Create lagged measures of breadwinning
@@ -50,54 +57,10 @@ reshape wide year hhe60, i(PUBID_1997) j(time)
 // before being a mother.
 gen hh60_minus1_0=0
 
-// Create the lagged measures
-
-* lagged one year
+* lagged lag years
 forvalues t=1/9{
-    local s=`t'-1
-    gen hhe60_minus1_`t'=hhe60`s' 
-}
-
-* lagged two years
-forvalues t=2/9{
-    local r=`t'-2
-    gen hhe60_minus2_`t'=hhe60`r' 
-}
-
-*lagged three years
-forvalues t=3/9{
-    local u=`t'-3
-    gen hhe60_minus3_`t'=hhe60`u' 
-}
-
-forvalues t=4/9{
-    local v=`t'-4
-    gen hhe60_minus4_`t'=hhe60`v' 
-}
-
-forvalues t=5/9{
-    local v=`t'-5
-    gen hhe60_minus5_`t'=hhe60`v' 
-}
-
-forvalues t=6/9{
-    local v=`t'-6
-    gen hhe60_minus6_`t'=hhe60`v' 
-}
-
-forvalues t=7/9{
-    local v=`t'-7
-    gen hhe60_minus7_`t'=hhe60`v' 
-}
-
-forvalues t=8/9{
-    local v=`t'-8
-    gen hhe60_minus8_`t'=hhe60`v' 
-}
-
-forvalues t=9/9{
-    local v=`t'-9
-    gen hhe60_minus9_`t'=hhe60`v' 
+	local s=`t'- 1
+	gen hhe60_minus1_`t'=hhe60`s' 
 }
 
 // Create indicators for whether R has been observed as a 
@@ -114,9 +77,7 @@ forvalues t=1/9 {
 	}
 }
 
-reshape long year hhe60 hhe60_minus1_ hhe60_minus2_ hhe60_minus3_ hhe60_minus4_ ///
-             hhe60_minus5_ hhe60_minus6_ hhe60_minus7_ hhe60_minus8_  ///
-			 hhe60_minus9_ prevbreadwon, i(PUBID_1997) j(time)
+reshape long year hhe60 hhe60_minus1_ prevbreadwon, i(PUBID_1997) j(time)
 
 label var prevbreadwon "R breadwon at any prior duration"
 
@@ -179,7 +140,7 @@ matrix peratbirth60 = e(b)
 * breadwinning.
 
 forvalues t = 1/9 {
-	drop if hhe60_minus1_ == 1 
+	drop if hhe60_minus1_ == 1 // can't transition if already bw
 	display "Estimate of (weighted) proportion transitioning into breadwinning at duration `t' without censoring on previous breadwinning"
 	tab hhe60 if time == `t' & !missing(hhe60_minus1_) [fweight=wt1997]
 	* store table in a matrix
@@ -207,7 +168,11 @@ restore
 *INTERPRETATION: The proportion becoming a bw mother is smaller in the this table 
 *than in the first. This suggests that repeat bw does lead to an overestimate of 
 *lifetime breadwinning unless one censors on previous bw. 
-
+********************************************************************************
+*
+*
+*
+*
 ********************************************************************************
 * % of mothers ever previously bw by # years since becoming a bw.
 ********************************************************************************
