@@ -30,7 +30,7 @@ local change_variables 	year monthsobserved nmos_bw50 nmos_bw60 tpearn thearn sp
 			partner	wpfinwgt minorchildren minorbiochildren tceb ///
 			oldest_age start_spartner last_spartner durmom  ///
 			youngest_age anytype2 hh_noearnings bw50 bw60 	///
-			gain_partner lost_partner partial_year raceth   ///
+			gain_partner lost_partner partial_year raceth nmb  ///
 			educ tage ageb1 earnings_ratio
 
 // Create macros for reshape command

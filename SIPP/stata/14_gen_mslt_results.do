@@ -47,7 +47,7 @@ putexcel A24:J24 = "pxy refers to the transition rate from status x at the previ
 ********************************************************************************
 
 local cutoffs "50 60"
-local groups "t w b h e1 e2 e3 e4 we1 we2 we3 we4 be1 be2 be3 be4 he1 he2 he3 he4"
+local groups "t w b h e1 e2 e3 e4 we1 we2 we3 we4 be1 be2 be3 be4 he1 he2 he3 he4 nmb0 nmb1"
 
 foreach c of local cutoffs {
     foreach g of local groups {
@@ -202,6 +202,10 @@ putexcel A22 = "Hispanic - Some College"
 putexcel B22 = matrix(m60he3), nformat(number_d2)
 putexcel A23 = "Hispanic - College Grad"
 putexcel B23 = matrix(m60he4), nformat(number_d2)
+putexcel A24 = "Marital first birth"
+putexcel B24 = matrix(m60nmb0), nformat(number_d2)
+putexcel A25 = "Non-marital first birth"
+putexcel B25 = matrix(m60nmb1), nformat(number_d2)
 
 local Ycolumns B C D
 local Pcolumns G H I

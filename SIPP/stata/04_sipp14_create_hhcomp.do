@@ -41,6 +41,9 @@ gen partner			=1 		if relationship==2 // unmarried partner
 // Identify Type 2 people
 gen numtype2		=1 		if pairtype==2
 
+// Identify adults
+gen adults = 1 if to_age > 17 & !missing(to_age)
+
 ********************************************************************************
 * Create household composition vars
 ********************************************************************************
@@ -48,12 +51,18 @@ gen numtype2		=1 		if pairtype==2
 // Every person gets a 1 to prep for collapse.
 gen hhsize			=1
 
-collapse (count) minorchildren minorbiochildren spouse partner hhsize numtype2 (min) youngest_age=childage (max) oldest_age=childage, by(SSUID PNUM panelmonth)
+collapse (count) minorchildren minorbiochildren spouse partner hhsize numtype2 adults (min) youngest_age=childage (max) oldest_age=childage, by(SSUID PNUM panelmonth)
 
 * this file has one record per person living with PNUM. Need to add add one to hhsize for PNUM
 replace hhsize=hhsize+1
+
+gen no_otheradult=1 if missing(adults) | adults==1
+replace no_otheradult=0 if missing(no_otheradult)
 
 save "$tempdir/hhcomp.dta", replace
 
 sum youngest_age
 sum oldest_age
+sum adults
+
+tab no_otheradult, m

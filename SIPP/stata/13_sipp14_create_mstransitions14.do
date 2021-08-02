@@ -91,6 +91,8 @@ create_mstransitions 50 "keep if raceduc==9" "he1"
 create_mstransitions 50 "keep if raceduc==10" "he2"
 create_mstransitions 50 "keep if raceduc==11" "he3"
 create_mstransitions 50 "keep if raceduc==12" "he4"
+create_mstransitions 50 "keep if nmb==0" "nmb0"
+create_mstransitions 50 "keep if nmb==1" "nmb1"
 
 // Transition rate at the 60% threshold
 create_mstransitions 60 "keep if 1==1" "t"
@@ -113,6 +115,8 @@ create_mstransitions 60 "keep if raceduc==9" "he1"
 create_mstransitions 60 "keep if raceduc==10" "he2"
 create_mstransitions 60 "keep if raceduc==11" "he3"
 create_mstransitions 60 "keep if raceduc==12" "he4"
+create_mstransitions 60 "keep if nmb==0" "nmb0"
+create_mstransitions 60 "keep if nmb==1" "nmb1"
 
 
 * a hack to get the code to work 
