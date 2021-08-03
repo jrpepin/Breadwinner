@@ -123,7 +123,7 @@ replace 	momearn 	=. if momwages ==. | mombiz ==.
 
 cap drop	totinc
 gen			totinc = .
-replace		totinc = CV_INCOME_GROSS_YR 	if CV_INCOME_GROSS_YR_ !=.
+replace		totinc = CV_INCOME_GROSS_YR_ 	if CV_INCOME_GROSS_YR_ !=.
 replace		totinc = CV_INCOME_FAMILY_ 		if CV_INCOME_FAMILY_   !=.
 
 replace		totinc = . 		if totinc		<  0	// Address missing
