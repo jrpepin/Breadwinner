@@ -6,6 +6,10 @@
 * The goal of these files is to create estimates of breadwinning in order to
 * better account for repeat breadwinning using the SIPP
 
+// check version. code written for version 17
+
+version 17
+
 ********************************************************************************
 * A1. ENVIRONMENT
 ********************************************************************************

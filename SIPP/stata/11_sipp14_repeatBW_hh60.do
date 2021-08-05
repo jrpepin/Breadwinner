@@ -43,6 +43,7 @@
 
 local raceth "white black asian other hispanic"
 local ed "lesshs hs somecol univ"
+local nmbst "marital nonmar"
 
 ********************************************************************************
 * Apply the "Repeat BW discount" for years 5 - 17
@@ -55,6 +56,8 @@ gen     	notbw60adj_lesshs 	= (1-prop_bw60_atbirth1)
 gen     	notbw60adj_hs      	= (1-prop_bw60_atbirth2)
 gen     	notbw60adj_somecol 	= (1-prop_bw60_atbirth3)
 gen     	notbw60adj_univ   	= (1-prop_bw60_atbirth4)
+gen     	notbw60adj_marital   	= (1-prop_bw60_atbirth_nmb0)
+gen     	notbw60adj_nonmar   	= (1-prop_bw60_atbirth_nmb1)
 
 foreach re in 1 2 5{
 	local race : word `re' of `raceth'
@@ -68,8 +71,9 @@ foreach re in 1 2 5{
 
 // These stay the same
 forvalues d=1/4 {
-	gen notbw60adj_`d' 		= 1 - firstbw60_`d'[1,2]
-
+ 
+    gen notbw60adj_`d' 	= 1 - firstbw60_`d'[1,2]   
+	
 	// by education
 	forvalues e=1/4{
 		local educ : word `e' of `ed'
@@ -80,6 +84,13 @@ forvalues d=1/4 {
 			gen notbw60adj_`educ'_`race'_`d' = 1-firstbw60`e'_`race'_`d'[1,2]
 		}
 	}
+	
+	// by marital status at first birth
+		forvalues fb=0/1 {
+			local nextword = `fb' + 1
+			local nmb: word `nextword' of `nmbst'
+			gen notbw60adj_`nmb'_`d' = 1 - firstbw60_nmb`fb'_`d'[1,2]
+		}
 }
 	
 
@@ -98,6 +109,12 @@ forvalues d=5/17 {
 			gen notbw60adj_`educ'_`race'_`d' = 1-firstbw60`e'_`race'_`d'[1,2] * $discount60
 		}
 	}	
+	// by marital status at first birth
+		forvalues fb=0/1 {
+			local nextword = `fb' + 1
+			local nmb: word `nextword' of `nmbst'
+			gen notbw60adj_`nmb'_`d' = 1 - firstbw60_nmb`fb'_`d'[1,2]*$discount60
+		}
 }
 
 * Create the total macros (adjusted bw) _---------------------------------------
@@ -126,6 +143,12 @@ cap drop sur_*
 		}
 	}
 		
+	// by marital status at first birth
+		forvalues fb=0/1 {
+			local nextword = `fb' + 1
+			local nmb: word `nextword' of `nmbst'
+			gen sur_`nmb'_0 = notbw60adj_`nmb'
+		}
 
 forvalues d=1/17 {
 	local lag = `d'-1
@@ -139,8 +162,13 @@ forvalues d=1/17 {
 			local race : word `re' of `raceth'
 			gen sur_`educ'_`race'_`d' 	= (sur_`educ'_`race'_`lag') 	* (notbw60adj_`educ'_`race'_`d')
 		}
-	
 	}
+	// by marital status at first birth
+		forvalues fb=0/1 {
+			local nextword = `fb' + 1
+			local nmb: word `nextword' of `nmbst'
+			gen sur_`nmb'_`d' = (sur_`nmb'_`lag') *  (notbw60adj_`nmb'_`d')
+		}
 }
 
 ********************************************************************************
@@ -172,5 +200,15 @@ foreach re in 1 2 5{
 		local c = `c' + 1
 	}
 }
+
+local columns "S T"
+
+forvalues fb = 0/1 {
+	local nextword = `fb' + 1
+	local nmb: word `nextword' of `nmbst'
+	local col: word `nextword' of `columns'
+	putexcel `col'8 = (100*(1-sur_`nmb'_17)), nformat(number_d2)
+}
+
 	
 			

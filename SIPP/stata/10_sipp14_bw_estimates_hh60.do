@@ -29,7 +29,7 @@ replace bw60=0 if minorchildren==0
 ********************************************************************************
 * Describe percent breadwinning in the first birth year
 ********************************************************************************
-* durmom == 0 is when mother had first birth in reference year
+* durmom == 0 is when mother had first birth // in reference year
 
 // The percent breadwinning (60% threhold) in the first year. (~25%)
 	sum bw60 if durmom	==0 [aweight=wpfinwgt] // Breadwinning in the year of the birth
@@ -48,6 +48,7 @@ forvalues e=1/4 {
 
 local raceth "white black asian other hispanic"
 local ed "lesshs hs somecol univ"
+local nmbst "marital nonmar"
 
 // by race by education
 
@@ -59,6 +60,12 @@ foreach re in 1 2 5 {
 	}
 }
 
+// by marital status at first birth
+forvalues fb=0/1 {
+	sum bw60 if durmom	==0 & nmb==`fb' [aweight=wpfinwgt] 
+	gen prop_bw60_atbirth_nmb`fb'=`r(mean)'
+}
+
 // Capture sample size
 tab durmom if inlist(trans_bw60,0,1), matcell(Ns60)
 forvalues e=1/4 {
@@ -66,6 +73,10 @@ forvalues e=1/4 {
 	foreach re in 1 2 5 {
 		tab durmom if inlist(trans_bw60,0,1) & educ==`e' & raceth==`re', matcell(Ns60e`e're`re')
 	}
+}
+
+forvalues fb = 0/1 {
+    tab durmom if inlist(trans_bw60,0,1) & nmb==`fb', matcell(Ns60_nmb`fb')
 }
 
 ********************************************************************************
@@ -97,12 +108,17 @@ replace durmom=durmom-1
 drop if durmom < 0
 
 *******************************************************************************
-* Estimating duration-specific transition rates overall and by education and by education
+* Estimating duration-specific transition rates overall, by marital status at 
+* first birth and by education and by race by education
 *******************************************************************************
 
 forvalues d=1/17 {
 	mean durmom trans_bw60 [aweight=wpfinwgt] if trans_bw60 !=2 & durmom==`d'
 	matrix firstbw60_`d' = e(b)
+	forvalues fb=0/1 {
+		mean durmom trans_bw60 [aweight=wpfinwgt] if trans_bw60 !=2 & durmom==`d' & nmb==`fb'
+		matrix firstbw60_nmb`fb'_`d' = e(b)
+	}
 	forvalues e=1/4 {
 		mean durmom trans_bw60 [aweight=wpfinwgt] if trans_bw60 !=2 & durmom==`d' & educ==`e'
 		matrix firstbw60`e'_`d' = e(b)
@@ -126,12 +142,18 @@ forvalues d=1/17 {
 // we also create a cumulative measure by age 8 which has the d8 in the name.
 
 gen     notbw60             = notbw60_atbirth // evenutally cumulative measure at 18 initialized at birth
-gen     notbw60d8           = notbw60_atbirth // measure at 8 initialized at birth
+gen     notbw60d8           = notbw60_atbirth // measure at 8, here initializing at birth
 
 cap drop 	notbw60_*
 cap drop 	notbw60d8_*
 
 // initializing measures for sub population by education and by education by race/ethnicity
+
+forvalues fb = 0/1 {
+    local nextword = `fb' + 1
+	local nmb: word `nextword' of `nmbst'
+	gen notbw60_`nmb' = (1-prop_bw60_atbirth_nmb`fb')
+}
 
 forvalues e=1/4{
 	local edname:word `e' of `ed'
@@ -156,10 +178,24 @@ forvalues d=1/17 {
   replace 	notbw60	= notbw60*notbw60_`d'
 }
 
+// by marital status at first birth
 // By Education (18 years)
 // by education by race (18 years)
 
 forvalues d=1/17 {
+    
+	// by marital status at first birth
+	
+	forvalues fb = 0/1 {
+    local nextword = `fb' + 1
+	local nmb: word `nextword' of `nmbst'
+		
+		// estimate the proportion transitioning into breadwinning at this duration
+		gen notbw60_`nmb'_`d' = 1 - firstbw60_nmb`fb'_`d'[1,2]
+		
+		// decrement the proportion never breadwinning by the probability of transitioning into bw at this duration
+		replace notbw60_`nmb' = notbw60_`nmb'*notbw60_`nmb'_`d'
+	}
 	
 	// by education 
 	forvalues e=1/4{
@@ -237,7 +273,6 @@ forvalues d=1/7 {
 *  is handled in the next file (11_)
 **
 
-
 // 60% BW at 1st year of birth
 global per_bw60_atbirth				= round(per_bw60_atbirth		, .02)
 
@@ -247,6 +282,8 @@ global notbw60bydur18_lesshs		= round(100*(notbw60_lesshs), .02)
 global notbw60bydur18_hs            = round(100*(notbw60_hs), .02)
 global notbw60bydur18_somecol		= round(100*(notbw60_somecol), .02)
 global notbw60bydur18_univ	    	= round(100*(notbw60_univ), .02)
+global notby60bydur18_nmb0			= round(100*(notbw60_marital), .02)
+global notby60bydur18_nmb1			= round(100*(notbw60_nonmar), .02)
 
 // % BW by time first child is age 18
 * Take the inverse of the proportion not breadwinning to get the proportion breadwinning.
@@ -256,6 +293,9 @@ global bw60bydur18_lesshs           = round(100*(1-notbw60_lesshs)	, .02)
 global bw60bydur18_hs	     	    = round(100*(1-notbw60_hs)	, .02)
 global bw60bydur18_somecol          = round(100*(1-notbw60_somecol)	, .02)
 global bw60bydur18_univ		    	= round(100*(1-notbw60_univ)	, .02)
+global bw60bydur18_marital			= round(100*(1-notbw60_marital), .02)
+global bw60bydur18_nonmar			= round(100*(1-notbw60_nonmar), .02)
+
 
 global bw60bydur18_lesshs_white		= round(100*(1-notbw60_lesshs_white)	, .02)
 global bw60bydur18_hs_white	     	= round(100*(1-notbw60_hs_white)	, .02)
@@ -293,36 +333,41 @@ global bw60bydurd8_univ		    	= round(100*(1-notbw60d8_univ), .02)
 	di	"$per_bw60_atbirth""%"		        // 60% bw at 1st year of birth
 	di	"$notbw60bydur18""%"		        // % NEVER BW by time first child is age 18
 	di	"$bw60bydur18""%"   		        // % BW by time first child is age 18
+	
+// by marital status at first birth
+	
+	di "$bw60bydur18_marital"
+	di "$bw60bydur18_nonmarital"
 
 // By education (age 18)
-	di	"$bw60bydur18_lesshs""%"   	        // % BW by time first child is age 18
-	di	"$bw60bydur18_hs""%"   		        // % BW by time first child is age 18
-	di	"$bw60bydur18_somecol""%"           // % BW by time first child is age 18
-	di	"$bw60bydur18_univ""%"   	        // % BW by time first child is age 18
+	di	"$bw60bydur18_lesshs""%"   	        
+	di	"$bw60bydur18_hs""%"   		        
+	di	"$bw60bydur18_somecol""%"           
+	di	"$bw60bydur18_univ""%"   	        
 	
 // by education by race/ethnicity (age 18)
 
-	di	"$bw60bydur18_lesshs_white""%"   	// % BW by time first child is age 18
-	di	"$bw60bydur18_hs_white""%"   		// % BW by time first child is age 18
-	di	"$bw60bydur18_somecol_white""%"     // % BW by time first child is age 18
-	di	"$bw60bydur18_univ_white""%"        // % BW by time first child is age 18
+	di	"$bw60bydur18_lesshs_white""%"   	
+	di	"$bw60bydur18_hs_white""%"   		
+	di	"$bw60bydur18_somecol_white""%"     
+	di	"$bw60bydur18_univ_white""%"        
 	
-	di	"$bw60bydur18_lesshs_black""%"   	// % BW by time first child is age 18
-	di	"$bw60bydur18_hs_black""%"   		// % BW by time first child is age 18
-	di	"$bw60bydur18_somecol_black""%"     // % BW by time first child is age 18
-	di	"$bw60bydur18_univ_black""%"        // % BW by time first child is age 18
+	di	"$bw60bydur18_lesshs_black""%"   	
+	di	"$bw60bydur18_hs_black""%"   		
+	di	"$bw60bydur18_somecol_black""%"     
+	di	"$bw60bydur18_univ_black""%"        
 
-	di	"$bw60bydur18_lesshs_hispanic""%"   // % BW by time first child is age 18
-	di	"$bw60bydur18_hs_hispanic""%"   	// % BW by time first child is age 18
-	di	"$bw60bydur18_somecol_hispanic""%"  // % BW by time first child is age 18
-	di	"$bw60bydur18_univ_hispanic""%"     // % BW by time first child is age 18
+	di	"$bw60bydur18_lesshs_hispanic""%"   
+	di	"$bw60bydur18_hs_hispanic""%"   	
+	di	"$bw60bydur18_somecol_hispanic""%"  
+	di	"$bw60bydur18_univ_hispanic""%"     
 	
 // Totals & by education (age 8)
 	di	"$bw60bydurd8""%"   		        // % BW by time first child is age 8
-	di	"$bw60bydurd8_lesshs""%"            // % BW by time first child is age 8
-	di	"$bw60bydurd8_hs""%"   	            // % BW by time first child is age 8
-	di	"$bw60bydurd8_somecol""%"           // % BW by time first child is age 8
-	di	"$bw60bydurd8_univ""%"   	        // % BW by time first child is age 8
+	di	"$bw60bydurd8_lesshs""%"            
+	di	"$bw60bydurd8_hs""%"   	            
+	di	"$bw60bydurd8_somecol""%"           
+	di	"$bw60bydurd8_univ""%"   	        
 
 // Create macros of censored bw by duration
 forvalues d=1/17 {
@@ -348,6 +393,7 @@ foreach row in 15 36 57 {
 	local nrow = `row'+1 
 	putexcel D`row':G`row' = ("Education"), merge border(bottom)
 	putexcel H`row':S`row' = ("Education by race"), merge border(bottom)
+	putexcel T`row':U`row' = ("marital status at first birth"), merge border(bottom)
 	putexcel B`nrow' = ("Total"), border(bottom)  
 	putexcel D`nrow'=("< HS"), border(bottom) 
 	putexcel E`nrow'=("HS"), border(bottom) 
@@ -365,7 +411,8 @@ foreach row in 15 36 57 {
 	putexcel Q`nrow'=("Hispanic HS"), border(bottom) 
 	putexcel R`nrow'=("Hispanic Some college"), border(bottom) 
 	putexcel S`nrow'=("Hispanic College Grad"), border(bottom)
-	putexcel U`nrow'=("Unweighted N"), border(bottom)
+	putexcel T`nrow'=("Marital"), border(bottom)
+	putexcel U`nrow'=("Non-Marital"), border(bottom)
 }
 
 putexcel A37 = "Proportion not primary earning"
@@ -376,6 +423,7 @@ local columns "D E F G "
 local white_cols "H I J K" 
 local black_cols "L M N O "
 local hispanic_cols "P Q R S" 
+local nmb_cols "T U"
 
 putexcel A17 = 0
 forvalues d=1/17 {
@@ -403,6 +451,15 @@ foreach re in 1 2 5{
 	}
 }
 
+// by marital status at first birth
+forvalues fb=0/1 {
+    local nextword = `fb' + 1
+	local nmb: word `nextword' of `nmbst'
+	local col : word `nextword' of `nmb_cols'
+	putexcel `col'17 = prop_bw60_atbirth_nmb`fb', nformat(number_d2)
+}
+	
+	
 // fill in rest of table with duration-specific transition rates into breadwinning at each duration in motherhood
 // total
 forvalues d=1/17 {
@@ -421,6 +478,13 @@ forvalues d=1/17 {
 			local col : word `e' of ``racename'_cols'
 			putexcel `col'`row' = matrix(firstbw60`e'_`racename'_`d'[1,2]), nformat(number_d2)
 		}
+	}
+// by marital status at first birth
+	forvalues fb=0/1 {
+		local nextword = `fb' + 1
+		local nmb: word `nextword' of `nmbst'
+		local col : word `nextword' of `nmb_cols'
+		putexcel `col'`row' = matrix(firstbw60_nmb`fb'_`d'[1,2]), nformat(number_d2)
 	}
 
 }
@@ -449,13 +513,15 @@ forvalues d=1/18 {
 	putexcel Q`row' = matrix(Ns60e2re5[`d',1])
 	putexcel R`row' = matrix(Ns60e3re5[`d',1])
 	putexcel S`row' = matrix(Ns60e4re5[`d',1])
+	putexcel T`row' = matrix(Ns60_nmb0[`d',1])
+	putexcel U`row' = matrix(Ns60_nmb1[`d',1])
 	
 }
 
 // Doing a lifetable analysis in the excel spreadsheet to make the calculation visible
 
 * calculate the proportion NOT transitioning into primary earning at this duration
-foreach col in B D E F G H I J K L M N  P Q R S {
+foreach col in B D E F G H I J K L M N  P Q R S T U {
 	forvalues d=1/18 {
 		local row = `d'+37
 		local source_row = `d'+16
@@ -467,7 +533,7 @@ foreach col in B D E F G H I J K L M N  P Q R S {
 * lifetable cumulates the probability never breadwinning by the produc of survival rates across 
 * previous durations. The inital value is simply the survival rate at duration 0 (birth)
 
-foreach col in B D E F G H I J K L M N  P Q R S {
+foreach col in B D E F G H I J K L M N  P Q R S T U {
 	putexcel `col'59 = formula(+`col'38) // start with initial levels of primary earning
 	forvalues d=2/18 {
 		local row = `d'+58
@@ -481,7 +547,7 @@ foreach col in B D E F G H I J K L M N  P Q R S {
 
 // Create Shell
 putexcel set "$output/Descriptives60.xlsx", sheet(proportions) modify
-putexcel A3:Q3 = "Estimated percentage primary earner by 8 and 18 years, unadjusted and adjusted for repeat breadwinning", merge border(bottom)
+putexcel A3:T3 = "Estimated percentage primary earner by 8 and 18 years, unadjusted and adjusted for repeat breadwinning", merge border(bottom)
 putexcel C4:F4 = "By Education", merge border(bottom)
 putexcel B5 = ("Total") C5= ("< HS") D5 = ("HS") E5 = ("Some College") F5 = ("College Grad+")
 putexcel G4:J4 = "White by education", merge border(bottom)
@@ -489,25 +555,26 @@ putexcel G5= ("< HS") H5 = ("HS") I5 = ("Some College") J5 = ("College Grad+")
 putexcel K4:N4 = "Black by education", merge border(bottom)
 putexcel K5= ("< HS") L5 = ("HS") M5 = ("Some College") N5 = ("College Grad+")
 putexcel O4:R4 = "Hispanic by education", merge border(bottom)
-putexcel O5= ("< HS") P5 = ("HS") Q5 = ("Some College") R5 = ("College Grad+")
-putexcel A6 = ("SIPP (8 yrs)")
+putexcel O5 = ("< HS") P5 = ("HS") Q5 = ("Some College") R5 = ("College Grad+")
+putexcel S4:T4 = "Marital status at First Birth", merge border(bottom)
+putexcel S5 = ("Marital") T5 = ("Non-Marital")
+putexcel A8 = ("SIPP (8 yrs)")
 putexcel A7 = ("SIPP (18 yrs)")
 * Note that the adjusted estimates come from the next file (11_sipp14_reeatBW_hh60.do
 
 // BW by age 8
-putexcel B6 = (100*(1-notbw60d8))  			, nformat(number_d2) // Total
-putexcel C6 = (100*(1-notbw60d8_lesshs)) 	, nformat(number_d2) // < HS
-putexcel D6 = (100*(1-notbw60d8_hs))     	, nformat(number_d2) // HS
-putexcel E6 = (100*(1-notbw60d8_somecol))	, nformat(number_d2) // Some col
-putexcel F6 = (100*(1-notbw60d8_univ))   	, nformat(number_d2) // College
+putexcel B7 = (100*(1-notbw60d8))  			, nformat(number_d2) // Total
+putexcel C7 = (100*(1-notbw60d8_lesshs)) 	, nformat(number_d2) // < HS
+putexcel D7 = (100*(1-notbw60d8_hs))     	, nformat(number_d2) // HS
+putexcel E7 = (100*(1-notbw60d8_somecol))	, nformat(number_d2) // Some col
+putexcel F7 = (100*(1-notbw60d8_univ))   	, nformat(number_d2) // College
 
 // BW by age 18
-putexcel B7 = (100*(1-notbw60))  			, nformat(number_d2) // Total
-putexcel C7 = (100*(1-notbw60_lesshs))  	, nformat(number_d2) // < HS
-putexcel D7 = (100*(1-notbw60_hs))  		, nformat(number_d2) // HS
-putexcel E7 = (100*(1-notbw60_somecol))  	, nformat(number_d2) // Some col
-putexcel F7 = (100*(1-notbw60_univ))  		, nformat(number_d2) // College
-
+putexcel B8 = (100*(1-notbw60))  			, nformat(number_d2) // Total
+putexcel C8 = (100*(1-notbw60_lesshs))  	, nformat(number_d2) // < HS
+putexcel D8 = (100*(1-notbw60_hs))  		, nformat(number_d2) // HS
+putexcel E8 = (100*(1-notbw60_somecol))  	, nformat(number_d2) // Some col
+putexcel F8 = (100*(1-notbw60_univ))  		, nformat(number_d2) // College
 
 local columns "G H I J K L M N O P Q R"
 
@@ -521,7 +588,15 @@ foreach re in 1 2 5{
 		putexcel `col'7 = (100*(1-notbw60_`educ'_`race')), nformat(number_d2)
 		local c = `c' + 1
 	}
-	
+}
+
+local columns "S T"
+
+forvalues fb = 0/1 {
+	local nextword = `fb' + 1
+	local nmb: word `nextword' of `nmbst'
+	local col: word `nextword' of `columns'
+	putexcel `col'7 = (100*(1-notbw60_`nmb')), nformat(number_d2)
 }
 
 * Description of personal and household earnings and their ratio

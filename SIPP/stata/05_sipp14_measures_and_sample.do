@@ -17,15 +17,15 @@ di "$S_DATE"
 * Read in each original, compressed, data set and extract the key variables
 ********************************************************************************
 clear
-set maxvar 5500 //set the maxvar if not starting from a master project file.
+*set maxvar 5500 //set the maxvar if not starting from a master project file.
 
    forvalues w=1/4{
       use "$SIPP2014/pu2014w`w'_compressed.dta"
-      keep	swave 		monthcode		ssuid 		pnum 						/// /* TECHNICAL   */	
+      keep	swave 		monthcode		ssuid 		pnum 					/// /* TECHNICAL   */	
 		shhadid 	eresidenceid 	wpfinwgt								///
-		tpearn 		apearn 			tjb?_msum 	ajb?_msum 					/// /* FINANCIAL   */
-		erace 		esex 			tage 		eeduc 		tceb 	tcbyr_* 		///
-		tyrfirstmarr 	eorigin 										///	/* DEMOGRAPHIC */
+		tpearn 		apearn 								 					/// /* FINANCIAL   */
+		erace 		esex 			tage 		eeduc 		tceb 	tcbyr_* ///
+		tyrfirstmarr 	eorigin												///	/* DEMOGRAPHIC */
             			
 	  gen year = 2012+`w'
       save "$tempdir/sipp14tpearn`w'", replace
@@ -55,7 +55,7 @@ clear
 	rename ssuid SSUID
 	rename eresidenceid ERESIDENCEID
 	rename pnum PNUM
-
+	
 // Create a measure of total household earnings per month (with allocated data)
 	* Note that this approach omits the earnings of type 2 people.
     egen thearn = total(tpearn), 	by(SSUID ERESIDENCEID swave monthcode)
@@ -95,7 +95,7 @@ clear
    gen ageb1=yrfirstbirth-mybirthyear
 
 // create a indicator for whether the first birth is non-marital
-gen nmb= yrfirstbirth < tyrfirstmarr
+gen nmb= yrfirstbirth <= tyrfirstmarr
 replace nmb = 1 if !missing(yrfirstbirth) & missing(tyrfirstmarr)
 
 tab nmb

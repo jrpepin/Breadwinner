@@ -31,7 +31,7 @@ table durmom wave, statistic(mean bw50) nformat(%3.2g)
 local change_variables 	year monthsobserved nmos_bw50 nmos_bw60 tpearn thearn earnings_ratio spouse partner	///
 						wpfinwgt minorchildren minorbiochildren tceb oldest_age start_spartner 	///
 						last_spartner durmom youngest_age anytype2 hh_noearnings bw50 bw60 		///
-						gain_partner lost_partner partial_year raceth educ tage ageb1
+						gain_partner lost_partner partial_year raceth educ tage ageb1 nmb maxadults minadults
 						
 // Create macros for reshape command
 local i_vars "SSUID PNUM"
@@ -201,7 +201,7 @@ matrix mbw60 = 100*e(b)
 local pbw60 = mbw60[1,1]
 putexcel B18 = `pbw60', nformat(##.#)
 
-local means "age durmom tpearn thearn earnings_ratio"
+local means "tage durmom tpearn thearn earnings_ratio"
 
 forvalues m=1/5{
     local var: word `m' of `means'

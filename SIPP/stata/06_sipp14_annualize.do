@@ -55,8 +55,8 @@ collapse 	(count) monthsobserved=one  nmos_bw50=mbw50 nmos_bw60=mbw60 		///
 			(sum) 	tpearn thearn 												///
 			(mean) 	spouse partner numtype2 wpfinwgt 							///
 			(max) 	minorchildren minorbiochildren raceth educ tceb oldest_age nmb	///
-					start_spartner last_spartner tage ageb1						///
-			(min) 	durmom youngest_age first_wave,								///
+					start_spartner last_spartner tage ageb1	maxadults=adults					///
+			(min) 	durmom youngest_age first_wave minadults=adults,								///
 			by(SSUID PNUM year)
 			
 // Fix Type 2 people identifier

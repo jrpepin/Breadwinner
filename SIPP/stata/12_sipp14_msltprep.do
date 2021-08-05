@@ -25,14 +25,22 @@ drop if durmom > 18
 * List of variables that should be constants:
 	* per_bw50_atbirth notbw50_atbirth pper_bw60_atbirth notbw50_atbirth first_wave
 
+	// Indicator for whether mother lives with no other adults
+
+gen adult_others= minadults==0
+replace adult_others=0 if minadults==1 & tage < 18 // there's one adult in the hh and it's not the mother.
+	
 // List of variables that change over time
 local change_variables 	year monthsobserved nmos_bw50 nmos_bw60 tpearn thearn spouse ///
 			partner	wpfinwgt minorchildren minorbiochildren tceb ///
 			oldest_age start_spartner last_spartner durmom  ///
 			youngest_age anytype2 hh_noearnings bw50 bw60 	///
 			gain_partner lost_partner partial_year raceth nmb  ///
-			educ tage ageb1 earnings_ratio
+			educ tage ageb1 earnings_ratio minadults maxadults ///
+			adult_others
 
+
+			
 // Create macros for reshape command
 local i_vars "SSUID PNUM"
 local j_vars "wave"
@@ -47,11 +55,13 @@ reshape wide `change_variables', i(`i_vars') j(`j_vars')
 
 gen bw50L1=. // in wave 1 we have no measure of breadwinning in previous wave
 gen bw60L1=. 
+gen minadultsL1=.
 
     forvalues w=2/4{
        local v					=`w'-1
        gen bw50L`w'				=bw50`v' 
        gen bw60L`w'				=bw60`v' 
+	   gen minadultsL`w'		=minadults`v'
 	   gen monthsobservedL`w'	=monthsobserved`v'
 	   gen minorbiochildrenL`w'	=minorbiochildren`v'
     }
@@ -59,7 +69,7 @@ gen bw60L1=.
 ********************************************************************************
 * Reshape data to back to long format
 ********************************************************************************
-reshape long `change_variables' trans_bw50 trans_bw60 bw50L bw60L monthsobservedL minorbiochildrenL, i(`i_vars') j(`j_vars')
+reshape long `change_variables' trans_bw50 trans_bw60 bw50L bw60L minadultsL monthsobservedL minorbiochildrenL, i(`i_vars') j(`j_vars')
 
 //* delete observations created by reshape
 keep if !missing(monthsobserved)
@@ -76,6 +86,12 @@ gen mbw50=bw50+2
 gen mbw60=bw60+2
 gen mbw50L=bw50L+2
 gen mbw60L=bw60L+2
+
+* finally, add one if mother spent some time in the year with no (other) adults
+replace mbw50=4 if mbw50==3 & adult_others==0 
+replace mbw60=4 if mbw60==3 & adult_others==0
+replace mbw50L=4 if mbw60L==3 & adult_others==0 
+replace mbw60L=4 if mbw60L==3 & adult_others==0
 
 tab bw50L, m
 
@@ -106,7 +122,8 @@ replace raceduc=educ+8 if raceth==5
 #delimit ;
 label define bwstat 1 "not living with children or first child > 18"
                     2 "non-breadwinning mother"
-                    3 "breadwinning mother" ; 		
+                    3 "breadwinning mother other adults"
+					4 "breadwinning mother sometimes alone"; 		
 # delimit cr
 
 label values mbw50 bwstat

@@ -37,8 +37,10 @@ program define create_mstransitions
    egen den=total(weight), by(durmom mbw`cutoff'L)
 
    keep trans den mbw`cutoff'L mbw`cutoff' durmom
+   
+   tab mbw`cutoff'L mbw`cutoff'
  
-   collapse (max) trans den, by(durmom mbw`cutoff'L mbw`cutoff')
+   collapse (max) trans den, by(durmom mbw`cutoff'L mbw`cutoff') 
 
    * create rates
  
@@ -49,13 +51,26 @@ program define create_mstransitions
    egen combo=concat(mbw`cutoff'L mbw`cutoff')
 
    destring combo, replace
-
+   
    format combo %-2.0f
  
    drop mbw`cutoff'L mbw`cutoff'
 
    reshape wide p  , i(durmom) j(combo)
 
+   local allcombos "p11 p12 p13 p14 p21 p22 p23 p24 p31 p32 p33 p34 p41 p42 p43 p44"
+      
+   foreach var in `allcombos' {
+       capture confirm variable `var', exact
+	   if !_rc {
+	    display "`var' exists"
+	   }
+	   else {
+	    display "`var' does not exist"
+		gen `var'=0
+	   }
+   }
+   
    foreach var of varlist _all{
 	replace `var'=0 if missing(`var')
    }
@@ -117,13 +132,6 @@ create_mstransitions 60 "keep if raceduc==11" "he3"
 create_mstransitions 60 "keep if raceduc==12" "he4"
 create_mstransitions 60 "keep if nmb==0" "nmb0"
 create_mstransitions 60 "keep if nmb==1" "nmb1"
-
-
-* a hack to get the code to work 
-use "$SIPP14keep/transrates60be1.dta", clear
-
-gen p31=0 if age < 18
-replace p31=1 if age == 18
 
 save "$SIPP14keep/transrates60be1.dta", replace
 

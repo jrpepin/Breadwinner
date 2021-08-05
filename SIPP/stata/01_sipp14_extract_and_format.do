@@ -32,7 +32,8 @@ forvalues wave=1/4 {
 			tftotinc 		thtotinc  																	/// /* FINANCIAL */
 			tst_intv  		ems  			eorigin  		erace  		esex  			tage   			/// /* DEMOGRAPHIC */
 			eeduc  			rged 			renroll  		eedgrade  	eedgrep  		rfoodr  		///
-			rfoods  		rhpov 			rhpovt2 		thincpov  	thincpovt2  
+			rfoods  		rhpov 			rhpovt2 		thincpov  	thincpovt2  			
+			
 	
 // Make the person number identifier numeric
 		 * destring pnum, replace /// Already numeric
