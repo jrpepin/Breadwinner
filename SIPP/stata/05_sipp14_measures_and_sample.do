@@ -95,7 +95,7 @@ clear
    gen ageb1=yrfirstbirth-mybirthyear
 
 // create a indicator for whether the first birth is non-marital
-gen nmb= yrfirstbirth <= tyrfirstmarr
+gen nmb= yrfirstbirth < tyrfirstmarr
 replace nmb = 1 if !missing(yrfirstbirth) & missing(tyrfirstmarr)
 
 tab nmb

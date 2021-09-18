@@ -87,14 +87,14 @@ version 17
 
 * 50% threshold ----------------------------------------------------------------
 // Breadwinning estimates at the 50% threshold
-	log using "$logdir/bw_estimates_hh50.log", replace
-	do "$SIPP2014_code/08_sipp14_bw_estimates_hh50.do"
-	log close
+*	log using "$logdir/bw_estimates_hh50.log", replace
+*	do "$SIPP2014_code/08_sipp14_bw_estimates_hh50.do"
+*	log close
 
 // ADJUSTED Breadwinning estimates at the 50% threshold
-	log using "$logdir/repeatBW_hh50.log", replace
-	do "$SIPP2014_code/09_sipp14_repeatBW_hh50.do"
-	log close
+*	log using "$logdir/repeatBW_hh50.log", replace
+*	do "$SIPP2014_code/09_sipp14_repeatBW_hh50.do"
+*	log close
 
 * 60% threshold ----------------------------------------------------------------
 // Breadwinning estimates at the 60% threshold
@@ -105,6 +105,11 @@ version 17
 // ADJUSTED Breadwinning estimates at the 60% threshold
 	log using "$logdir/repeatBW_hh60.log", replace
 	do "$SIPP2014_code/11_sipp14_repeatBW_hh60.do"
+	log close
+
+// Allternative (conservative) ADJUSTED Breadwinning estimates at the 60% threshold
+	log using "$logdir/repeatBW_hh60.log", replace
+	do "$SIPP2014_code/11b_sipp14_repeatBW_hh60.do"
 	log close
 	
 ********************************************************************************
