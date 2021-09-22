@@ -122,7 +122,7 @@ reshape long `change_variables' trans_bw50 trans_bw60 bw50L bw60L monthsobserved
 		display as error "The sample size is different than annualize."
 		exit
 		}
-		
+
 * Create table describing full sample of mothers and analytical sample.
 
 putexcel set "$output/Descriptives60.xlsx", sheet(sample) modify
@@ -200,6 +200,8 @@ mean bw60 [aweight=wpfinwgt]
 matrix mbw60 = 100*e(b)
 local pbw60 = mbw60[1,1]
 putexcel B18 = `pbw60', nformat(##.#)
+
+replace earnings_ratio=1 if earnings_ratio > 1
 
 local means "tage durmom tpearn thearn earnings_ratio"
 
