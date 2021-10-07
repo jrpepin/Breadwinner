@@ -201,7 +201,14 @@ matrix mbw60 = 100*e(b)
 local pbw60 = mbw60[1,1]
 putexcel B18 = `pbw60', nformat(##.#)
 
+sum tpearn, detail
+
+sum tpearn [aweight=wpfinwgt]
+
 replace earnings_ratio=1 if earnings_ratio > 1
+replace tpearn=0 if tpearn < 0
+
+sum thearn [aweight=wpfinwgt]
 
 local means "tage durmom tpearn thearn earnings_ratio"
 
