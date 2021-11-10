@@ -25,9 +25,10 @@ putexcel A4 = ("Age")
 local columns "B C D E F G H I J K L M N O P Q"
 forvalues a=1/4{
 	forvalues b=1/4{
-		local c=(`a'-1)*3+`b'
+		local c=(`a'-1)*4+`b'
 		local col: word `c' of `columns'
 		putexcel `col'4 = "p`a'`b'"
+		display "col is `col' and pxy is p`a'`b'"
 	}
 }
 
@@ -39,7 +40,7 @@ use "$SIPP14keep/transrates60t.dta"
 export excel using "$output/Descriptives60.xlsx", sheet("StatusbyDuration") sheetmodify cell(A5)
 
 // add note
-putexcel A24:J24 = "pxy refers to the transition rate from status x at the previous duration to status y at this duration 1 = not living with children, 2 = living with children, not primary earner 3 = primary earning mother with other adults 4 = primary earning mother sometimes no adult others", merge
+putexcel A24:Q24 = "pxy refers to the transition rate from status x at the previous duration to status y at this duration 1 = not living with children, 2 = living with children, not primary earner 3 = primary earning mother with other adults 4 = primary earning mother sometimes no adult others", merge
 
 
 ********************************************************************************

@@ -37,7 +37,7 @@ local change_variables 	year monthsobserved nmos_bw50 nmos_bw60 tpearn thearn sp
 			youngest_age anytype2 hh_noearnings bw50 bw60 	///
 			gain_partner lost_partner partial_year raceth nmb  ///
 			educ tage ageb1 earnings_ratio minadults maxadults ///
-			adult_others
+			adult_others 
 
 
 			
@@ -56,6 +56,7 @@ reshape wide `change_variables', i(`i_vars') j(`j_vars')
 gen bw50L1=. // in wave 1 we have no measure of breadwinning in previous wave
 gen bw60L1=. 
 gen minadultsL1=.
+gen adult_othersL1=.
 
     forvalues w=2/4{
        local v					=`w'-1
@@ -64,12 +65,13 @@ gen minadultsL1=.
 	   gen minadultsL`w'		=minadults`v'
 	   gen monthsobservedL`w'	=monthsobserved`v'
 	   gen minorbiochildrenL`w'	=minorbiochildren`v'
+	   gen adult_othersL`w' = adult_others`v'
     }
 
 ********************************************************************************
 * Reshape data to back to long format
 ********************************************************************************
-reshape long `change_variables' trans_bw50 trans_bw60 bw50L bw60L minadultsL monthsobservedL minorbiochildrenL, i(`i_vars') j(`j_vars')
+reshape long `change_variables' trans_bw50 trans_bw60 bw50L bw60L minadultsL monthsobservedL minorbiochildrenL adult_othersL, i(`i_vars') j(`j_vars')
 
 //* delete observations created by reshape
 keep if !missing(monthsobserved)
@@ -90,8 +92,8 @@ gen mbw60L=bw60L+2
 * finally, add one if mother spent some time in the year with no (other) adults
 replace mbw50=4 if mbw50==3 & adult_others==0 
 replace mbw60=4 if mbw60==3 & adult_others==0
-replace mbw50L=4 if mbw60L==3 & adult_others==0 
-replace mbw60L=4 if mbw60L==3 & adult_others==0
+replace mbw50L=4 if mbw60L==3 & adult_othersL==0 
+replace mbw60L=4 if mbw60L==3 & adult_othersL==0
 
 tab bw50L, m
 
@@ -123,7 +125,7 @@ replace raceduc=educ+8 if raceth==5
 label define bwstat 1 "not living with children or first child > 18"
                     2 "non-breadwinning mother"
                     3 "breadwinning mother other adults"
-					4 "breadwinning mother sometimes alone"; 		
+		    4 "breadwinning mother sometimes alone"; 		
 # delimit cr
 
 label values mbw50 bwstat
