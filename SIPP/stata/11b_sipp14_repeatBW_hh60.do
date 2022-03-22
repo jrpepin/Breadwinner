@@ -46,6 +46,12 @@ gen     	notbw60adjb_univ   	= (1-prop_bw60_atbirth4)
 gen     	notbw60adjb_marital   	= (1-prop_bw60_atbirth_nmb0)
 gen     	notbw60adjb_nonmar   	= (1-prop_bw60_atbirth_nmb1)
 
+gen     	notbw60adjb_white 		= (1-prop_bw60_atbirth_r1)
+gen     	notbw60adjb_black      	= (1-prop_bw60_atbirth_r2)
+gen     	notbw60adjb_asian 		= (1-prop_bw60_atbirth_r3)
+gen     	notbw60adjb_other   	= (1-prop_bw60_atbirth_r4)
+gen     	notbw60adjb_hispanic   	= (1-prop_bw60_atbirth_r5)
+
 foreach re in 1 2 5{
 	local race : word `re' of `raceth'
 	gen     	notbw60adjb_lesshs_`race' 	= (1-prop_bw60_atbirth1_`race')
@@ -70,6 +76,12 @@ forvalues d=1/4 {
 			local race: word `re' of `raceth'
 			gen notbw60adjb_`educ'_`race'_`d' = 1-firstbw60`e'_`race'_`d'[1,2]
 		}
+	}
+	
+	// by race
+	forvalues r=1/5{
+		local race : word `r' of `raceth'
+		gen notbw60adjb_`race'_`d' 	= 1 - firstbw60_r`r'_`d'[1,2]
 	}
 	
 	// by marital status at first birth
@@ -106,6 +118,11 @@ forvalues d=5/17 {
 			gen notbw60adjb_`educ'_`race'_`d' = 1-firstbw60`e'_`race'_`d'[1,2] * (`disco60_`d'')
 		}
 	}	
+	// by race
+	forvalues r=1/5{
+		local race : word `r' of `raceth'
+		gen notbw60adjb_`race'_`d' 	= 1 - firstbw60_r`r'_`d'[1,2] * (`disco60_`d'')
+	}
 	// by marital status at first birth
 		forvalues fb=0/1 {
 			local nextword = `fb' + 1
@@ -139,6 +156,12 @@ cap drop sur_*
 			gen  sur_`educ'_`race'_0  	=  	notbw60adjb_`educ'_`race'
 		}
 	}
+	
+	// by race
+	forvalues r=1/5{
+		local race : word `r' of `raceth'
+		gen  sur_`race'_0  	=  	notbw60adjb_`race'
+	}
 		
 	// by marital status at first birth
 		forvalues fb=0/1 {
@@ -160,6 +183,13 @@ forvalues d=1/17 {
 			gen sur_`educ'_`race'_`d' 	= (sur_`educ'_`race'_`lag') 	* (notbw60adjb_`educ'_`race'_`d')
 		}
 	}
+	
+	// by race
+	forvalues r=1/5{
+		local race : word `r' of `raceth'
+		gen sur_`race'_`d' 	= (sur_`race'_`lag') 	* (notbw60adjb_`race'_`d')
+	}
+	
 	// by marital status at first birth
 		forvalues fb=0/1 {
 			local nextword = `fb' + 1
@@ -183,6 +213,11 @@ putexcel C9 = (100*(1-sur_lesshs_17))  		, nformat(number_d2) // < HS
 putexcel D9 = (100*(1-sur_hs_17))  		, nformat(number_d2) // HS
 putexcel E9 = (100*(1-sur_somecol_17))  	, nformat(number_d2) // Some col
 putexcel F9 = (100*(1-sur_univ_17))  		, nformat(number_d2) // College
+putexcel U9 = (100*(1-sur_white_17))  		, nformat(number_d2) // White
+putexcel V9 = (100*(1-sur_black_17))  		, nformat(number_d2) // Black
+putexcel W9 = (100*(1-sur_asian_17))  		, nformat(number_d2) // Asian
+putexcel X9 = (100*(1-sur_other_17))  		, nformat(number_d2) // Other
+putexcel Y9 = (100*(1-sur_hispanic_17))  	, nformat(number_d2) // Hispanic
 
 local columns "G H I J K L M N O P Q R"
 

@@ -46,6 +46,13 @@ forvalues e=1/4 {
 	gen prop_bw60_atbirth`e'=`r(mean)'
 }
 
+// by race
+forvalues r=1/5 {
+	sum bw60 if durmom	==0 & raceth==`r' [aweight=wpfinwgt] 
+	gen prop_bw60_atbirth_r`r'=`r(mean)'
+}
+
+
 local raceth "white black asian other hispanic"
 local ed "lesshs hs somecol univ"
 local nmbst "marital nonmar"
@@ -123,6 +130,10 @@ forvalues d=1/17 {
 		mean durmom trans_bw60 [aweight=wpfinwgt] if trans_bw60 !=2 & durmom==`d' & educ==`e'
 		matrix firstbw60`e'_`d' = e(b)
 	}
+	forvalues r=1/5 {
+		mean durmom trans_bw60 [aweight=wpfinwgt] if trans_bw60 !=2 & durmom==`d' & raceth==`r'
+		matrix firstbw60_r`r'_`d' = e(b)
+	}
 	foreach re in 1 2 5 {
 		local race: word `re' of `raceth'
 		forvalues e=1/4 {
@@ -165,6 +176,12 @@ forvalues e=1/4{
 		gen notbw60_`edname'_`race' = (1-prop_bw60_atbirth`e'_`race')
 		gen notbw60d8_`edname'_`race' = (1-prop_bw60_atbirth`e'_`race')
 	}
+}
+
+forvalues r=1/5{
+	local racename:word `r' of `raceth'
+	gen notbw60_`racename' = (1-prop_bw60_atbirth_r`r')
+	gen notbw60d8_`racename' = (1-prop_bw60_atbirth_r`r')
 }
 
 // now estimating cumulative proportion ever breadwinning 
@@ -223,6 +240,17 @@ forvalues d=1/17 {
 		tab notbw60_`edname'_`race'
 		}
 	}
+	
+	// by race
+	forvalues r=1/5{
+		local racename:word `r' of `raceth'
+		
+		// estimate the proportion transitioning into breadwinning at this duration
+		gen notbw60_`racename'_`d' = 1-firstbw60_r`r'_`d'[1,2]
+		
+		// decrement the proportion never breadwinning by the probability of transitioning into bw at this duration
+		replace notbw60_`racename' = notbw60_`racename'*notbw60_`racename'_`d'
+	}
 
 }
 
@@ -264,6 +292,20 @@ forvalues d=1/7 {
 		}
 	}
 
+	// by race
+	forvalues r=1/5{
+		local racename:word `r' of `raceth'
+
+		// be sure nothing hanging around from previous runs
+		cap drop	notd8bw60_`racename'_*
+		
+		// estimate the proportion transitioning into breadwinning at this duration
+		gen notbw60d8_`racename'_`d' = 1-firstbw60_r`r'_`d'[1,2]
+		
+		// decrement the proportion never breadwinning by the probability of transitioning into bw at this duration
+		replace notbw60d8_`racename' = notbw60d8_`racename'*notbw60d8_`racename'_`d'
+	}
+
 }
 
 *******************************************************************************
@@ -284,6 +326,11 @@ global notbw60bydur18_somecol		= round(100*(notbw60_somecol), .02)
 global notbw60bydur18_univ	    	= round(100*(notbw60_univ), .02)
 global notby60bydur18_nmb0			= round(100*(notbw60_marital), .02)
 global notby60bydur18_nmb1			= round(100*(notbw60_nonmar), .02)
+global notbw60bydur18_white			= round(100*(notbw60_white), .02)
+global notbw60bydur18_black         = round(100*(notbw60_black), .02)
+global notbw60bydur18_asian			= round(100*(notbw60_asian), .02)
+global notbw60bydur18_other	    	= round(100*(notbw60_other), .02)
+global notby60bydur18_hispanic		= round(100*(notbw60_hispanic), .02)
 
 // % BW by time first child is age 18
 * Take the inverse of the proportion not breadwinning to get the proportion breadwinning.
@@ -295,6 +342,11 @@ global bw60bydur18_somecol          = round(100*(1-notbw60_somecol)	, .02)
 global bw60bydur18_univ		    	= round(100*(1-notbw60_univ)	, .02)
 global bw60bydur18_marital			= round(100*(1-notbw60_marital), .02)
 global bw60bydur18_nonmar			= round(100*(1-notbw60_nonmar), .02)
+global bw60bydur18_white     	    = round(100*(1-notbw60_white)	, .02)
+global bw60bydur18_black	        = round(100*(1-notbw60_black)	, .02)
+global bw60bydur18_asian	    	= round(100*(1-notbw60_asian)	, .02)
+global bw60bydur18_other			= round(100*(1-notbw60_other), .02)
+global bw60bydur18_hispanic			= round(100*(1-notbw60_hispanic), .02)
 
 
 global bw60bydur18_lesshs_white		= round(100*(1-notbw60_lesshs_white)	, .02)
@@ -319,6 +371,11 @@ global notbw60bydur8_lesshs         = round(100*(notbw60_lesshs), .02)
 global notbw60bydur8_hs		    	= round(100*(notbw60_hs), .02)
 global notbw60bydur8_somecol		= round(100*(notbw60_somecol), .02)
 global notbw60bydur8_univ	    	= round(100*(notbw60_univ), .02)
+global notbw60bydur8_white      	= round(100*(notbw60_white), .02)
+global notbw60bydur8_black	    	= round(100*(notbw60_black), .02)
+global notbw60bydur8_asian			= round(100*(notbw60_asian), .02)
+global notbw60bydur8_other	    	= round(100*(notbw60_other), .02)
+global notbw60bydur8_hispanic       = round(100*(notbw60_hispanic), .02)
 
 // % BW by time first child is age 8
 * Take the inverse of the proportion not breadwinning to get the proportion breadwinning.
@@ -328,6 +385,12 @@ global bw60bydurd8_lesshs           = round(100*(1-notbw60d8_lesshs), .02)
 global bw60bydurd8_hs               = round(100*(1-notbw60d8_hs), .02)
 global bw60bydurd8_somecol          = round(100*(1-notbw60d8_somecol), .02)
 global bw60bydurd8_univ		    	= round(100*(1-notbw60d8_univ), .02)
+
+global bw60bydurd8_white   		    = round(100*(1-notbw60d8_white), .02)
+global bw60bydurd8_black            = round(100*(1-notbw60d8_black), .02)
+global bw60bydurd8_asian        	= round(100*(1-notbw60d8_asian), .02)
+global bw60bydurd8_other		    = round(100*(1-notbw60d8_other), .02)
+global bw60bydurd8_hispanic		    = round(100*(1-notbw60d8_hispanic), .02)
 
 // Totals (age 18)
 	di	"$per_bw60_atbirth""%"		        // 60% bw at 1st year of birth
@@ -558,23 +621,39 @@ putexcel O4:R4 = "Hispanic by education", merge border(bottom)
 putexcel O5 = ("< HS") P5 = ("HS") Q5 = ("Some College") R5 = ("College Grad+")
 putexcel S4:T4 = "Marital status at First Birth", merge border(bottom)
 putexcel S5 = ("Marital") T5 = ("Non-Marital")
-putexcel A8 = ("SIPP (8 yrs)")
+putexcel U4:Y4 = "Race", merge border(bottom)
+putexcel U5 = ("White") V5 = ("Black") W5 = ("Asian") X5 = ("Other") Y5 = ("Hispanic")
+putexcel A6 = ("SIPP (8 yrs)")
 putexcel A7 = ("SIPP (18 yrs)")
 * Note that the adjusted estimates come from the next file (11_sipp14_reeatBW_hh60.do
 
-// BW by age 8
-putexcel B7 = (100*(1-notbw60d8))  			, nformat(number_d2) // Total
-putexcel C7 = (100*(1-notbw60d8_lesshs)) 	, nformat(number_d2) // < HS
-putexcel D7 = (100*(1-notbw60d8_hs))     	, nformat(number_d2) // HS
-putexcel E7 = (100*(1-notbw60d8_somecol))	, nformat(number_d2) // Some col
-putexcel F7 = (100*(1-notbw60d8_univ))   	, nformat(number_d2) // College
+// BW by age 8 - education
+putexcel B6 = (100*(1-notbw60d8))  			, nformat(number_d2) // Total
+putexcel C6 = (100*(1-notbw60d8_lesshs)) 	, nformat(number_d2) // < HS
+putexcel D6 = (100*(1-notbw60d8_hs))     	, nformat(number_d2) // HS
+putexcel E6 = (100*(1-notbw60d8_somecol))	, nformat(number_d2) // Some col
+putexcel F6 = (100*(1-notbw60d8_univ))   	, nformat(number_d2) // College
 
 // BW by age 18
-putexcel B8 = (100*(1-notbw60))  			, nformat(number_d2) // Total
-putexcel C8 = (100*(1-notbw60_lesshs))  	, nformat(number_d2) // < HS
-putexcel D8 = (100*(1-notbw60_hs))  		, nformat(number_d2) // HS
-putexcel E8 = (100*(1-notbw60_somecol))  	, nformat(number_d2) // Some col
-putexcel F8 = (100*(1-notbw60_univ))  		, nformat(number_d2) // College
+putexcel B7 = (100*(1-notbw60))  			, nformat(number_d2) // Total
+putexcel C7 = (100*(1-notbw60_lesshs))  	, nformat(number_d2) // < HS
+putexcel D7 = (100*(1-notbw60_hs))  		, nformat(number_d2) // HS
+putexcel E7 = (100*(1-notbw60_somecol))  	, nformat(number_d2) // Some col
+putexcel F7 = (100*(1-notbw60_univ))  		, nformat(number_d2) // College
+
+// BW by age 8 - race
+putexcel U6 = (100*(1-notbw60d8_white)) 	, nformat(number_d2) // White
+putexcel V6 = (100*(1-notbw60d8_black)) 	, nformat(number_d2) // Black
+putexcel W6 = (100*(1-notbw60d8_asian))     , nformat(number_d2) // Asian
+putexcel X6 = (100*(1-notbw60d8_other))		, nformat(number_d2) // Other
+putexcel Y6 = (100*(1-notbw60d8_hispanic))  , nformat(number_d2) // Hispanic
+
+// BW by age 18
+putexcel U7 = (100*(1-notbw60_white))  		, nformat(number_d2) // White
+putexcel V7 = (100*(1-notbw60_black))  		, nformat(number_d2) // Black
+putexcel W7 = (100*(1-notbw60_asian))  		, nformat(number_d2) // Asian
+putexcel X7 = (100*(1-notbw60_other))  		, nformat(number_d2) // Other
+putexcel Y7 = (100*(1-notbw60_hispanic))  	, nformat(number_d2) // Hispanic
 
 local columns "G H I J K L M N O P Q R"
 
@@ -645,8 +724,8 @@ forvalues r=3/8 {
 }
 
 cdfplot(trim_er) [aweight=wpfinwgt], name(earningsratio, replace) 
-graph export $output/earningsratio.png, name(earningsratio) replace
-putexcel A13 = picture($output/earningsratio.png)
+graph export "$output/earningsratio.png", name(earningsratio) replace
+putexcel A13 = picture("$output/earningsratio.png")
 
 /*
 cdfplot(trim_thearn) [aweight=wpfinwgt], name(thearn, replace)
